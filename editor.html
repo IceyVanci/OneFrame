@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OneFrame - 编辑器</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: #0a0a0a;
+  color: #eee;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.editor-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* 主预览区 */
+.preview-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #16213e;
+  padding: 40px;
+  padding-right: 120px;
+}
+
+.frame-wrapper {
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+}
+
+.frame-wrapper img {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.frame-wrapper .photo-footer {
+  background: #fff;
+  height: 60px;
+}
+
+/* 右侧浮动图标按钮 */
+.float-actions {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+}
+
+.float-btn {
+  width: 72px;
+  height: 72px;
+  background: rgba(17, 17, 17, 0.9);
+  border: 1px solid #333;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #888;
+}
+
+.float-btn:hover {
+  background: rgba(104, 187, 255, 0.15);
+  border-color: #68bbff;
+  color: #68bbff;
+  transform: scale(1.05);
+}
+
+.float-btn i {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.float-btn span {
+  font-size: 10px;
+}
+
+/* 编辑面板 */
+.edit-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  background: #111;
+  border-left: 1px solid #222;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.edit-panel.visible {
+  transform: translateX(0);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #222;
+  position: sticky;
+  top: 0;
+  background: #111;
+  z-index: 1;
+}
+
+.panel-close {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 16px;
+}
+
+.panel-close:hover {
+  border-color: #68bbff;
+  color: #68bbff;
+}
+
+.panel-title {
+  color: #eee;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* 编辑分区 */
+.edit-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid #222;
+}
+
+.edit-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  color: #68bbff;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title i {
+  font-size: 14px;
+}
+
+.control-group {
+  margin-bottom: 16px;
+}
+
+.control-group:last-child {
+  margin-bottom: 0;
+}
+
+.control-group label {
+  display: block;
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.control-group input[type="color"] {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.control-group input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 4px;
+}
+
+.control-group input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #222;
+  appearance: none;
+  outline: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #68bbff;
+  cursor: pointer;
+}
+
+.control-group input[type="text"] {
+  width: 100%;
+  height: 40px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #eee;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.control-group input[type="text"]:focus {
+  outline: none;
+  border-color: #68bbff;
+}
+
+.control-group select {
+  width: 100%;
+  height: 40px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #eee;
+  padding: 0 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.control-group select:focus {
+  outline: none;
+  border-color: #68bbff;
+}
+
+.value-display {
+  color: #68bbff;
+  font-size: 12px;
+  float: right;
+}
+
+.switch-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.switch {
+  width: 44px;
+  height: 24px;
+  background: #333;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.switch.active {
+  background: #68bbff;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+}
+
+.switch.active::after {
+  transform: translateX(20px);
+}
+
+/* 导出按钮 */
+.panel-footer {
+  padding: 20px 24px;
+  position: sticky;
+  bottom: 0;
+  background: #111;
+  border-top: 1px solid #222;
+}
+
+.btn-primary {
+  width: 100%;
+  background: #68bbff;
+  color: #0a0a0a;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #8fcfff;
+}
+
+/* 滚动条 */
+.edit-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.edit-panel::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+  </style>
+</head>
+<body>
+  <div class="editor-view">
+    <!-- 主预览区 -->
+    <div class="preview-area">
+      <div class="frame-wrapper" id="frameWrapper">
+        <img id="userImage" src="examples/A.jpg" alt="用户图片">
+        <div class="photo-footer" id="photoFooter"></div>
+      </div>
+    </div>
+
+    <!-- 右侧浮动图标按钮 -->
+    <div class="float-actions">
+      <button class="float-btn" id="btnTemplate" title="换个模板">
+        <i class="fas fa-th-large"></i>
+        <span>换个模板</span>
+      </button>
+      <button class="float-btn" id="btnReselect" title="重选照片">
+        <i class="fas fa-image"></i>
+        <span>重选照片</span>
+      </button>
+      <button class="float-btn" id="btnEdit" title="编辑">
+        <i class="fas fa-sliders-h"></i>
+        <span>编辑</span>
+      </button>
+      <button class="float-btn" id="btnSave" title="保存">
+        <i class="fas fa-save"></i>
+        <span>保存</span>
+      </button>
+    </div>
+
+    <!-- 编辑面板 -->
+    <div class="edit-panel" id="editPanel">
+      <div class="panel-header">
+        <button class="panel-close" id="btnClosePanel">←</button>
+        <span class="panel-title">图片设置</span>
+      </div>
+
+      <!-- 比例设置 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-crop"></i> 比例</div>
+        <div class="control-group">
+          <label>输出比例</label>
+          <select id="aspectRatio">
+            <option value="original">保持原比例</option>
+            <option value="1:1">1:1</option>
+            <option value="4:3">4:3</option>
+            <option value="3:2">3:2</option>
+            <option value="16:9">16:9</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 边框设置 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-border-all"></i> 边框</div>
+        <div class="control-group">
+          <label>边框颜色</label>
+          <input type="color" id="borderColor" value="#ffffff">
+        </div>
+        <div class="control-group">
+          <label>边框高度 <span class="value-display" id="borderHeightLabel">12%</span></label>
+          <input type="range" id="borderHeight" min="5" max="30" value="12">
+        </div>
+      </div>
+
+      <!-- Logo 设置 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-camera"></i> Logo</div>
+        <div class="control-group">
+          <div class="switch-group">
+            <label>显示相机 Logo</label>
+            <div class="switch active" id="switchLogo"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Logo 位置</label>
+          <select id="logoPosition">
+            <option value="left">左下角</option>
+            <option value="right">右下角</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 设备型号 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-mobile-alt"></i> 设备型号</div>
+        <div class="control-group">
+          <div class="switch-group">
+            <label>显示设备型号</label>
+            <div class="switch active" id="switchModel"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>自定义型号（留空使用EXIF）</label>
+          <input type="text" id="customModel" placeholder="如: Canon EOS R5">
+        </div>
+      </div>
+
+      <!-- 拍摄参数 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-tachometer-alt"></i> 拍摄参数</div>
+        <div class="control-group">
+          <div class="switch-group">
+            <label>显示拍摄参数</label>
+            <div class="switch active" id="switchParams"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>显示内容</label>
+          <select id="paramsDisplay">
+            <option value="full">完整参数（焦距/光圈/快门/ISO）</option>
+            <option value="simple">仅光圈+快门</option>
+            <option value="custom">自定义</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 时间设置 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-clock"></i> 时间</div>
+        <div class="control-group">
+          <div class="switch-group">
+            <label>显示拍摄时间</label>
+            <div class="switch active" id="switchTime"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>时间格式</label>
+          <select id="timeFormat">
+            <option value="full">2024-01-15 14:30</option>
+            <option value="date">2024-01-15</option>
+            <option value="custom">自定义</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 署名设置 -->
+      <div class="edit-section">
+        <div class="section-title"><i class="fas fa-pen"></i> 署名</div>
+        <div class="control-group">
+          <div class="switch-group">
+            <label>显示署名</label>
+            <div class="switch" id="switchSignature"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>署名文字</label>
+          <input type="text" id="signatureText" placeholder="如: Photo by John">
+        </div>
+      </div>
+
+      <!-- 导出按钮 -->
+      <div class="panel-footer">
+        <button class="btn-primary" id="btnExport">导出图片</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const borderColor = document.getElementById('borderColor');
+    const borderHeight = document.getElementById('borderHeight');
+    const borderHeightLabel = document.getElementById('borderHeightLabel');
+    const photoFooter = document.getElementById('photoFooter');
+    const userImage = document.getElementById('userImage');
+    const editPanel = document.getElementById('editPanel');
+    const btnEdit = document.getElementById('btnEdit');
+    const btnTemplate = document.getElementById('btnTemplate');
+    const btnReselect = document.getElementById('btnReselect');
+    const btnSave = document.getElementById('btnSave');
+
+    function updateBorder() {
+      photoFooter.style.backgroundColor = borderColor.value;
+      const shortSide = Math.min(userImage.clientWidth, userImage.clientHeight);
+      const height = Math.round(shortSide * (borderHeight.value / 100));
+      photoFooter.style.height = `${height}px`;
+      borderHeightLabel.textContent = `${borderHeight.value}%`;
+    }
+
+    borderColor.addEventListener('input', updateBorder);
+    borderHeight.addEventListener('input', updateBorder);
+    userImage.addEventListener('load', updateBorder);
+    if (userImage.complete) updateBorder();
+
+    // 换个模板 - 返回主页
+    btnTemplate.addEventListener('click', () => {
+      location.href = 'home.html';
+    });
+
+    // 重选照片
+    btnReselect.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        if (e.target.files[0]) {
+          userImage.src = URL.createObjectURL(e.target.files[0]);
+        }
+      };
+      input.click();
+    });
+
+    // 编辑 - 切换编辑面板
+    btnEdit.addEventListener('click', () => {
+      editPanel.classList.toggle('visible');
+    });
+
+    // 关闭编辑面板按钮
+    document.getElementById('btnClosePanel').addEventListener('click', () => {
+      editPanel.classList.remove('visible');
+    });
+
+    // 保存
+    btnSave.addEventListener('click', () => {
+      if (window.electronAPI) {
+        window.electronAPI.saveImage('oneframe-output.jpg').then(path => {
+          if (path) alert('保存到: ' + path);
+        });
+      } else {
+        alert('保存功能仅在 Electron 环境下可用');
+      }
+    });
+
+    // 导出按钮
+    document.getElementById('btnExport').addEventListener('click', () => {
+      btnSave.click();
+    });
+
+    // Switch 切换
+    document.querySelectorAll('.switch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>

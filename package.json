@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "electron-store": "^8.1.0",
+    "exifreader": "^4.14.1",
     "piexifjs": "^1.0.6"
   },
   "build": {
@@ -39,7 +40,15 @@
     "files": [
       "src/**/*",
       "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "src/renderer/logos/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/renderer/logos",
+        "to": "logos",
+        "filter": ["**/*"]
+      }
     ]
   }
 }

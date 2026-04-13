@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OneFrame</title>
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: #0a0a0a;
+  color: #eee;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px;
+}
+
+/* 顶部标题栏 */
+.app-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-title {
+  font-size: 36px;
+  color: #68bbff;
+  margin-bottom: 8px;
+}
+
+.app-subtitle {
+  font-size: 16px;
+  color: #888;
+}
+
+/* 样式图片墙 */
+.style-gallery {
+  flex: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-title {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 20px;
+}
+
+.style-card {
+  background: #16213e;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.style-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: #68bbff;
+}
+
+.style-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.style-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.style-preview {
+  padding: 20px;
+  background: #0a0a0a;
+}
+
+.frame-container {
+  max-width: 200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.frame-container img {
+  width: 100%;
+  display: block;
+}
+
+.photo-footer {
+  background: #fff;
+  width: 100%;
+  position: relative;
+}
+
+/* 样式B: 黑色边框 */
+.frame-container.style-b .photo-footer {
+  background: #000;
+}
+
+/* 即将推出占位 */
+.coming-soon {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 14px;
+}
+
+.style-info {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.style-name {
+  color: #eee;
+  font-weight: 500;
+}
+
+.style-tag {
+  color: #68bbff;
+  font-size: 12px;
+  background: rgba(104, 187, 255, 0.15);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 底部提示 */
+.app-footer {
+  text-align: center;
+  padding: 30px 20px;
+  color: #555;
+}
+
+.footer-hint {
+  font-size: 14px;
+}
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 顶部标题栏 -->
+    <header class="app-header">
+      <h1 class="app-title">🎨 OneFrame</h1>
+      <p class="app-subtitle">为照片添加精美边框</p>
+    </header>
+
+    <!-- 边框样式图片墙 -->
+    <main class="style-gallery">
+      <h2 class="section-title">选择边框样式</h2>
+      
+      <div class="style-grid">
+        <!-- 样式卡片 1: 白色下边框 -->
+        <div class="style-card" onclick="location.href='editor.html'">
+          <div class="style-preview">
+            <div class="frame-container">
+              <img src="examples/A.jpg" alt="示例图片">
+              <div class="photo-footer" style="height: 24px;"></div>
+            </div>
+          </div>
+          <div class="style-info">
+            <span class="style-name">白色下边框</span>
+            <span class="style-tag">Type A</span>
+          </div>
+        </div>
+
+        <!-- 样式卡片 2: 黑色下边框 -->
+        <div class="style-card" onclick="location.href='editor.html'">
+          <div class="style-preview">
+            <div class="frame-container style-b">
+              <img src="examples/B.jpg" alt="示例图片">
+              <div class="photo-footer" style="height: 24px;"></div>
+            </div>
+          </div>
+          <div class="style-info">
+            <span class="style-name">黑色下边框</span>
+            <span class="style-tag">Type B</span>
+          </div>
+        </div>
+
+        <!-- 更多样式卡片可以在这里添加 -->
+        <div class="style-card disabled">
+          <div class="style-preview">
+            <div class="coming-soon">即将推出</div>
+          </div>
+          <div class="style-info">
+            <span class="style-name">更多样式</span>
+            <span class="style-tag">开发中</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部操作区 -->
+    <footer class="app-footer">
+      <p class="footer-hint">💡 点击样式卡片，然后选择要处理的图片</p>
+    </footer>
+  </div>
+</body>
+</html>

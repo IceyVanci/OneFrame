@@ -7,6 +7,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 保存图片
   saveImage: (defaultName) => ipcRenderer.invoke('save-image', defaultName),
   
-  // 截图功能（后续扩展）
-  captureScreenshot: (options) => ipcRenderer.invoke('capture-screenshot', options)
+  // 保存 Blob 数据
+  saveBlob: (buffer, filePath) => ipcRenderer.invoke('save-blob', { buffer, filePath }),
+  
+  // 读取文件为 ArrayBuffer（用于 EXIF 读取）
+  readFileAsArrayBuffer: (filePath) => ipcRenderer.invoke('read-file-as-arraybuffer', filePath),
+  
+  // 在主进程读取 EXIF
+  readExif: (filePath) => ipcRenderer.invoke('read-exif', filePath),
+  
+  // 读取 logo SVG
+  getLogoSvg: (logoName) => ipcRenderer.invoke('get-logo-svg', logoName)
 });
