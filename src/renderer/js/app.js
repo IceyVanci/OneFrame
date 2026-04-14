@@ -1,6 +1,6 @@
 // OneFrame 主程序
-import { getExif, formatDateTime } from './exif.js';
-import { getMakeLogoSvg, getModelName } from './logo-utils.js';
+import { getExif, formatDateTime, getFocalLength } from './exif.js';
+import { getMakeLogoSvg, getModelName, logoSvgMap, getAllLogos, getLogoFilename, getAutoLogoFilename, getMakeName, getMakeLogo, getMakeLogoPath } from './logo-utils.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const borderColor = document.getElementById('borderColor');
   const borderHeight = document.getElementById('borderHeight');
   const borderHeightLabel = document.getElementById('borderHeightLabel');
-  const logoSelect = document.getElementById('logoSelect');
+  const logoGrid = document.getElementById('logoGrid');
   const logoPreview = document.getElementById('logoPreview');
   const customModel = document.getElementById('customModel');
   const fNumber = document.getElementById('fNumber');
@@ -35,6 +35,81 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateTime = document.getElementById('dateTime');
 
   let currentStyle = null;
+  let selectedLogo = null;
+
+  // 初始化 Logo 网格（使用 <img> 显示 .svg 文件）
+  async function initLogoGrid() {
+    let logos = getAllLogos();
+    
+    // 尝试从主进程获取 logo 列表（动态读取文件夹）
+    if (window.electronAPI) {
+      try {
+        const serverLogos = await window.electronAPI.getLogos();
+        if (serverLogos && serverLogos.length > 0) {
+          logos = serverLogos;
+          console.log('Loaded logos from server:', logos.length);
+        }
+      } catch (e) {
+        console.warn('Failed to load logos from server:', e);
+      }
+    }
+    
+    logoGrid.innerHTML = '';
+    logos.forEach(name => {
+      const item = document.createElement('div');
+      item.className = 'logo-grid-item';
+      item.dataset.logo = name;
+      
+      // 创建 <img> 元素加载 .svg 文件
+      const img = document.createElement('img');
+      img.alt = name;
+      img.loading = 'lazy';
+      
+      // 尝试加载 logo
+      loadLogoImage(name, img);
+      
+      item.appendChild(img);
+      item.addEventListener('click', () => selectLogo(name));
+      logoGrid.appendChild(item);
+    });
+  }
+
+  // 加载 Logo 图片（使用相对路径加载 src/renderer/logos/*.svg）
+  async function loadLogoImage(name, imgElement) {
+    try {
+      imgElement.src = `logos/${getLogoFilename(name)}`;
+    } catch (e) {
+      console.warn('Failed to load logo image:', name, e);
+    }
+  }
+
+  // 选择 Logo
+  function selectLogo(name) {
+    selectedLogo = name;
+    // 更新选中状态
+    document.querySelectorAll('.logo-grid-item').forEach(item => {
+      item.classList.toggle('selected', item.dataset.logo === name);
+    });
+    // 更新预览 - 使用 <img> 显示
+    if (name) {
+      const previewImg = document.createElement('img');
+      previewImg.alt = name;
+      previewImg.style.maxWidth = '100%';
+      previewImg.style.maxHeight = '100%';
+      previewImg.style.objectFit = 'contain';
+      
+      // 加载预览图片
+      loadLogoImage(name, previewImg);
+      
+      logoPreview.innerHTML = '';
+      logoPreview.appendChild(previewImg);
+    } else {
+      logoPreview.innerHTML = '';
+    }
+    
+    // 更新边框内容预览
+    updateBorderContent();
+  }
 
   // 加载图片并读取EXIF
   async function loadImageWithExif(file) {
@@ -81,29 +156,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateExifDisplay() {
     if (!currentExif) return;
 
-    // Logo
-    const logoSvg = getMakeLogoSvg(currentExif);
-    if (logoSvg) {
-      logoPreview.innerHTML = logoSvg;
-      // 自动设置select值
-      const make = currentExif.Make || currentExif.Model;
-      if (make) {
-        const makeName = make.trim().toLowerCase();
-        for (const opt of logoSelect.options) {
-          if (opt.value && opt.value.toLowerCase() === makeName) {
-            logoSelect.value = opt.value;
-            break;
-          }
-        }
+    // Logo - 自动检测厂商
+    const make = currentExif.Make || currentExif.Model;
+    if (make) {
+      const makeName = getMakeName(make);
+      // 查找匹配的厂商
+      const allLogos = getAllLogos();
+      const matchedLogo = allLogos.find(logo => 
+        makeName.toLowerCase().includes(logo.toLowerCase())
+      );
+      
+      if (matchedLogo) {
+        selectLogo(matchedLogo);
       }
     }
 
-    // 设备型号
+    // 设备型号 - 始终填充值
     if (currentExif.Model) {
       customModel.value = getModelName(currentExif.Model);
     }
 
-    // 拍摄参数
+    // 拍摄参数 - 填充值
     if (currentExif.FNumber) {
       fNumber.value = typeof currentExif.FNumber === 'string' 
         ? currentExif.FNumber.replace('f/', '').replace('F', '')
@@ -112,16 +185,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentExif.ExposureTime) {
       exposureTime.value = currentExif.ExposureTime;
     }
-    if (currentExif.FocalLength) {
-      focalLength.value = currentExif.FocalLength;
+    // 焦距 - 优先等效焦距
+    const focal = getFocalLength(currentExif);
+    if (focal) {
+      focalLength.value = focal;
     }
     if (currentExif.ISOSpeedRatings) {
       iso.value = currentExif.ISOSpeedRatings;
     }
 
-    // 时间
+    // 时间 - 转换为 datetime-local 格式
     if (currentExif.DateTimeOriginal) {
-      dateTime.value = currentExif.DateTimeOriginal;
+      const dt = currentExif.DateTimeOriginal;
+      // 格式: YYYY-MM-DDTHH:mm
+      const parts = dt.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2})/);
+      if (parts) {
+        dateTime.value = `${parts[1]}-${parts[2]}-${parts[3]}T${parts[4]}:${parts[5]}`;
+      }
     }
   }
 
@@ -172,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resetForm() {
-    logoSelect.value = '';
+    selectedLogo = null;
     logoPreview.innerHTML = '';
     customModel.value = '';
     fNumber.value = '';
@@ -180,7 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
     focalLength.value = '';
     iso.value = '';
     dateTime.value = '';
-    document.querySelectorAll('.switch').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.logo-grid-item').forEach(item => {
+      item.classList.remove('selected');
+    });
   }
 
   // 换个模板 - 返回主页
@@ -224,34 +306,118 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Logo选择变化
-  logoSelect.addEventListener('change', () => {
-    const selected = logoSelect.value;
-    if (selected) {
-      const svg = getMakeLogoSvg(selected);
-      logoPreview.innerHTML = svg;
-    } else {
-      logoPreview.innerHTML = '';
-    }
-  });
-
   function updateBorder() {
     if (!userImage.complete) return;
     photoFooter.style.backgroundColor = borderColor.value;
-    const shortSide = Math.min(userImage.clientWidth, userImage.clientHeight);
-    const height = Math.round(shortSide * (borderHeight.value / 100));
-    photoFooter.style.height = `${height}px`;
+    
+    // 边框宽度 = 图片的显示宽度（无论横向还是纵向）
+    const imgDisplayWidth = userImage.clientWidth;
+    const imgDisplayHeight = userImage.clientHeight;
+    
+    // 边框高度 = 图片显示宽度 × 边框比例
+    // 这样纵向图片的边框宽度也等于图片显示宽度（短边）
+    const footerHeight = Math.round(imgDisplayWidth * (borderHeight.value / 100));
+    photoFooter.style.height = `${footerHeight}px`;
+    
     borderHeightLabel.textContent = `${borderHeight.value}%`;
+    
+    // 更新边框内容预览
+    updateBorderContent();
+  }
+  
+  // 更新边框内容预览
+  function updateBorderContent() {
+    const borderLogo = document.getElementById('borderLogo');
+    const borderModel = document.getElementById('borderModel');
+    const borderParams = document.getElementById('borderParams');
+    const borderFocal = document.getElementById('borderFocal');
+    const borderSignature = document.getElementById('borderSignature');
+    const borderTime = document.getElementById('borderTime');
+    
+    // 根据边框颜色确定文字颜色
+    const isLight = borderColor.value === '#ffffff' || borderColor.value === '#fff';
+    const textColor = isLight ? '#000' : '#fff';
+    document.querySelectorAll('.border-text').forEach(el => {
+      el.style.color = textColor;
+    });
+    
+    // 1. Logo - 根据背景颜色自动切换
+    if (selectedLogo && document.getElementById('switchLogo')?.classList.contains('active')) {
+      const logoSrc = `logos/${selectedLogo}.svg`;
+      // 白背景用原色，黑背景反转
+      const logoFilter = isLight ? '' : 'filter: brightness(0) invert(1);';
+      borderLogo.innerHTML = `<img src="${logoSrc}" alt="" style="${logoFilter}">`;
+    } else {
+      borderLogo.innerHTML = '';
+    }
+    
+    // 2. 机型
+    if (customModel?.value && document.getElementById('switchModel')?.classList.contains('active')) {
+      borderModel.textContent = customModel.value;
+      borderModel.style.color = textColor;
+    } else {
+      borderModel.textContent = '';
+    }
+    
+    // 3. 参数（光圈、快门、ISO）
+    if (document.getElementById('switchParams')?.classList.contains('active')) {
+      const params = [];
+      if (fNumber?.value) params.push(`f/${fNumber.value}`);
+      if (exposureTime?.value) params.push(`${exposureTime.value}s`);
+      if (iso?.value) params.push(`ISO${iso.value}`);
+      borderParams.textContent = params.join(' ');
+      borderParams.style.color = textColor;
+    } else {
+      borderParams.textContent = '';
+    }
+    
+    // 4. 焦距（输入框已有 mm 单位，不再添加）
+    if (focalLength?.value) {
+      borderFocal.textContent = focalLength.value;
+      borderFocal.style.color = textColor;
+    } else {
+      borderFocal.textContent = '';
+    }
+    
+  // 5. 署名（有内容时自动显示，无需开关）
+    if (signatureText?.value) {
+      borderSignature.textContent = signatureText.value;
+      borderSignature.style.color = textColor;
+    } else {
+      borderSignature.textContent = '';
+    }
+    
+    // 6. 时间
+    if (dateTime?.value && document.getElementById('switchTime')?.classList.contains('active')) {
+      const dt = new Date(dateTime.value);
+      borderTime.textContent = `${dt.getFullYear()}/${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+      borderTime.style.color = textColor;
+    } else {
+      borderTime.textContent = '';
+    }
   }
 
   borderColor.addEventListener('input', updateBorder);
   borderHeight.addEventListener('input', updateBorder);
   userImage.addEventListener('load', updateBorder);
+  
+  // 编辑控件 - 输入时实时更新预览
+  const editControls = [
+    'customModel', 'fNumber', 'exposureTime', 'focalLength', 'iso',
+    'dateTime', 'signatureText'
+  ];
+  editControls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', updateBorderContent);
+    }
+  });
 
   // Switch 切换
   document.querySelectorAll('.switch').forEach(sw => {
     sw.addEventListener('click', () => {
       sw.classList.toggle('active');
+      updateBorderContent();
     });
   });
 
@@ -259,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getEditSettings() {
     return {
       showLogo: document.getElementById('switchLogo')?.classList.contains('active') ?? false,
-      selectedLogo: logoSelect?.value || '',
+      selectedLogo: selectedLogo || '',
       showModel: document.getElementById('switchModel')?.classList.contains('active') ?? false,
       customModel: customModel?.value || '',
       showParams: document.getElementById('switchParams')?.classList.contains('active') ?? false,
@@ -326,6 +492,9 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSave.addEventListener('click', exportImageHandler);
   document.getElementById('btnExport')?.addEventListener('click', exportImageHandler);
   document.getElementById('btnExportTop')?.addEventListener('click', exportImageHandler);
+
+  // 初始化 Logo 网格
+  initLogoGrid();
 
   // 初始化边框高度计算
   const previewImages = document.querySelectorAll('.style-preview .frame-container img');

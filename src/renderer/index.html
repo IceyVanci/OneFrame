@@ -73,7 +73,33 @@
     <div class="preview-area">
       <div class="frame-wrapper" id="frameWrapper">
         <img id="userImage" src="" alt="用户图片">
-        <div class="photo-footer" id="photoFooter"></div>
+        <div class="photo-footer" id="photoFooter">
+          <!-- 边框内容预览 -->
+          <div class="border-content" id="borderContent">
+            <div class="border-content-inner">
+              <!-- Logo - 左侧 2.5% -->
+              <div class="border-logo" id="borderLogo"></div>
+              <!-- 机型+参数 - 中间区域 -->
+              <div class="border-info">
+                <div class="border-info-inner">
+                  <div class="border-text border-model" id="borderModel"></div>
+                  <div class="border-text border-params" id="borderParams"></div>
+                </div>
+              </div>
+              <!-- 焦距 - 52.5% -->
+              <div class="border-focal">
+                <div class="border-text border-focal-text" id="borderFocal"></div>
+              </div>
+              <!-- 署名+时间 - 右侧 -->
+              <div class="border-right">
+                <div class="border-right-inner">
+                  <div class="border-text border-signature" id="borderSignature"></div>
+                  <div class="border-text" id="borderTime"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -149,47 +175,15 @@
             <div class="switch active" id="switchLogo"></div>
           </div>
         </div>
-        <div class="control-group">
-          <label>选择厂商</label>
-          <select id="logoSelect">
-            <option value="">-- 自动检测 --</option>
-            <option value="Apple">Apple</option>
-            <option value="Canon">Canon</option>
-            <option value="DJI">DJI</option>
-            <option value="Fujifilm">Fujifilm</option>
-            <option value="Google">Google</option>
-            <option value="GoPro">GoPro</option>
-            <option value="Hasselblad">Hasselblad</option>
-            <option value="Huawei">Huawei</option>
-            <option value="Insta360">Insta360</option>
-            <option value="Leica">Leica</option>
-            <option value="Lumix">Lumix</option>
-            <option value="Nikon">Nikon</option>
-            <option value="Nokia">Nokia</option>
-            <option value="Olympus">Olympus</option>
-            <option value="OnePlus">OnePlus</option>
-            <option value="OPPO">OPPO</option>
-            <option value="Pentax">Pentax</option>
-            <option value="Ricoh">Ricoh</option>
-            <option value="Samsung">Samsung</option>
-            <option value="Sigma">Sigma</option>
-            <option value="Sony">Sony</option>
-            <option value="Vivo">Vivo</option>
-            <option value="Xiaomi">Xiaomi</option>
-          </select>
-        </div>
+        <!-- Logo 网格选择器 -->
+        <div class="logo-grid" id="logoGrid"></div>
         <div class="logo-preview" id="logoPreview"></div>
       </div>
 
       <!-- 设备型号 -->
       <div class="edit-section">
         <div class="section-title"><i class="fas fa-mobile-alt"></i> 设备型号</div>
-        <div class="control-group">
-          <div class="switch-group">
-            <label>显示设备型号</label>
-            <div class="switch active" id="switchModel"></div>
-          </div>
-        </div>
+        <input type="hidden" id="switchModel" class="switch active">
         <div class="control-group">
           <label>设备型号</label>
           <input type="text" id="customModel" placeholder="自动从EXIF读取">
@@ -205,21 +199,24 @@
             <div class="switch active" id="switchParams"></div>
           </div>
         </div>
-        <div class="control-group">
-          <label>光圈 (f/)</label>
-          <input type="text" id="fNumber" placeholder="自动">
-        </div>
-        <div class="control-group">
-          <label>快门 (s)</label>
-          <input type="text" id="exposureTime" placeholder="自动">
-        </div>
-        <div class="control-group">
-          <label>焦距 (mm)</label>
-          <input type="text" id="focalLength" placeholder="自动">
-        </div>
-        <div class="control-group">
-          <label>ISO</label>
-          <input type="text" id="iso" placeholder="自动">
+        <!-- 参数 2x2 网格 - 单位在后置 -->
+        <div class="params-grid">
+          <div class="param-item">
+            <input type="text" id="fNumber" placeholder="—">
+            <label>f/</label>
+          </div>
+          <div class="param-item">
+            <input type="text" id="exposureTime" placeholder="—">
+            <label>s</label>
+          </div>
+          <div class="param-item">
+            <input type="text" id="focalLength" placeholder="—">
+            <label>mm</label>
+          </div>
+          <div class="param-item">
+            <label>ISO</label>
+            <input type="text" id="iso" placeholder="—">
+          </div>
         </div>
       </div>
 
@@ -234,19 +231,14 @@
         </div>
         <div class="control-group">
           <label>拍摄时间</label>
-          <input type="text" id="dateTime" placeholder="自动从EXIF读取">
+          <input type="datetime-local" id="dateTime">
         </div>
       </div>
 
       <!-- 署名设置 -->
       <div class="edit-section">
         <div class="section-title"><i class="fas fa-pen"></i> 署名</div>
-        <div class="control-group">
-          <div class="switch-group">
-            <label>显示署名</label>
-            <div class="switch" id="switchSignature"></div>
-          </div>
-        </div>
+        <input type="hidden" id="switchSignature" class="switch">
         <div class="control-group">
           <label>署名文字</label>
           <input type="text" id="signatureText" placeholder="如: Photo by John">

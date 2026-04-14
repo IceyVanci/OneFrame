@@ -17,5 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readExif: (filePath) => ipcRenderer.invoke('read-exif', filePath),
   
   // 读取 logo SVG
-  getLogoSvg: (logoName) => ipcRenderer.invoke('get-logo-svg', logoName)
+  getLogoSvg: (logoName) => ipcRenderer.invoke('get-logo-svg', logoName),
+  
+  // 获取 logo 列表
+  getLogos: () => ipcRenderer.invoke('get-logos')
 });

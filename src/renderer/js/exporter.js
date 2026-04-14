@@ -3,6 +3,22 @@
  * 支持保留 EXIF 信息的高质量 JPG 输出
  */
 
+import opentype from 'opentype.js';
+
+// 预加载字体
+let fontSemibold = null;
+let fontNormal = null;
+
+async function loadFonts() {
+  if (!fontSemibold) {
+    fontSemibold = await opentype.load('fonts/MiSans-Semibold.ttf');
+  }
+  if (!fontNormal) {
+    fontNormal = await opentype.load('fonts/MiSans-Normal.ttf');
+  }
+  return { fontSemibold, fontNormal };
+}
+
 /**
  * 创建带边框的图片并导出
  * @param {HTMLImageElement} img - 原始图片元素
@@ -11,6 +27,7 @@
  * @param {number} options.borderHeight - 边框高度(px)
  * @param {Object} options.exif - 原始 EXIF 数据
  * @param {number} options.quality - JPG 质量 (0-1)
+ * @param {Object} options.settings - 导出设置
  * @returns {Promise<Blob>} 导出的图片 Blob
  */
 export async function exportImage(img, options) {
@@ -18,8 +35,12 @@ export async function exportImage(img, options) {
     borderColor = '#ffffff',
     borderHeight = 100,
     exif = null,
-    quality = 1.0
+    quality = 1.0,
+    settings = {}
   } = options;
+
+  // 加载字体
+  const fonts = await loadFonts();
 
   // 创建 Canvas
   const canvas = document.createElement('canvas');
@@ -36,24 +57,23 @@ export async function exportImage(img, options) {
   ctx.fillStyle = borderColor;
   ctx.fillRect(0, img.naturalHeight, img.naturalWidth, borderHeight);
 
+  // 如果有边框内容需要绘制
+  if (settings && (settings.selectedLogo || settings.showModel || settings.showParams || settings.showTime || settings.showSignature)) {
+    await drawBorderContent(ctx, img.naturalWidth, img.naturalHeight, borderHeight, settings, fonts);
+  }
+
   // 导出为 DataURL（包含 EXIF）
   return new Promise((resolve, reject) => {
-    // 首先尝试导出为 base64
     const dataUrl = canvas.toDataURL('image/jpeg', quality);
     
-    // 如果有 EXIF 数据，需要嵌入
     if (exif && Object.keys(exif).length > 0) {
       try {
-        // 动态导入 piexifjs（避免打包问题）
         import('piexifjs').then(module => {
           const piexif = module.default || module;
           const exifObj = buildExifObj(exif, piexif);
           const exifBytes = piexif.dump(exifObj);
           const newDataUrl = piexif.insert(exifBytes, dataUrl);
-          
-          // 转换 dataURL 为 Blob
-          const blob = dataURLtoBlob(newDataUrl);
-          resolve(blob);
+          resolve(dataURLtoBlob(newDataUrl));
         }).catch(err => {
           console.warn('piexifjs 导入失败，使用无 EXIF 导出:', err);
           resolve(dataURLtoBlob(dataUrl));
@@ -66,6 +86,177 @@ export async function exportImage(img, options) {
       resolve(dataURLtoBlob(dataUrl));
     }
   });
+}
+
+/**
+ * 使用 opentype.js 绘制文字
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Object} font - opentype 字体
+ * @param {string} text - 文字
+ * @param {number} x - X 坐标
+ * @param {number} y - Y 坐标
+ * @param {number} fontSize - 字号
+ * @param {Object} options - 选项 { align: 'left'|'right'|'center' }
+ */
+function drawText(ctx, font, text, x, y, fontSize, options = {}) {
+  const path = font.getPath(text, x, y, fontSize);
+  
+  // 设置对齐
+  if (options.align === 'right' && font && font.getAdvanceWidth) {
+    const width = font.getAdvanceWidth(text, fontSize);
+    path.translate(-width, 0);
+  }
+  
+  ctx.fill(path.toPath2D ? path.toPath2D() : new Path2D(path.toSVG(2)));
+}
+
+/**
+ * 绘制边框内容 - 使用 opentype.js 精确匹配 CSS
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} imgWidth - 图片宽度
+ * @param {number} imgHeight - 图片高度
+ * @param {number} borderHeight - 边框高度
+ * @param {Object} settings - 设置
+ * @param {Object} fonts - { fontSemibold, fontNormal }
+ */
+async function drawBorderContent(ctx, imgWidth, imgHeight, borderHeight, settings, fonts) {
+  const borderTop = imgHeight;
+  const textColor = borderColorIsLight(settings.borderColor) ? '#000000' : '#ffffff';
+  
+  ctx.fillStyle = textColor;
+  
+  // 字号 - 与 CSS 保持一致
+  const fontSize = 12;  // 基础字号（CSS: 12px）
+  const largeFontSize = 24;  // 焦距大字（CSS: 24px）
+  
+  // 布局位置（与 CSS 完全一致）
+  const leftEdge = imgWidth * 0.025;     // 2.5%
+  const centerX = imgWidth * 0.175;      // 17.5%
+  const focalX = imgWidth * 0.525;       // 52.5%
+  const rightEdge = imgWidth * 0.975;    // 97.5%
+  
+  // 垂直居中
+  const centerY = borderTop + borderHeight / 2;
+  const lineHeight = fontSize * 1.2;
+  
+  // 1. Logo（左侧 2.5% 处）- 高度为边框的 60%
+  if (settings.selectedLogo && settings.showLogo) {
+    drawLogo(ctx, settings.selectedLogo, leftEdge, centerY, borderHeight, settings.borderColor);
+  }
+  
+  // 2. 机型 + 拍摄参数（17.5%，居右对齐）
+  if (settings.showModel || settings.showParams) {
+    const centerRightX = centerX;  // 17.5% 位置
+    
+    // 第一行：机型名称（semibold）
+    if (settings.showModel && settings.customModel) {
+      const width = fonts.fontSemibold.getAdvanceWidth(settings.customModel, fontSize);
+      drawText(ctx, fonts.fontSemibold, settings.customModel, centerRightX - width, centerY - lineHeight / 2 + fontSize * 0.35, fontSize, { align: 'right' });
+    }
+    
+    // 第二行：光圈、快门、ISO（normal）
+    if (settings.showParams) {
+      const params = [];
+      if (settings.fNumber) params.push(`f/${settings.fNumber}`);
+      if (settings.exposureTime) params.push(`${settings.exposureTime}s`);
+      if (settings.iso) params.push(`ISO${settings.iso}`);
+      
+      if (params.length > 0) {
+        const paramsText = params.join(' ');
+        const width = fonts.fontNormal.getAdvanceWidth(paramsText, fontSize);
+        drawText(ctx, fonts.fontNormal, paramsText, centerRightX - width, centerY + lineHeight / 2 + fontSize * 0.35, fontSize, { align: 'right' });
+      }
+    }
+  }
+  
+  // 3. 焦距（52.5%，居左，大字）
+  if (settings.focalLength) {
+    drawText(ctx, fonts.fontSemibold, `${settings.focalLength}mm`, focalX, centerY + largeFontSize * 0.35, largeFontSize);
+  }
+  
+  // 4. 署名 + 时间（右侧 97.5%）
+  const rightX = rightEdge;
+  
+  // 署名（semibold）
+  if (settings.showSignature && settings.signatureText) {
+    const width = fonts.fontSemibold.getAdvanceWidth(settings.signatureText, fontSize);
+    drawText(ctx, fonts.fontSemibold, settings.signatureText, rightX - width, centerY - lineHeight / 2 + fontSize * 0.35, fontSize, { align: 'right' });
+  }
+  
+  // 时间（normal）
+  if (settings.showTime && settings.dateTime) {
+    const timeStr = formatDateForDisplay(settings.dateTime);
+    const width = fonts.fontNormal.getAdvanceWidth(timeStr, fontSize);
+    drawText(ctx, fonts.fontNormal, timeStr, rightX - width, centerY + lineHeight / 2 + fontSize * 0.35, fontSize, { align: 'right' });
+  }
+}
+
+/**
+ * 绘制 Logo（根据背景颜色自动调整）
+ */
+function drawLogo(ctx, logoName, x, centerY, borderHeight, borderColor) {
+  const logoPath = `logos/${logoName}.svg`;
+  
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  
+  img.onload = () => {
+    const logoHeight = borderHeight * 0.6;
+    const logoWidth = (img.width / img.height) * logoHeight;
+    
+    // 绘制到临时 canvas 处理颜色
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = logoWidth;
+    tempCanvas.height = logoHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // 绘制原始 Logo
+    tempCtx.drawImage(img, 0, 0, logoWidth, logoHeight);
+    
+    // 如果是深色背景，反转 Logo 颜色
+    if (!borderColorIsLight(borderColor)) {
+      const imageData = tempCtx.getImageData(0, 0, logoWidth, logoHeight);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = 255 - data[i];         // R
+        data[i + 1] = 255 - data[i + 1]; // G
+        data[i + 2] = 255 - data[i + 2]; // B
+      }
+      tempCtx.putImageData(imageData, 0, 0);
+    }
+    
+    // 绘制到主画布
+    ctx.drawImage(tempCanvas, x, centerY - logoHeight / 2);
+  };
+  
+  img.src = logoPath;
+}
+
+/**
+ * 判断边框颜色是否为浅色
+ */
+function borderColorIsLight(color) {
+  if (!color) return true;
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128;
+}
+
+/**
+ * 格式化日期用于显示
+ */
+function formatDateForDisplay(dateTimeStr) {
+  if (!dateTimeStr) return '';
+  const dt = new Date(dateTimeStr);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const d = String(dt.getDate()).padStart(2, '0');
+  const h = String(dt.getHours()).padStart(2, '0');
+  const min = String(dt.getMinutes()).padStart(2, '0');
+  return `${y}/${m}/${d} ${h}:${min}`;
 }
 
 /**

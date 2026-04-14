@@ -142,3 +142,20 @@ ipcMain.handle('read-exif', async (event, filePath) => {
     return null;
   }
 });
+
+// 获取 logo 列表（动态读取 logos 文件夹）
+ipcMain.handle('get-logos', async () => {
+  try {
+    const logosPath = path.join(__dirname, '../renderer/logos');
+    const files = fs.readdirSync(logosPath);
+    // 只返回 .svg 文件，排除 .auto.svg
+    const logos = files
+      .filter(f => f.endsWith('.svg') && !f.endsWith('.auto.svg'))
+      .map(f => f.replace('.svg', ''));
+    console.log('Found logos:', logos.length);
+    return logos;
+  } catch (error) {
+    console.error('Error reading logos:', error);
+    return [];
+  }
+});

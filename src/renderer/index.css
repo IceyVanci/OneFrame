@@ -1,3 +1,25 @@
+/* 导入 MiSans 字体 */
+@font-face {
+  font-family: 'MiSans';
+  src: url('fonts/MiSans-Normal.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('fonts/MiSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: url('fonts/MiSans-Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,7 +27,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-family: 'MiSans', 'Segoe UI', 'Microsoft YaHei', sans-serif;
   background: #0a0a0a;
   color: #eee;
   min-height: 100vh;
@@ -166,24 +188,33 @@ body {
   background: #16213e;
   padding: 40px;
   padding-right: 120px;
+  overflow: hidden;
 }
 
 .frame-wrapper {
   max-width: 900px;
   width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 
 .frame-wrapper img {
-  width: 100%;
-  display: block;
-  border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+  max-height: calc(100vh - 200px);
+  width: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .frame-wrapper .photo-footer {
   background: #fff;
-  height: 60px;
+  width: 100%;
 }
 
 /* 右侧浮动图标按钮 */
@@ -446,6 +477,109 @@ select:focus {
   border-color: #68bbff;
 }
 
+/* 拍摄参数 2x2 网格 */
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.param-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0 8px;
+}
+
+.param-item label {
+  color: #888;
+  font-size: 11px;
+  min-width: 28px;
+  margin: 0;
+}
+
+.param-item input {
+  flex: 1;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: #eee;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  min-width: 0;
+}
+
+.param-item input:focus {
+  outline: none;
+  border: none;
+}
+
+.param-item input::placeholder {
+  color: #555;
+}
+
+/* Logo 网格选择器 - 每行6个 */
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 40px);
+  grid-auto-rows: 40px;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 200px;
+  padding: 6px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.logo-grid-item {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px;
+}
+
+.logo-grid-item img,
+.logo-grid-item svg {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-grid-item:hover {
+  background: #333;
+  border-color: #555;
+}
+
+.logo-grid-item.selected {
+  border-color: #68bbff;
+  background: rgba(104, 187, 255, 0.15);
+}
+
+.logo-grid-item svg {
+  width: 100%;
+  height: 100%;
+  color: #888;
+}
+
+.logo-grid-item.selected svg {
+  color: #fff;
+}
+
 /* Logo 预览 */
 .logo-preview {
   margin-top: 12px;
@@ -459,6 +593,106 @@ select:focus {
   color: #555;
   font-size: 12px;
   overflow: hidden;
+}
+
+/* ========== 边框内容预览样式 ========== */
+
+/* 边框内容容器 */
+.border-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.border-content-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* 边框内容区域 */
+.border-logo,
+.border-info,
+.border-focal,
+.border-right {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.border-logo {
+  left: 2.5%;
+  max-width: 15%;
+}
+
+.border-logo img {
+  max-height: 60%;
+  max-width: 100%;
+  object-fit: contain;
+  filter: none;
+}
+
+.border-info {
+  left: 17.5%;
+  right: 50%;
+  justify-content: flex-end;
+}
+
+.border-info-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  padding-right: 5%;
+}
+
+.border-focal {
+  left: 52.5%;
+  right: 20%;
+  justify-content: flex-start;
+}
+
+.border-right {
+  left: 82.5%;
+  right: 2.5%;
+  justify-content: flex-end;
+}
+
+.border-right-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* 文字样式 - 基础字号 */
+.border-text {
+  font-size: 12px;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+/* 机型、参数、署名 - 使用 semibold (600) */
+.border-model,
+.border-params,
+.border-signature {
+  font-weight: 600;
+}
+
+/* 焦距 - 大号字体（机型的2倍） */
+.border-focal-text {
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .logo-preview svg {

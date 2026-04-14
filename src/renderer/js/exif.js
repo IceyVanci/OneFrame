@@ -173,6 +173,23 @@ export function formatDateTime(dateStr) {
 }
 
 /**
+ * 获取焦距（优先等效焦距）
+ * @param {Object} exif - EXIF 数据
+ * @returns {string|null}
+ */
+export function getFocalLength(exif) {
+  // 优先使用等效焦距
+  if (exif['FocalLengthIn35mmFilm']) {
+    return exif.FocalLengthIn35mmFilm;
+  }
+  // 回退到物理焦距
+  if (exif.FocalLength) {
+    return exif.FocalLength;
+  }
+  return null;
+}
+
+/**
  * 特殊字段格式化
  */
 const exifKeyFormatter = {
