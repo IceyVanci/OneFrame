@@ -636,7 +636,11 @@ select:focus {
   max-height: 60%;
   max-width: 100%;
   object-fit: contain;
-  filter: none;
+}
+
+/* Logo 颜色反转 - 深色背景时将深色 logo 转为白色 */
+.border-logo img.logo-invert {
+  filter: brightness(0) invert(1);
 }
 
 .border-info {
@@ -682,17 +686,28 @@ select:focus {
   white-space: nowrap;
 }
 
-/* 机型、参数、署名 - 使用 semibold (600) */
-.border-model,
-.border-params,
+/* 机型 - 使用 medium (500)，参数 - 使用 normal (400)，署名 - 使用 semibold (600) */
+.border-model {
+  font-weight: 500;
+}
+
+.border-params {
+  font-weight: normal;
+}
+
 .border-signature {
   font-weight: 600;
 }
 
-/* 焦距 - 大号字体（机型的2倍） */
+/* 时间 - 使用 normal */
+.border-time {
+  font-weight: normal;
+}
+
+/* 焦距 - 大号字体 Medium */
 .border-focal-text {
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .logo-preview svg {
@@ -794,4 +809,9 @@ select:focus {
 .edit-panel::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 3px;
+}
+
+/* Logo 颜色反转 - 深色背景时将深色 logo 转为白色 */
+.logo-invert {
+  filter: brightness(0) invert(1);
 }

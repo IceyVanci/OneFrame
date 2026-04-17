@@ -16,9 +16,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 在主进程读取 EXIF
   readExif: (filePath) => ipcRenderer.invoke('read-exif', filePath),
   
+  // 读取文件为 Base64（用于导出时 piexif 读取）
+  readExifBinary: (filePath) => ipcRenderer.invoke('read-exif-binary', filePath),
+  
   // 读取 logo SVG
   getLogoSvg: (logoName) => ipcRenderer.invoke('get-logo-svg', logoName),
   
   // 获取 logo 列表
-  getLogos: () => ipcRenderer.invoke('get-logos')
+  getLogos: () => ipcRenderer.invoke('get-logos'),
+  
+  // 获取文件修改时间
+  getFileMtime: (filePath) => ipcRenderer.invoke('get-file-mtime', filePath)
 });

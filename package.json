@@ -35,7 +35,8 @@
             "x64"
           ]
         }
-      ]
+      ],
+      "signAndEditExecutable": false
     },
     "portable": {
       "artifactName": "OneFrame.exe"

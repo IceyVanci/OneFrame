@@ -1,11 +1,81 @@
 // OneFrame 主程序
 import { getExif, formatDateTime, getFocalLength } from './exif.js';
-import { getMakeLogoSvg, getModelName, logoSvgMap, getAllLogos, getLogoFilename, getAutoLogoFilename, getMakeName, getMakeLogo, getMakeLogoPath } from './logo-utils.js';
+import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-utils.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
 let currentFile = null;
 let currentImagePath = null;
+
+// Logo 亮度缓存 { logoName: { isLight: boolean } }
+const logoBrightnessCache = {};
+
+/**
+ * 检测 logo 图片的平均亮度
+ * @param {string} logoPath - logo 文件路径
+ * @returns {Promise<boolean>} 是否为浅色 logo
+ */
+function detectLogoBrightness(logoPath) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // 创建临时 canvas 分析像素
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      try {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        let totalBrightness = 0;
+        let pixelCount = 0;
+        
+        // 采样分析（每隔一个像素）
+        for (let i = 0; i < data.length; i += 8) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+          
+          // 跳过透明像素
+          if (a < 128) continue;
+          
+          // 计算亮度
+          const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+          totalBrightness += brightness;
+          pixelCount++;
+        }
+        
+        const avgBrightness = pixelCount > 0 ? totalBrightness / pixelCount : 128;
+        // 亮度 > 100 认为是浅色 logo
+        resolve(avgBrightness > 100);
+      } catch (e) {
+        // 跨域或加载失败，默认浅色
+        resolve(true);
+      }
+    };
+    img.onerror = () => resolve(true);
+    img.src = logoPath;
+  });
+}
+
+/**
+ * 获取 logo 是否为浅色（带缓存）
+ */
+async function isLogoLight(logoName) {
+  if (logoBrightnessCache[logoName] !== undefined) {
+    return logoBrightnessCache[logoName].isLight;
+  }
+  
+  // 检测原始 logo 亮度
+  const brightness = await detectLogoBrightness(`logos/${logoName}.svg`);
+  logoBrightnessCache[logoName] = { isLight: brightness };
+  
+  return brightness;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const appContainer = document.querySelector('.app-container');
@@ -33,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const focalLength = document.getElementById('focalLength');
   const iso = document.getElementById('iso');
   const dateTime = document.getElementById('dateTime');
+  const signatureText = document.getElementById('signatureText');
 
   let currentStyle = null;
   let selectedLogo = null;
@@ -103,6 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
       
       logoPreview.innerHTML = '';
       logoPreview.appendChild(previewImg);
+      
+      // 预加载 logo 亮度信息（异步，不阻塞 UI）
+      isLogoLight(name);
     } else {
       logoPreview.innerHTML = '';
     }
@@ -130,10 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
     currentImagePath = imagePath;
     currentFile = null;
     userImage.src = `file://${imagePath}`;
+    
+    // 重置表单（清除之前图片的数据）
+    resetForm();
+    
     try {
       // 通过主进程 IPC 读取 EXIF
       const exifTags = await window.electronAPI.readExif(imagePath);
-      if (exifTags) {
+      if (exifTags && Object.keys(exifTags).length > 0) {
         // 转换为对象格式
         currentExif = {};
         for (const key in exifTags) {
@@ -145,6 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log('EXIF from main process:', currentExif);
         updateExifDisplay();
+      } else {
+        // 无 EXIF 信息，使用文件修改时间
+        currentExif = {};
+        const fileMtime = await window.electronAPI.getFileMtime(imagePath);
+        if (fileMtime) {
+          const dt = new Date(fileMtime);
+          dateTime.value = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}T${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+        }
       }
     } catch (error) {
       console.error('Error reading EXIF:', error);
@@ -306,27 +392,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 比例选择器切换
+  document.getElementById('aspectRatio')?.addEventListener('change', updateBorder);
+
   function updateBorder() {
     if (!userImage.complete) return;
+    
     photoFooter.style.backgroundColor = borderColor.value;
     
-    // 边框宽度 = 图片的显示宽度（无论横向还是纵向）
-    const imgDisplayWidth = userImage.clientWidth;
-    const imgDisplayHeight = userImage.clientHeight;
+    // 判断图片方向
+    const isLandscape = userImage.clientWidth > userImage.clientHeight;
     
-    // 边框高度 = 图片显示宽度 × 边框比例
-    // 这样纵向图片的边框宽度也等于图片显示宽度（短边）
-    const footerHeight = Math.round(imgDisplayWidth * (borderHeight.value / 100));
+    // 边框高度 = 图片短边（显示宽度或高度）× 边框比例
+    const shortSide = Math.min(userImage.clientWidth, userImage.clientHeight);
+    const footerHeight = Math.round(shortSide * (borderHeight.value / 100));
     photoFooter.style.height = `${footerHeight}px`;
     
+    // 边框宽度：根据图片方向分别处理
+    if (isLandscape) {
+      photoFooter.style.width = '100%';  // 横向图片：占满宽度
+    } else {
+      photoFooter.style.width = `${shortSide}px`;  // 纵向图片：使用短边
+    }
+    
     borderHeightLabel.textContent = `${borderHeight.value}%`;
+    
+    // 根据比例设置调整预览效果
+    const aspectRatio = document.getElementById('aspectRatio').value;
+    
+    if (aspectRatio === 'original') {
+      const offset = Math.round(footerHeight / 4);  // 边框高度的1/4
+      
+      // 横向和纵向图片使用相同的裁切逻辑
+      // 裁切百分比 = 边框高度/2 / 图片高度 × 100
+      const cropPercent = (footerHeight / 2) / userImage.clientHeight * 100;
+      userImage.style.clipPath = `inset(${cropPercent}% 0)`;
+      userImage.style.transform = `translateY(${offset}px)`;
+      photoFooter.style.transform = `translateY(-${offset}px)`;
+    } else {
+      // 默认模式：不做裁剪
+      userImage.style.clipPath = 'none';
+      userImage.style.transform = 'none';
+      photoFooter.style.transform = 'none';
+    }
     
     // 更新边框内容预览
     updateBorderContent();
   }
   
   // 更新边框内容预览
-  function updateBorderContent() {
+  async function updateBorderContent() {
     const borderLogo = document.getElementById('borderLogo');
     const borderModel = document.getElementById('borderModel');
     const borderParams = document.getElementById('borderParams');
@@ -341,25 +456,43 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.color = textColor;
     });
     
-    // 1. Logo - 根据背景颜色自动切换
+    // 1. Logo - 智能检测：根据原始 logo 亮度决定是否使用 .auto.svg
     if (selectedLogo && document.getElementById('switchLogo')?.classList.contains('active')) {
-      const logoSrc = `logos/${selectedLogo}.svg`;
-      // 白背景用原色，黑背景反转
-      const logoFilter = isLight ? '' : 'filter: brightness(0) invert(1);';
-      borderLogo.innerHTML = `<img src="${logoSrc}" alt="" style="${logoFilter}">`;
+      // 确保亮度检测完成
+      let logoIsLight = logoBrightnessCache[selectedLogo]?.isLight;
+      if (logoIsLight === undefined) {
+        // 缓存未命中，强制检测
+        logoIsLight = await isLogoLight(selectedLogo);
+      }
+      
+      if (isLight) {
+        // 浅色背景：用原始 logo
+        borderLogo.innerHTML = `<img src="logos/${selectedLogo}.svg" alt="">`;
+      } else {
+        // 深色背景
+        if (logoIsLight) {
+          // 原始 logo 是浅色，保持原样（浅色在深色背景也可见）
+          borderLogo.innerHTML = `<img src="logos/${selectedLogo}.svg" alt="">`;
+        } else {
+          // 原始 logo 是深色，需要将颜色转换成白色
+          borderLogo.innerHTML = `<img src="logos/${selectedLogo}.svg" alt="" class="logo-invert">`;
+        }
+      }
     } else {
       borderLogo.innerHTML = '';
     }
     
-    // 2. 机型
+    // 2. 机型 - 使用 Medium
     if (customModel?.value && document.getElementById('switchModel')?.classList.contains('active')) {
       borderModel.textContent = customModel.value;
       borderModel.style.color = textColor;
+      borderModel.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
+      borderModel.style.fontWeight = '500';
     } else {
       borderModel.textContent = '';
     }
     
-    // 3. 参数（光圈、快门、ISO）
+    // 3. 参数（光圈、快门、ISO）- 使用 Semibold
     if (document.getElementById('switchParams')?.classList.contains('active')) {
       const params = [];
       if (fNumber?.value) params.push(`f/${fNumber.value}`);
@@ -367,31 +500,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (iso?.value) params.push(`ISO${iso.value}`);
       borderParams.textContent = params.join(' ');
       borderParams.style.color = textColor;
+      borderParams.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
+      borderParams.style.fontWeight = 'normal';
     } else {
       borderParams.textContent = '';
     }
     
-    // 4. 焦距（输入框已有 mm 单位，不再添加）
+    // 4. 焦距（输入框已有 mm 单位，不再添加）- 使用 Medium
     if (focalLength?.value) {
       borderFocal.textContent = focalLength.value;
       borderFocal.style.color = textColor;
+      borderFocal.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
+      borderFocal.style.fontWeight = '500';
     } else {
       borderFocal.textContent = '';
     }
     
-  // 5. 署名（有内容时自动显示，无需开关）
+  // 5. 署名（有内容时自动显示，无需开关）- 使用 Semibold
     if (signatureText?.value) {
       borderSignature.textContent = signatureText.value;
       borderSignature.style.color = textColor;
+      borderSignature.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
+      borderSignature.style.fontWeight = '600';
     } else {
       borderSignature.textContent = '';
     }
     
-    // 6. 时间
+    // 6. 时间 - 使用 Normal
     if (dateTime?.value && document.getElementById('switchTime')?.classList.contains('active')) {
       const dt = new Date(dateTime.value);
       borderTime.textContent = `${dt.getFullYear()}/${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
       borderTime.style.color = textColor;
+      borderTime.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
+      borderTime.style.fontWeight = 'normal';
     } else {
       borderTime.textContent = '';
     }
@@ -439,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
       signatureText: document.getElementById('signatureText')?.value || '',
       borderColor: borderColor?.value || '#ffffff',
       borderHeight: borderHeight?.value || 12,
-      aspectRatio: document.getElementById('aspectRatio')?.value || 'original'
+      aspectRatio: document.getElementById('aspectRatio')?.value || 'default'
     };
   }
 
@@ -454,14 +595,16 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSave.disabled = true;
       btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
+      // 边框高度 = 图片短边 × 边框比例（与预览保持一致）
       const shortSide = Math.min(userImage.naturalWidth, userImage.naturalHeight);
-      const borderHeightPx = Math.round(shortSide * ((borderHeight?.value || 12) / 100));
+      const borderHeightPx = Math.round(shortSide * (Number(borderHeight?.value) || 12) / 100);
       const settings = getEditSettings();
-
+      
       const blob = await exportImage(userImage, {
+        file: currentFile,
+        imagePath: currentImagePath,
         borderColor: settings.borderColor,
         borderHeight: borderHeightPx,
-        exif: currentExif,
         quality: 1.0,
         settings: settings
       });

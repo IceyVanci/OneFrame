@@ -143,6 +143,30 @@ ipcMain.handle('read-exif', async (event, filePath) => {
   }
 });
 
+// 读取文件为 Base64（用于导出时 piexif.load 读取）
+ipcMain.handle('read-exif-binary', async (event, filePath) => {
+  try {
+    const buffer = fs.readFileSync(filePath);
+    const base64 = buffer.toString('base64');
+    // 返回完整的 data URL 格式
+    return `data:image/jpeg;base64,${base64}`;
+  } catch (error) {
+    console.error('Error reading file as binary:', error);
+    return null;
+  }
+});
+
+// 获取文件修改时间
+ipcMain.handle('get-file-mtime', async (event, filePath) => {
+  try {
+    const stats = fs.statSync(filePath);
+    return stats.mtime.toISOString();
+  } catch (error) {
+    console.error('Error getting file mtime:', error);
+    return null;
+  }
+});
+
 // 获取 logo 列表（动态读取 logos 文件夹）
 ipcMain.handle('get-logos', async () => {
   try {

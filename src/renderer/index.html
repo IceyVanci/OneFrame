@@ -6,6 +6,8 @@
   <title>OneFrame</title>
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/opentype.js/1.3.4/opentype.min.js"></script>
+  <script src="assets/piexif.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -140,11 +142,8 @@
         <div class="control-group">
           <label>输出比例</label>
           <select id="aspectRatio">
-            <option value="original">保持原比例</option>
-            <option value="1:1">1:1</option>
-            <option value="4:3">4:3</option>
-            <option value="3:2">3:2</option>
-            <option value="16:9">16:9</option>
+            <option value="default" selected>默认</option>
+            <option value="original">原始比例</option>
           </select>
         </div>
       </div>
