@@ -13,26 +13,20 @@
   <div class="app-container">
     <!-- 顶部标题栏 -->
     <header class="app-header">
-      <h1 class="app-title">🎨 OneFrame</h1>
-      <p class="app-subtitle">为照片添加精美边框</p>
+      <h1 class="app-title">OneFrame</h1>
     </header>
 
     <!-- 边框样式图片墙 -->
     <main class="style-gallery">
-      <h2 class="section-title">选择边框样式</h2>
       
       <div class="style-grid">
         <!-- 样式卡片 1: 白色下边框 -->
         <div class="style-card" data-style="type-a">
           <div class="style-preview">
             <div class="frame-container">
-              <img src="../../examples/A.jpg" alt="示例图片" class="preview-image">
+              <img src="../../TypeA-sample.jpg" alt="示例图片" class="preview-image">
               <div class="photo-footer"></div>
             </div>
-          </div>
-          <div class="style-info">
-            <span class="style-name">白色下边框</span>
-            <span class="style-tag">Type A</span>
           </div>
         </div>
 
@@ -44,20 +38,12 @@
               <div class="photo-footer"></div>
             </div>
           </div>
-          <div class="style-info">
-            <span class="style-name">黑色下边框</span>
-            <span class="style-tag">Type B</span>
-          </div>
         </div>
 
         <!-- 更多样式卡片 -->
         <div class="style-card disabled">
           <div class="style-preview">
             <div class="coming-soon">即将推出</div>
-          </div>
-          <div class="style-info">
-            <span class="style-name">更多样式</span>
-            <span class="style-tag">开发中</span>
           </div>
         </div>
       </div>
@@ -75,29 +61,28 @@
     <div class="preview-area">
       <div class="frame-wrapper" id="frameWrapper">
         <img id="userImage" src="" alt="用户图片">
-        <div class="photo-footer" id="photoFooter">
-          <!-- 边框内容预览 -->
-          <div class="border-content" id="borderContent">
-            <div class="border-content-inner">
-              <!-- Logo - 左侧 2.5% -->
-              <div class="border-logo" id="borderLogo"></div>
-              <!-- 机型+参数 - 中间区域 -->
-              <div class="border-info">
-                <div class="border-info-inner">
-                  <div class="border-text border-model" id="borderModel"></div>
-                  <div class="border-text border-params" id="borderParams"></div>
-                </div>
+        <div class="photo-footer" id="photoFooter"></div>
+        <!-- 边框内容预览 - 放在 photoFooter 外面以便覆盖 -->
+        <div class="border-content" id="borderContent">
+          <div class="border-content-inner">
+            <!-- Logo - 左侧 2.5% -->
+            <div class="border-logo" id="borderLogo"></div>
+            <!-- 机型+参数 - 中间区域 -->
+            <div class="border-info">
+              <div class="border-info-inner">
+                <div class="border-text border-model" id="borderModel"></div>
+                <div class="border-text border-params" id="borderParams"></div>
               </div>
-              <!-- 焦距 - 52.5% -->
-              <div class="border-focal">
-                <div class="border-text border-focal-text" id="borderFocal"></div>
-              </div>
-              <!-- 署名+时间 - 右侧 -->
-              <div class="border-right">
-                <div class="border-right-inner">
-                  <div class="border-text border-signature" id="borderSignature"></div>
-                  <div class="border-text" id="borderTime"></div>
-                </div>
+            </div>
+            <!-- 焦距 - 52.5% -->
+            <div class="border-focal">
+              <div class="border-text border-focal-text" id="borderFocal"></div>
+            </div>
+            <!-- 署名+时间 - 右侧 -->
+            <div class="border-right">
+              <div class="border-right-inner">
+                <div class="border-text border-signature" id="borderSignature"></div>
+                <div class="border-text" id="borderTime"></div>
               </div>
             </div>
           </div>
@@ -137,7 +122,7 @@
       </div>
 
       <!-- 比例设置 -->
-      <div class="edit-section">
+      <div class="edit-section" id="aspectRatioSection">
         <div class="section-title"><i class="fas fa-crop"></i> 比例</div>
         <div class="control-group">
           <label>输出比例</label>

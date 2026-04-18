@@ -1,3 +1,7 @@
+/* 导入样式模块 */
+@import url('css/type-a.css');
+@import url('css/type-b.css');
+
 /* 导入 MiSans 字体 */
 @font-face {
   font-family: 'MiSans';
@@ -75,13 +79,12 @@ body {
 
 .style-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 800px));
   gap: 24px;
   padding: 20px;
 }
 
 .style-card {
-  background: #16213e;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -101,13 +104,12 @@ body {
 }
 
 .style-preview {
-  padding: 20px;
-  background: #0a0a0a;
+  padding: 0;
+  background: transparent;
 }
 
 .frame-container {
-  max-width: 200px;
-  margin: 0 auto;
+  width: 100%;
   position: relative;
 }
 
@@ -191,17 +193,6 @@ body {
   overflow: hidden;
 }
 
-.frame-wrapper {
-  max-width: 900px;
-  width: 100%;
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
 .frame-wrapper img {
   max-width: 100%;
   max-height: calc(100vh - 200px);
@@ -210,11 +201,6 @@ body {
   object-fit: contain;
   border-radius: 0;
   box-shadow: none;
-}
-
-.frame-wrapper .photo-footer {
-  background: #fff;
-  width: 100%;
 }
 
 /* 右侧浮动图标按钮 */
@@ -596,119 +582,7 @@ select:focus {
 }
 
 /* ========== 边框内容预览样式 ========== */
-
-/* 边框内容容器 */
-.border-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.border-content-inner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-/* 边框内容区域 */
-.border-logo,
-.border-info,
-.border-focal,
-.border-right {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.border-logo {
-  left: 2.5%;
-  max-width: 15%;
-}
-
-.border-logo img {
-  max-height: 60%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-/* Logo 颜色反转 - 深色背景时将深色 logo 转为白色 */
-.border-logo img.logo-invert {
-  filter: brightness(0) invert(1);
-}
-
-.border-info {
-  left: 17.5%;
-  right: 50%;
-  justify-content: flex-end;
-}
-
-.border-info-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-  width: 100%;
-  padding-right: 5%;
-}
-
-.border-focal {
-  left: 52.5%;
-  right: 20%;
-  justify-content: flex-start;
-}
-
-.border-right {
-  left: 82.5%;
-  right: 2.5%;
-  justify-content: flex-end;
-}
-
-.border-right-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-}
-
-/* 文字样式 - 基础字号 */
-.border-text {
-  font-size: 12px;
-  font-weight: normal;
-  white-space: nowrap;
-}
-
-/* 机型 - 使用 medium (500)，参数 - 使用 normal (400)，署名 - 使用 semibold (600) */
-.border-model {
-  font-weight: 500;
-}
-
-.border-params {
-  font-weight: normal;
-}
-
-.border-signature {
-  font-weight: 600;
-}
-
-/* 时间 - 使用 normal */
-.border-time {
-  font-weight: normal;
-}
-
-/* 焦距 - 大号字体 Medium */
-.border-focal-text {
-  font-size: 24px;
-  font-weight: 500;
-}
+/* 注意：边框内容样式已移至 css/type-a.css */
 
 .logo-preview svg {
   max-height: 100%;

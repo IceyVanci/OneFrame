@@ -60,17 +60,32 @@ OneFrame/
 │   │   └── preload.js       # 安全桥接
 │   └── renderer/
 │       ├── index.html       # 主页面
-│       ├── index.css        # 样式文件
+│       ├── index.css        # 全局样式
+│       ├── css/
+│       │   ├── type-a.css   # Type A 样式
+│       │   └── type-b.css   # Type B 样式
 │       ├── js/
-│       │   ├── app.js        # 主逻辑
-│       │   ├── exif.js      # EXIF 读取
-│       │   ├── exif-exporter.js  # EXIF 导出
-│       │   ├── exporter.js      # 图片导出
-│       │   └── logo-utils.js     # Logo 工具
-│       ├── logos/           # 相机厂商 Logo
-│       ├── fonts/           # 字体文件 (MiSans)
-│       └── assets/
-│           └── piexif.js    # EXIF 处理库
+│       │   ├── app.js        # 主逻辑入口
+│       │   ├── events.js     # 事件处理
+│       │   ├── state.js      # 状态管理
+│       │   ├── exif.js       # EXIF 读取 (exifreader)
+│       │   ├── exif-exporter.js  # EXIF 导出 (piexifjs)
+│       │   ├── exporter.js    # 图片导出
+│       │   ├── logo-utils.js  # Logo 工具
+│       │   ├── components/    # UI 组件
+│       │   │   ├── index.js    # 组件导出
+│       │   │   ├── home.js    # 首页视图
+│       │   │   ├── editor.js  # 编辑器视图
+│       │   │   ├── type-a-editor-panel.js  # Type A 面板配置
+│       │   │   └── type-b-editor-panel.js  # Type B 面板配置
+│       │   └── styles/        # 样式模块
+│       │       ├── index.js   # 样式注册表
+│       │       ├── type-a-preview.js   # Type A 预览
+│       │       ├── type-b-preview.js   # Type B 预览
+│       │       ├── type-a-export.js    # Type A 导出
+│       │       └── type-b-export.js    # Type B 导出
+│       ├── logos/            # 相机厂商 Logo (SVG)
+│       └── fonts/            # 字体文件 (MiSans)
 ├── package.json
 ├── README.md
 ├── DESIGN.md
