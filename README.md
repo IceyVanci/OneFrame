@@ -16,8 +16,9 @@
 - 自动读取拍摄时间和设备型号
 
 ### 🎨 边框定制
-- 支持白色和黑色边框颜色
-- 可调节边框高度（5%-30%）
+- 支持多种边框样式（Type A / Type B）
+- Type A：可调节边框高度（5%-30%）
+- Type B：固定边框比例
 - 边框颜色自适应文字配色
 
 ### 📝 边框信息编辑
@@ -32,7 +33,7 @@
 
 ### 📁 广泛的相机支持
 支持以下相机厂商的 Logo 和信息识别：
-Apple、Canon、DJI、Fujifilm、Google、GoPro、Hasselblad、Huawei、Insta360、Leica、Lumix、Nikon、Nokia、Olympus、OnePlus、OPPO、Pentax、Ricoh、Samsung、Sigma、Sony、Vivo、Xiaomi 等
+Apple、Canon、DJI、Fujifilm、Google、GoPro、Hasselblad、Leica、Lumix、Nikon、Nokia、Olympus、Oneplus、Pentax、Ricoh、Sigma、Sony、Vivo、Xiaomi 等
 
 ---
 
@@ -85,7 +86,9 @@ OneFrame/
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       └── type-b-export.js    # Type B 导出
 │       ├── logos/            # 相机厂商 Logo (SVG)
-│       └── fonts/            # 字体文件 (MiSans)
+│       ├── fonts/            # 字体文件 (MiSans)
+│       └── assets/
+│           └── piexif.js    # EXIF 处理库
 ├── package.json
 ├── README.md
 ├── DESIGN.md
@@ -199,6 +202,13 @@ npm run build
 
 ---
 
+## 📚 相关文档
+
+- [function_analysis.md](./function_analysis.md) - 项目函数分析
+- [style_separation_analysis.md](./style_separation_analysis.md) - 样式分离状况分析
+
+---
+
 ## 🙏 致谢
 
 - [Electron](https://www.electronjs.org/) - 桌面应用框架
@@ -206,4 +216,4 @@ npm run build
 - [piexifjs](https://github.com/hMatoba/piexifjs) - EXIF 信息写入
 - [opentype.js](https://github.com/opentypejs/opentype.js) - 字体渲染
 - [Font Awesome](https://fontawesome.com/) - 图标库
-- [MiSans](https://xiaomi.fonts.net.cn/) - 小米 MiSans 字体
+- [MiSans](https://hyperos.mi.com/font) - 小米 MiSans 字体
