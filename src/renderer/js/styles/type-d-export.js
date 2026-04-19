@@ -1,7 +1,7 @@
 /**
  * Type D 导出渲染模块
  * 负责在 Canvas 上绘制边框和内容
- * 当前与 Type A 相同，后续可自定义
+ * 基于 Type C 样式
  */
 
 // 使用全局 opentype 变量（从 CDN 加载）
@@ -98,20 +98,22 @@ async function drawBorderContent(ctx, imgWidth, imgHeight, borderHeight, setting
   const previewBase = 900;  // CSS 基准尺寸
   const scale = baseScale / previewBase;
   
-  const fontSize = Math.round(12 * scale);     // 基础字号（CSS: 12px）放大
+  // 纵向图片字体缩小 0.85 倍
+  const fontScale = isLandscape ? 1 : 0.85;
+  const fontSize = Math.round(12 * scale * fontScale);     // 基础字号（CSS: 12px）放大
   const largeFontSize = Math.round(24 * scale); // 焦距大字（CSS: 24px）放大
   
   // 使用图片宽度计算百分比位置
   const baseWidth = imgWidth;
   
-  // 布局位置（与 CSS 完全一致）
-  // .border-info { left: 17.5%; right: 50%; justify-content: flex-end } - 内容靠右，所以 x 用 50% 位置
-  // .border-focal { left: 52.5%; right: 20% } - 内容靠左，所以 x 用 52.5% 位置
-  // .border-right { left: 82.5%; right: 2.5% } - 内容靠右，所以 x 用 97.5% 位置
-  const infoRightX = baseWidth * 0.5;       // 50% - .border-info 的右边界
-  const focalX = baseWidth * 0.525;       // 52.5% - .border-focal 的左边界
-  const rightEdgeX = baseWidth * 0.975;    // 97.5% - .border-right 的右边界
-  const rightLeftX = baseWidth * 0.825;    // 82.5% - .border-right 的左边界
+  // Type D 布局（已调整）：
+  // .border-left (2.5%): 机型 + 时间
+  // .border-logo (45%~55%): Logo 中心在 50%
+  // .border-info (77.5%): 参数 + 署名
+  const leftX = baseWidth * 0.025;     // 2.5% - 左侧区域左边界
+  const logoX = baseWidth * 0.45;      // 45% - Logo 区域左边界
+  const logoWidth = baseWidth * 0.10;  // 10% - Logo 区域宽度
+  const rightX = baseWidth * 0.975;    // 97.5% - 右侧区域右边界
   
   // 垂直居中 - 边框顶部 + 一半高度
   const centerY = borderTop + borderHeight / 2;
@@ -119,77 +121,64 @@ async function drawBorderContent(ctx, imgWidth, imgHeight, borderHeight, setting
   // 两行文字的偏移：各自偏离中心半个行高+gap
   const lineOffset = fontSize / 2 + lineGap / 2;
   
-  // 1. Logo（左侧 2.5% 处）- 高度为边框的 60%，宽度限制为边框宽度的 15%
+  // 1. Logo（中间位置，中心在 65% 处）
   const logoPromises = [];
-  const logoX = baseWidth * 0.025;  // 2.5%
   if (settings.selectedLogo && settings.showLogo) {
     const promise = new Promise((resolve) => {
-      drawLogo(ctx, settings.selectedLogo, logoX, centerY, borderHeight, baseWidth, settings.borderColor, resolve);
+      drawLogo(ctx, settings.selectedLogo, logoX, centerY, borderHeight, logoWidth, settings.borderColor, resolve);
     });
     logoPromises.push(promise);
   }
   
-  // 2. 机型 + 拍摄参数（17.5%，居右对齐）
-  // CSS .border-info-inner { justify-content: center } 使内容垂直居中
-  // 当只有一行时居中，有两行时上下分布
-  // .border-info { left: 17.5%; right: 50% }，内容靠右对齐，所以用 50% 位置作为右边界
-  const hasModel = !!(settings.showModel && settings.customModel);
-  const hasParams = !!(settings.showParams && (settings.fNumber || settings.exposureTime || settings.iso));
+  // Type D 布局：.border-left: 时间 + 机型，.border-info: 参数 + 署名
   
-  if (hasModel || hasParams) {
-    const rightX = infoRightX;  // 50% 位置（.border-info 的右边界）
-    
-    if (hasModel && hasParams) {
-      // 两行：机型在上，参数在下（Medium）
-      drawText(ctx, fonts.fontMedium, settings.customModel, rightX, centerY - lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: '500' });
+  // 2. 参数 + 署名（右侧区域，97.5%）
+  const hasParams = !!(settings.showParams && (settings.fNumber || settings.exposureTime || settings.focalLength || settings.iso));
+  const hasSignature = !!settings.signatureText;
+  
+  if (hasParams || hasSignature) {
+    if (hasParams && hasSignature) {
+      // 两行：参数在上（Normal），署名在下（Semibold）
       const params = [];
       if (settings.fNumber) params.push(`f/${settings.fNumber}`);
       if (settings.exposureTime) params.push(`${settings.exposureTime}s`);
+      if (settings.focalLength) params.push(settings.focalLength);
       if (settings.iso) params.push(`ISO${settings.iso}`);
       const paramsText = params.join(' ');
-      drawText(ctx, fonts.fontNormal, paramsText, rightX, centerY + lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: 'normal' });
-    } else if (hasModel) {
-      // 只有机型：居中（Medium）
-      drawText(ctx, fonts.fontMedium, settings.customModel, rightX, centerY, fontSize, { align: 'right', color: textColor, fontWeight: '500' });
+      drawText(ctx, fonts.fontNormal, paramsText, rightX, centerY - lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: 'normal' });
+      drawText(ctx, fonts.fontSemibold, settings.signatureText, rightX, centerY + lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: '600' });
     } else if (hasParams) {
-      // 只有参数：居中
+      // 只有参数：居右（Normal）
       const params = [];
       if (settings.fNumber) params.push(`f/${settings.fNumber}`);
       if (settings.exposureTime) params.push(`${settings.exposureTime}s`);
+      if (settings.focalLength) params.push(settings.focalLength);
       if (settings.iso) params.push(`ISO${settings.iso}`);
       const paramsText = params.join(' ');
       drawText(ctx, fonts.fontNormal, paramsText, rightX, centerY, fontSize, { align: 'right', color: textColor, fontWeight: 'normal' });
+    } else if (hasSignature) {
+      // 只有署名：居右（Semibold）
+      drawText(ctx, fonts.fontSemibold, settings.signatureText, rightX, centerY, fontSize, { align: 'right', color: textColor, fontWeight: '600' });
     }
   }
   
-  // 3. 焦距（52.5%，居左，大字）- 使用 Medium
-  // 注意：settings.focalLength 已包含 "mm" 后缀（如 "75mm"），不再添加
-  if (settings.focalLength) {
-    drawText(ctx, fonts.fontMedium, settings.focalLength, focalX, centerY, largeFontSize, { color: textColor, fontWeight: '500' });
-  }
-  
-  // 4. 署名 + 时间（82.5%-97.5% 区间，.border-right { left: 82.5%; right: 2.5% }）
-  // CSS .border-right-inner { justify-content: center } 使内容垂直居中
-  // 当只有一行时居中，有两行时上下分布
-  // .border-right 内容靠右对齐，所以用 97.5% 位置作为右边界
-  const hasSignature = !!settings.signatureText;
+  // 3. 机型 + 时间（左侧区域，2.5%）- 顺序已调整
   const hasTime = !!(settings.showTime && settings.dateTime);
+  const hasModel = !!(settings.showModel && settings.customModel);
   
-  if (hasSignature || hasTime) {
-    const rightX = rightEdgeX;  // 97.5% 位置（.border-right 的右边界）
-    
-    if (hasSignature && hasTime) {
-      // 两行：署名在上，时间在下
-      drawText(ctx, fonts.fontSemibold, settings.signatureText, rightX, centerY - lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: '600' });
+  if (hasTime || hasModel) {
+    if (hasModel && hasTime) {
+      // 两行：机型在上（Medium），时间在下（Normal）
+      drawText(ctx, fonts.fontMedium, settings.customModel, leftX, centerY - lineOffset, fontSize, { align: 'left', color: textColor, fontWeight: '500' });
       const timeStr = formatDateForDisplay(settings.dateTime);
-      drawText(ctx, fonts.fontNormal, timeStr, rightX, centerY + lineOffset, fontSize, { align: 'right', color: textColor, fontWeight: 'normal' });
-    } else if (hasSignature) {
-      // 只有署名：居中
-      drawText(ctx, fonts.fontSemibold, settings.signatureText, rightX, centerY, fontSize, { align: 'right', color: textColor, fontWeight: '600' });
+      drawText(ctx, fonts.fontNormal, timeStr, leftX, centerY + lineOffset, fontSize, { align: 'left', color: textColor, fontWeight: 'normal' });
+    } else if (hasModel) {
+      // 只有机型：居左（Medium）
+      drawText(ctx, fonts.fontMedium, settings.customModel, leftX, centerY, fontSize, { align: 'left', color: textColor, fontWeight: '500' });
     } else if (hasTime) {
-      // 只有时间：居中
+      // 只有时间：居左（Normal）
       const timeStr = formatDateForDisplay(settings.dateTime);
-      drawText(ctx, fonts.fontNormal, timeStr, rightX, centerY, fontSize, { align: 'right', color: textColor, fontWeight: 'normal' });
+      drawText(ctx, fonts.fontNormal, timeStr, leftX, centerY, fontSize, { align: 'left', color: textColor, fontWeight: 'normal' });
     }
   }
   
@@ -277,8 +266,8 @@ async function drawLogo(ctx, logoName, x, centerY, borderHeight, imgWidth, borde
     let logoHeight = borderHeight * 0.6;
     let logoWidth = (img.width / img.height) * logoHeight;
     
-    // 应用 CSS 中的 max-width: 15% 限制（相对于图片宽度）
-    const maxLogoWidth = imgWidth * 0.15;
+    // 应用 CSS 中的 max-width: 100% 限制（相对于 logo 区域宽度）
+    const maxLogoWidth = imgWidth;  // logo 区域宽度
     if (logoWidth > maxLogoWidth) {
       logoWidth = maxLogoWidth;
       // 相应调整高度，保持宽高比

@@ -276,21 +276,18 @@ document.addEventListener('DOMContentLoaded', () => {
     editPanel.classList.remove('visible');
     
     // 根据之前的样式重置
+    const preview = getPreview(previousStyle);
     if (previousStyle === 'type-b') {
       typeBPreview.reset();
+    } else if (preview && preview.reset) {
+      preview.reset();
     } else {
       // 重置 frameWrapper 类名
       const frameWrapper = document.getElementById('frameWrapper');
       if (frameWrapper) {
         frameWrapper.classList.remove('type-b');
-        frameWrapper.classList.add('type-a');
+        frameWrapper.classList.add(previousStyle || 'type-a');
       }
-    }
-    
-    // 重置 borderContent HTML
-    const borderContent = document.getElementById('borderContent');
-    if (borderContent) {
-      borderContent.innerHTML = `<div class="border-content-inner"><div class="border-logo" id="borderLogo"></div><div class="border-info"><div class="border-info-inner"><div class="border-text border-model" id="borderModel"></div><div class="border-text border-params" id="borderParams"></div></div></div><div class="border-focal"><div class="border-text border-focal-text" id="borderFocal"></div></div><div class="border-right"><div class="border-right-inner"><div class="border-text border-signature" id="borderSignature"></div><div class="border-text" id="borderTime"></div></div></div></div>`;
     }
     resetForm();
   }
@@ -349,13 +346,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       typeBPreview.update({ naturalHeight: userImage.naturalHeight, naturalWidth: userImage.naturalWidth }, getDisplaySettings());
     } else {
-      // 使用 Type A Preview 模块
+      // 使用对应样式 Preview 模块
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      // 先 init 设置 state，再 reset 重置 HTML 结构
       preview.init({
         img: userImage,
-        frameWrapper: document.getElementById('frameWrapper'),
+        frameWrapper: frameWrapper,
         photoFooter: photoFooter,
-        borderContent: document.getElementById('borderContent')
+        borderContent: borderContent
       });
+      preview.reset();
+      preview.updateFrameWrapper(frameWrapper);
       const footerHeight = Math.round(shortSide * (borderPercent / 100));
       preview.updatePreview(userImage, photoFooter, {
         borderColor: borderColor.value,

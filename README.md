@@ -15,11 +15,12 @@
 - 提取并展示拍摄参数（光圈、快门、ISO、焦距）
 - 自动读取拍摄时间和设备型号
 
-### 🎨 边框定制
-- 支持多种边框样式（Type A / Type B）
-- Type A：可调节边框高度（5%-30%）
-- Type B：固定边框比例
-- 边框颜色自适应文字配色
+### 🎨 边框样式
+支持多种边框样式：
+- **Type A**：白色下边框 - 可调节边框高度（5%-30%），完整编辑面板
+- **Type B**：黑色下边框 - 固定边框比例，简化编辑面板
+- **Type C**：横向布局 - Logo 在左侧，参数在右侧
+- **Type D**：横向布局 - Logo 居中，左侧时间+署名，右侧机型+参数
 
 ### 📝 边框信息编辑
 - Logo 显示开关
@@ -63,8 +64,10 @@ OneFrame/
 │       ├── index.html       # 主页面
 │       ├── index.css        # 全局样式
 │       ├── css/
-│       │   ├── type-a.css   # Type A 样式
-│       │   └── type-b.css   # Type B 样式
+│       │   ├── type-a.css   # Type A 样式（白色下边框）
+│       │   ├── type-b.css   # Type B 样式（黑色下边框）
+│       │   ├── type-c.css   # Type C 样式
+│       │   └── type-d.css   # Type D 样式
 │       ├── js/
 │       │   ├── app.js        # 主逻辑入口
 │       │   ├── events.js     # 事件处理
@@ -78,13 +81,19 @@ OneFrame/
 │       │   │   ├── home.js    # 首页视图
 │       │   │   ├── editor.js  # 编辑器视图
 │       │   │   ├── type-a-editor-panel.js  # Type A 面板配置
-│       │   │   └── type-b-editor-panel.js  # Type B 面板配置
+│       │   │   ├── type-b-editor-panel.js  # Type B 面板配置
+│       │   │   ├── type-c-editor-panel.js  # Type C 面板配置
+│       │   │   └── type-d-editor-panel.js  # Type D 面板配置
 │       │   └── styles/        # 样式模块
 │       │       ├── index.js   # 样式注册表
 │       │       ├── type-a-preview.js   # Type A 预览
 │       │       ├── type-b-preview.js   # Type B 预览
+│       │       ├── type-c-preview.js   # Type C 预览
+│       │       ├── type-d-preview.js   # Type D 预览
 │       │       ├── type-a-export.js    # Type A 导出
-│       │       └── type-b-export.js    # Type B 导出
+│       │       ├── type-b-export.js    # Type B 导出
+│       │       ├── type-c-export.js    # Type C 导出
+│       │       └── type-d-export.js    # Type D 导出
 │       ├── logos/            # 相机厂商 Logo (SVG)
 │       ├── fonts/            # 字体文件 (MiSans)
 │       └── assets/
@@ -140,7 +149,7 @@ npm run build
 ## 📖 使用说明
 
 ### 1. 选择边框样式
-启动应用后，点击首页的样式卡片（如"白色下边框"或"黑色下边框"）。
+启动应用后，点击首页的样式卡片（Type A / Type B / Type C / Type D）。
 
 ### 2. 选择图片
 选择样式后，系统会弹出文件选择器，选择要处理的图片。
@@ -186,13 +195,14 @@ npm run build
 2. 将文件放入 `src/renderer/logos/` 目录
 3. 文件命名规范：`{厂商名}.svg`（如 `Sony.svg`）
 4. 在 `src/renderer/js/logo-utils.js` 的 `logoList` 数组中添加厂商名称
-5. 如需自动检测，在 `SUPPORTED_MAKES` 数组中添加厂商名称
 
 ### 添加新的边框样式
 
 1. 在 `src/renderer/index.html` 中添加新的样式卡片
-2. 在 `src/renderer/index.css` 中添加对应的 CSS 样式
-3. 在 `src/renderer/js/app.js` 中添加样式处理逻辑
+2. 在 `src/renderer/css/` 中添加对应的 CSS 样式文件
+3. 在 `src/renderer/js/styles/` 中添加预览和导出模块
+4. 在 `src/renderer/js/components/` 中添加面板配置模块
+5. 在 `src/renderer/js/styles/index.js` 中注册新样式
 
 ---
 

@@ -94,6 +94,9 @@ export function updatePreview(img, photoFooter, options) {
   
   // 更新 borderContent 位置，使其只在 photoFooter 内显示
   updateBorderContentPosition(photoFooter, img, { aspectRatio });
+  
+  // 保存图片方向到 state 中，供 updateContentPreview 使用
+  state.isPortrait = !isLandscape;
 }
 
 /**
@@ -149,6 +152,11 @@ export function updateContentPreview(elements, settings) {
   const isLight = borderColor === '#ffffff' || borderColor === '#fff';
   const textColor = isLight ? '#000' : '#fff';
   
+  // 纵向图片时字体大小减小 30%
+  const isPortrait = state.isPortrait;
+  const baseFontSize = 12;
+  const fontSize = isPortrait ? Math.round(baseFontSize * 0.7) : baseFontSize;
+  
   // Logo
   if (selectedLogo && showLogo) {
     const logoPath = `logos/${selectedLogo}.svg`;
@@ -191,33 +199,29 @@ export function updateContentPreview(elements, settings) {
     borderModel.style.color = textColor;
     borderModel.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
     borderModel.style.fontWeight = '500';
+    borderModel.style.fontSize = `${fontSize}px`;
   } else {
     borderModel.textContent = '';
   }
   
-  // 参数
-  if (showParams && (fNumber || exposureTime || iso)) {
+  // 参数（包含光圈、快门速度、焦距、ISO）
+  if (showParams && (fNumber || exposureTime || focalLength || iso)) {
     const params = [];
     if (fNumber) params.push(`f/${fNumber}`);
     if (exposureTime) params.push(`${exposureTime}s`);
+    if (focalLength) params.push(focalLength);
     if (iso) params.push(`ISO${iso}`);
     borderParams.textContent = params.join(' ');
     borderParams.style.color = textColor;
     borderParams.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
     borderParams.style.fontWeight = 'normal';
+    borderParams.style.fontSize = `${fontSize}px`;
   } else {
     borderParams.textContent = '';
   }
   
-  // 焦距
-  if (focalLength) {
-    borderFocal.textContent = focalLength;
-    borderFocal.style.color = textColor;
-    borderFocal.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
-    borderFocal.style.fontWeight = '500';
-  } else {
-    borderFocal.textContent = '';
-  }
+  // 焦距区域已隐藏（焦距合并到参数中显示）
+  borderFocal.textContent = '';
   
   // 署名
   if (signatureText) {
@@ -225,6 +229,7 @@ export function updateContentPreview(elements, settings) {
     borderSignature.style.color = textColor;
     borderSignature.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
     borderSignature.style.fontWeight = '600';
+    borderSignature.style.fontSize = `${fontSize}px`;
   } else {
     borderSignature.textContent = '';
   }
@@ -236,6 +241,7 @@ export function updateContentPreview(elements, settings) {
     borderTime.style.color = textColor;
     borderTime.style.fontFamily = "'MiSans', 'Segoe UI', sans-serif";
     borderTime.style.fontWeight = 'normal';
+    borderTime.style.fontSize = `${fontSize}px`;
   } else {
     borderTime.textContent = '';
   }
@@ -273,8 +279,7 @@ export function reset() {
   }
   
   if (state.borderContent) {
-    // 重置为 CSS 定义的样式
-    state.borderContent.style.position = '';
+    // 重置动态设置的样式，保留 CSS 定义的 position: absolute
     state.borderContent.style.bottom = '';
     state.borderContent.style.left = '';
     state.borderContent.style.width = '';
@@ -290,6 +295,12 @@ export function reset() {
     state.borderContent.style.gap = '';
     state.borderContent.innerHTML = `
       <div class="border-content-inner">
+        <div class="border-left" id="borderLeft">
+          <div class="border-left-inner">
+            <div class="border-text border-signature" id="borderSignature"></div>
+            <div class="border-text" id="borderTime"></div>
+          </div>
+        </div>
         <div class="border-logo" id="borderLogo"></div>
         <div class="border-info">
           <div class="border-info-inner">
@@ -299,12 +310,6 @@ export function reset() {
         </div>
         <div class="border-focal">
           <div class="border-text border-focal-text" id="borderFocal"></div>
-        </div>
-        <div class="border-right">
-          <div class="border-right-inner">
-            <div class="border-text border-signature" id="borderSignature"></div>
-            <div class="border-text" id="borderTime"></div>
-          </div>
         </div>
       </div>
     `;

@@ -1,12 +1,15 @@
 /**
  * Type C 样式
  * 边框预览布局
- * 当前与 Type A 相同，后续可自定义
+ * 
+ * 布局调整：
+ * - 左下：时间 + 署名
+ * - 中间：Logo
+ * - 右下：机型 + 参数
  */
 
 /* Type C 样式 - 原始 flex 布局 */
-.frame-wrapper.type-c,
-.frame-wrapper:not(.type-b):not(.type-a) {
+.frame-wrapper.type-c {
   max-width: 900px;
   width: 100%;
   max-height: 100%;
@@ -18,9 +21,7 @@
 }
 
 /* 边框内容容器 - Type C 样式 */
-/* 使用 bottom: 0 定位，JS 会限制高度等于 photoFooter 高度 */
-.frame-wrapper.type-c .border-content,
-.frame-wrapper:not(.type-b):not(.type-a) .border-content {
+.frame-wrapper.type-c .border-content {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -29,8 +30,7 @@
   overflow: hidden;
 }
 
-.frame-wrapper.type-c .border-content-inner,
-.frame-wrapper:not(.type-b):not(.type-a) .border-content-inner {
+.frame-wrapper.type-c .border-content-inner {
   position: absolute;
   top: 0;
   left: 0;
@@ -42,110 +42,94 @@
 .frame-wrapper.type-c .border-logo,
 .frame-wrapper.type-c .border-info,
 .frame-wrapper.type-c .border-focal,
-.frame-wrapper.type-c .border-right,
-.frame-wrapper:not(.type-b):not(.type-a) .border-logo,
-.frame-wrapper:not(.type-b):not(.type-a) .border-info,
-.frame-wrapper:not(.type-b):not(.type-a) .border-focal,
-.frame-wrapper:not(.type-b):not(.type-a) .border-right {
+.frame-wrapper.type-c .border-left {
   position: absolute;
   display: flex;
   align-items: center;
   height: 100%;
 }
 
-.frame-wrapper.type-c .border-logo,
-.frame-wrapper:not(.type-b):not(.type-a) .border-logo {
+/* 左下：时间 + 署名 (原来的 logo 位置) */
+.frame-wrapper.type-c .border-left {
   left: 2.5%;
-  width: 12.5%;
+  width: 17.5%;
+  justify-content: flex-start;
 }
 
-.frame-wrapper.type-c .border-logo img,
-.frame-wrapper:not(.type-b):not(.type-a) .border-logo img {
+.frame-wrapper.type-c .border-left-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* 中间：Logo (中心在横向 65% 处，宽度 12.5%) */
+.frame-wrapper.type-c .border-logo {
+  left: 58.75%;
+  width: 12.5%;
+  justify-content: center;
+}
+
+.frame-wrapper.type-c .border-logo img {
   max-height: 60%;
   max-width: 100%;
   object-fit: contain;
 }
 
 /* Logo 颜色反转 - 深色背景时将深色 logo 转为白色 */
-.frame-wrapper.type-c .border-logo img.logo-invert,
-.frame-wrapper:not(.type-b):not(.type-a) .border-logo img.logo-invert {
+.frame-wrapper.type-c .border-logo img.logo-invert {
   filter: brightness(0) invert(1);
 }
 
-.frame-wrapper.type-c .border-info,
-.frame-wrapper:not(.type-b):not(.type-a) .border-info {
-  left: 17.5%;
-  right: 50%;
+/* 右下：机型 + 参数 (参数包含焦距) */
+.frame-wrapper.type-c .border-info {
+  left: 77.5%;
+  right: 2.5%;
   justify-content: flex-end;
 }
 
-.frame-wrapper.type-c .border-info-inner,
-.frame-wrapper:not(.type-b):not(.type-a) .border-info-inner {
+.frame-wrapper.type-c .border-info-inner {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
   gap: 2px;
   width: 100%;
-  padding-right: 5%;
 }
 
-.frame-wrapper.type-c .border-focal,
-.frame-wrapper:not(.type-b):not(.type-a) .border-focal {
-  left: 52.5%;
-  right: 20%;
-  justify-content: flex-start;
-}
-
-.frame-wrapper.type-c .border-right,
-.frame-wrapper:not(.type-b):not(.type-a) .border-right {
-  left: 82.5%;
-  right: 2.5%;
-  justify-content: flex-end;
-}
-
-.frame-wrapper.type-c .border-right-inner,
-.frame-wrapper:not(.type-b):not(.type-a) .border-right-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
+/* 隐藏焦距区域 */
+.frame-wrapper.type-c .border-focal {
+  display: none;
 }
 
 /* 文字样式 - 基础字号 */
-.frame-wrapper.type-c .border-text,
-.frame-wrapper:not(.type-b):not(.type-a) .border-text {
+.frame-wrapper.type-c .border-text {
   font-size: 12px;
   font-weight: normal;
   white-space: nowrap;
 }
 
 /* 机型 - 使用 medium (500)，参数 - 使用 normal (400)，署名 - 使用 semibold (600) */
-.frame-wrapper.type-c .border-model,
-.frame-wrapper:not(.type-b):not(.type-a) .border-model {
+.frame-wrapper.type-c .border-model {
   font-weight: 500;
 }
 
-.frame-wrapper.type-c .border-params,
-.frame-wrapper:not(.type-b):not(.type-a) .border-params {
+.frame-wrapper.type-c .border-params {
   font-weight: normal;
 }
 
-.frame-wrapper.type-c .border-signature,
-.frame-wrapper:not(.type-b):not(.type-a) .border-signature {
+.frame-wrapper.type-c .border-signature {
   font-weight: 600;
 }
 
 /* 时间 - 使用 normal */
-.frame-wrapper.type-c .border-time,
-.frame-wrapper:not(.type-b):not(.type-a) .border-time {
+.frame-wrapper.type-c .border-time {
   font-weight: normal;
 }
 
-/* 焦距 - 大号字体 Medium */
-.frame-wrapper.type-c .border-focal-text,
-.frame-wrapper:not(.type-b):not(.type-a) .border-focal-text {
+/* 焦距 - 大号字体 Medium (已隐藏) */
+.frame-wrapper.type-c .border-focal-text {
   font-size: 24px;
   font-weight: 500;
 }

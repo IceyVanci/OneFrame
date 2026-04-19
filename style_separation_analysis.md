@@ -2,12 +2,12 @@
 
 ## 📊 概览
 
-| 模块 | Type A | Type B | 分离状态 | 说明 |
-|------|--------|--------|----------|------|
-| **样式预览** | ✅ | ✅ | 完全分离 | 独立模块 `type-a-preview.js` / `type-b-preview.js` |
-| **样式导出** | ✅ | ✅ | 完全分离 | 独立模块 `type-a-export.js` / `type-b-export.js` |
-| **编辑面板配置** | ✅ | ✅ | 完全分离 | 独立模块 `type-a-editor-panel.js` / `type-b-editor-panel.js` |
-| **主逻辑 (app.js)** | ⚠️ | ⚠️ | 部分混合 | 包含 `if (currentStyle === 'type-b')` 分支 |
+| 模块 | Type A | Type B | Type C | Type D | 分离状态 | 说明 |
+|------|--------|--------|--------|--------|----------|------|
+| **样式预览** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-preview.js` |
+| **样式导出** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-export.js` |
+| **编辑面板配置** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-editor-panel.js` |
+| **主逻辑 (app.js)** | ⚠️ | ⚠️ | ⚠️ | ⚠️ | 部分混合 | 包含样式切换分支 |
 
 ---
 
@@ -17,21 +17,19 @@
 
 | 文件 | 功能 | 样式 |
 |------|------|------|
-| `type-a-preview.js` | Type A 边框预览 | Type A |
-| `type-b-preview.js` | Type B 边框预览 | Type B |
+| `type-a-preview.js` | Type A 边框预览（白色下边框） | Type A |
+| `type-b-preview.js` | Type B 边框预览（黑色下边框） | Type B |
+| `type-c-preview.js` | Type C 边框预览 | Type C |
+| `type-d-preview.js` | Type D 边框预览（横向布局） | Type D |
 
 **调用方式：**
 ```javascript
-import { getPreview, typeBPreview } from './styles/index.js';
+import { getPreview } from './styles/index.js';
 
 // 通用方式
 const preview = getPreview(currentStyle);
 preview.init(elements);
 preview.update(params, settings);
-
-// Type B 直接引用
-typeBPreview.init(elements);
-typeBPreview.update(params, settings);
 ```
 
 ### 2. 样式导出模块 (`styles/`)
@@ -40,24 +38,24 @@ typeBPreview.update(params, settings);
 |------|------|------|
 | `type-a-export.js` | Type A 图片导出 | Type A |
 | `type-b-export.js` | Type B 图片导出 | Type B |
+| `type-c-export.js` | Type C 图片导出 | Type C |
+| `type-d-export.js` | Type D 图片导出 | Type D |
 
 ### 3. 编辑面板配置模块 (`components/`)
 
 | 文件 | 功能 | 样式 |
 |------|------|------|
 | `type-a-editor-panel.js` | Type A 编辑面板配置 | Type A |
-| `type-b-editor-panel.js` | Type B 编辑面板配置 | Type B |
+| `type-b-editor-panel.js` | Type B 编辑面板配置（简化版） | Type B |
+| `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
+| `type-d-editor-panel.js` | Type D 编辑面板配置 | Type D |
 
 **调用方式：**
 ```javascript
-import { configureEditPanel as configureTypeA } from './type-a-editor-panel.js';
-import { configureEditPanel as configureTypeB } from './type-b-editor-panel.js';
+import { getStyle } from './styles/index.js';
 
-if (currentStyle === 'type-b') {
-  configureTypeB();
-} else {
-  configureTypeA();
-}
+const style = getStyle(currentStyle);
+style.panel.configureEditPanel();
 ```
 
 ---
@@ -66,74 +64,20 @@ if (currentStyle === 'type-b') {
 
 ### app.js
 
-**问题：** 包含大量 `if (currentStyle === 'type-b')` 条件分支
+**问题：** 包含样式切换条件分支
 
 **混合处理的部分：**
 
-| 函数/代码段 | Type A | Type B | 说明 |
-|-------------|--------|--------|------|
-| `loadImageWithExif` | ✅ | ✅ | Type B 检查纵向图片 |
-| `loadImageInElectron` | ✅ | ✅ | Type B 检查纵向图片 |
-| `showEditor` | ✅ | ✅ | Type B 隐藏编辑面板开关 |
-| `hideEditor` | ✅ | ✅ | Type B 重置预览 |
-| `updateBorder` | ✅ | ✅ | 使用对应样式预览模块 |
-| `updateBorderContent` | ✅ | ⚠️ | Type B 调用 `typeBPreview.update` |
-| `getDisplaySettings` | ✅ | ✅ | Type B 默认值不同 |
-| `getEditSettings` | ✅ | ✅ | Type B 默认值不同 |
-
-**Type B 相关代码片段：**
-
-```javascript
-// showEditor 中的 Type B 处理
-if (currentStyle === 'type-b') {
-  const switchLogo = document.getElementById('switchLogo');
-  if (switchLogo) switchLogo.style.display = 'none';
-  // ...
-}
-
-// updateBorder 中的 Type B 处理
-if (currentStyle === 'type-b') {
-  typeBPreview.init({...});
-  typeBPreview.update({...}, getDisplaySettings());
-}
-```
-
----
-
-## 🔧 还需要做的工作
-
-### 1. 编辑面板显示/隐藏逻辑 - ✅ 已完成
-
-| 操作 | 文件 | 状态 |
-|------|------|------|
-| Type B 隐藏开关按钮 | `app.js` / `type-b-editor-panel.js` | ✅ 已实现 |
-| Type B 输出比例简化 | `type-b-editor-panel.js` | ✅ 已实现 |
-| Type B 时间类型为 date | `type-b-editor-panel.js` | ✅ 已实现 |
-
-### 2. 预览内容更新 - ⚠️ 需要检查
-
-**问题：** `updateBorderContent` 函数在 Type B 时调用 `typeBPreview.update`，但 Type A 使用通用方式。
-
-**建议：** 统一使用 `getPreview(currentStyle).updateContentPreview()` 方式。
-
-### 3. 状态默认值 - ⚠️ 需要统一
-
-| 设置项 | Type A 默认值 | Type B 默认值 | 位置 |
-|--------|--------------|--------------|------|
-| `showLogo` | `switchLogo.classList.contains('active')` | `true` | `getDisplaySettings()` |
-| `showParams` | `switchParams.classList.contains('active')` | `true` | `getDisplaySettings()` |
-| `showTime` | `switchTime.classList.contains('active')` | `true` | `getDisplaySettings()` |
-
-### 4. app.js 重构建议 - 📋 可选
-
-可以考虑将 app.js 中的样式相关逻辑抽取到独立模块：
-
-```
-components/
-├── style-controller.js   # 统一管理样式切换逻辑
-├── type-a-state.js      # Type A 状态
-└── type-b-state.js      # Type B 状态
-```
+| 函数/代码段 | Type A | Type B | Type C | Type D | 说明 |
+|-------------|--------|--------|--------|--------|------|
+| `loadImageWithExif` | ✅ | ✅ | ✅ | ✅ | 通用 EXIF 读取 |
+| `loadImageInElectron` | ✅ | ✅ | ✅ | ✅ | IPC 读取 |
+| `showEditor` | ✅ | ✅ | ✅ | ✅ | 配置面板分支 |
+| `hideEditor` | ✅ | ✅ | ✅ | ✅ | 重置预览分支 |
+| `updateBorder` | ✅ | ✅ | ✅ | ✅ | 使用样式预览模块 |
+| `updateBorderContent` | ✅ | ✅ | ✅ | ✅ | 调用样式预览模块 |
+| `getDisplaySettings` | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
+| `getEditSettings` | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
 
 ---
 
@@ -146,8 +90,12 @@ components/
 | `index.js` | 样式注册表，提供 `getPreview()` / `getExport()` | 通用 |
 | `type-a-preview.js` | Type A 边框预览渲染 | Type A |
 | `type-b-preview.js` | Type B 边框预览渲染 | Type B |
+| `type-c-preview.js` | Type C 边框预览渲染 | Type C |
+| `type-d-preview.js` | Type D 边框预览渲染 | Type D |
 | `type-a-export.js` | Type A Canvas 绘制导出 | Type A |
 | `type-b-export.js` | Type B Canvas 绘制导出 | Type B |
+| `type-c-export.js` | Type C Canvas 绘制导出 | Type C |
+| `type-d-export.js` | Type D Canvas 绘制导出 | Type D |
 
 ### components/ 模块
 
@@ -157,34 +105,60 @@ components/
 | `home.js` | 首页视图 | 通用 |
 | `editor.js` | 编辑器视图（调用面板配置模块） | 通用 |
 | `type-a-editor-panel.js` | Type A 编辑面板配置 | Type A |
-| `type-b-editor-panel.js` | Type B 编辑面板配置 | Type B |
+| `type-b-editor-panel.js` | Type B 编辑面板配置（简化版） | Type B |
+| `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
+| `type-d-editor-panel.js` | Type D 编辑面板配置 | Type D |
 
 ### 共享模块
 
 | 文件 | 职责 | 说明 |
 |------|------|------|
-| `app.js` | 主逻辑入口，混合处理 | ⚠️ 需要重构 |
+| `app.js` | 主逻辑入口，混合处理 | ⚠️ 需要维护样式分支 |
 | `exif.js` | EXIF 读取 | ✅ 共享 |
-| `exporter.js` | 通用导出逻辑 | ✅ 共享 |
+| `exporter.js` | 通用导出逻辑（Type A/B） | ✅ 共享 |
 | `logo-utils.js` | Logo 工具函数 | ✅ 共享 |
-| `events.js` | 事件处理 | 待分析 |
-| `state.js` | 状态管理 | 待分析 |
+| `events.js` | 事件处理 | ✅ 共享 |
+| `state.js` | 状态管理 | ✅ 共享 |
+
+---
+
+## 🔧 样式特性
+
+### Type A - 白色下边框
+- 可调节边框高度（5%-30%）
+- 完整编辑面板
+- Logo + 机型 + 参数 + 时间
+
+### Type B - 黑色下边框
+- 固定边框比例
+- 简化编辑面板
+- 隐藏 Logo 开关
+
+### Type C - 样式 C
+- 横向布局
+- Logo 在左侧
+- 参数在右侧
+
+### Type D - 横向布局
+- Logo 居中
+- 左侧：时间 + 署名
+- 右侧：机型 + 参数
+- 纵向图片文字缩小 0.85x
 
 ---
 
 ## ✅ 结论
 
 **已实现完全分离的模块：**
-- 样式预览模块 (`type-a-preview.js` / `type-b-preview.js`)
-- 样式导出模块 (`type-a-export.js` / `type-b-export.js`)
-- 编辑面板配置模块 (`type-a-editor-panel.js` / `type-b-editor-panel.js`)
+- 样式预览模块 (`type-a/b/c/d-preview.js`)
+- 样式导出模块 (`type-a/b/c/d-export.js`)
+- 编辑面板配置模块 (`type-a/b/c/d-editor-panel.js`)
 
 **需要改进的部分：**
 - app.js 中的样式处理逻辑可以考虑进一步抽取
 - 状态默认值可以移到对应的 editor-panel 模块中统一管理
-- `updateBorderContent` 的调用方式可以统一
 
 **不影响其他样式的保障机制：**
 - ✅ 使用独立的模块文件
 - ✅ 在 `showEditor()` 中根据 `currentStyle` 调用对应配置
-- ✅ Type B 配置不会影响 Type A（只在 Type B 模式生效）
+- ✅ 每个样式的配置不会影响其他样式

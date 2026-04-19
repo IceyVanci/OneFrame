@@ -6,11 +6,15 @@
 import { readExifFromFile, readExifFromPath, embedExif, dumpExif, hasExifData } from './exif-exporter.js';
 import { typeAExport } from './styles/type-a-export.js';
 import { typeBExport } from './styles/type-b-export.js';
+import { typeCExport } from './styles/type-c-export.js';
+import { typeDExport } from './styles/type-d-export.js';
 
 // 导出样式映射
 const exportStyles = {
   'type-a': typeAExport,
-  'type-b': typeBExport
+  'type-b': typeBExport,
+  'type-c': typeCExport,
+  'type-d': typeDExport
 };
 
 /**

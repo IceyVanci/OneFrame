@@ -1,6 +1,7 @@
 /* 导入样式模块 */
 @import url('css/type-a.css');
 @import url('css/type-b.css');
+@import url('css/type-c.css');
 
 /* 导入 MiSans 字体 */
 @font-face {
