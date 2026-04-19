@@ -303,7 +303,7 @@ export async function renderImage(img, options) {
 
   // Type B: 正方形画布，边长 = 图片高度 × 110%
   const squareSize = Math.round(img.naturalHeight * 1.1);
-  const margin = Math.round(squareSize * 0.05); // 5% 边距
+  const margin = Math.round(squareSize * 0.025); // 2.5% 边距
   
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -315,97 +315,244 @@ export async function renderImage(img, options) {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, squareSize, squareSize);
   
-  // 图片居左显示，上下左三边距为 5%
-  const imgHeight = squareSize - margin * 2; // 图片高度 = 正方形高度 - 上下边距
-  const imgWidth = imgHeight; // 保持比例，宽度 = 高度（纵向图片）
+  // 图片居左显示，上下左三边距为 2.5%
+  const imgAvailableWidth = squareSize - margin * 2;
+  const imgAvailableHeight = squareSize - margin * 2;
+  
+  // 根据图片原始比例计算正确的显示尺寸
+  let drawWidth, drawHeight;
+  const aspectRatio = img.naturalHeight / img.naturalWidth;
+  
+  // 以宽度为准计算高度
+  drawWidth = imgAvailableWidth;
+  drawHeight = Math.round(drawWidth * aspectRatio);
+  
+  // 如果高度超出限制，以高度为准计算宽度
+  if (drawHeight > imgAvailableHeight) {
+    drawHeight = imgAvailableHeight;
+    drawWidth = Math.round(drawHeight / aspectRatio);
+  }
+  
+  // 计算居左的偏移量（上下居中）
+  const drawX = margin;
+  const drawY = margin + (imgAvailableHeight - drawHeight) / 2;
   
   // 绘制图片在左侧
-  ctx.drawImage(img, margin, margin, imgWidth, imgHeight);
+  ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
   
   // Type B 的边框内容位置调整（右侧白色区域）
-  const contentLeft = margin + imgWidth + margin; // 图片右边缘 + 右边距
-  const contentWidth = squareSize - contentLeft;
+  // 右侧预留约 15% 宽度
+  const rightAreaPercent = 0.15;
+  const leftAreaWidth = squareSize * (1 - rightAreaPercent);
+  const contentLeft = leftAreaWidth;
+  const contentWidth = squareSize - leftAreaWidth;
   
   if (contentWidth > 0 && settings) {
+    // 计算缩放比例：基于预览画布尺寸（原始正方形尺寸）进行缩放
+    const previewSquareSize = squareSize;
+    
     // 在右侧白色区域绘制边框内容
-    await drawBorderContentTypeB(ctx, squareSize, squareSize, squareSize, settings, fonts, contentLeft, contentWidth);
+    await drawBorderContentTypeB(ctx, squareSize, squareSize, settings, margin, drawWidth, previewSquareSize, fonts);
   }
 
   return canvas.toDataURL('image/jpeg', quality);
 }
 
 /**
- * Type B 专用边框内容绘制（右侧垂直排列）
+ * Type B 专用边框内容绘制（与预览完全一致）
+ * 布局：两列显示，左列灰色标签(75px) + 右列黑色数值(75px)
+ * 顺序：ShotAt → Focal → Aperture → Shutter → ISO → ShotOn → PhotoBy
+ * ShotAt 和 ISO 后有分隔线，Logo 在最下方
+ * @param {number} margin - 图片边距（2.5%）
+ * @param {number} drawWidth - 实际图片显示宽度
+ * @param {number} previewSquareSize - 预览时的画布尺寸（用于计算缩放比例）
  */
-async function drawBorderContentTypeB(ctx, canvasWidth, canvasHeight, borderHeight, settings, fonts, contentLeft, contentWidth) {
-  const textColor = '#000000'; // 白色背景用黑色文字
-  const baseScale = canvasHeight / 900;
-  const fontSize = Math.round(14 * baseScale);
-  const largeFontSize = Math.round(20 * baseScale);
+async function drawBorderContentTypeB(ctx, canvasWidth, canvasHeight, settings, margin, drawWidth, previewSquareSize, fonts) {
+  const textColor = '#000000';
+  const grayColor = '#888888';
   
-  // 内容区域居中
-  const centerX = contentLeft + contentWidth / 2;
-  const startY = canvasHeight * 0.2;
-  const lineGap = fontSize * 1.5;
+  // 计算缩放比例：预览文字是 12px，缩放到导出画布
+  const previewBaseSize = 900; // 预览基准
+  const scale = canvasWidth / previewBaseSize;
   
-  ctx.fillStyle = textColor;
-  ctx.textAlign = 'center';
+  // 字体大小基于 12px 基准
+  const fontSize = Math.round(12 * scale);
+  const lineGap = Math.round(9 * scale); // 9px 行距
+  const colWidth = Math.round(75 * scale); // 75px 列宽
+  const colGap = Math.round(8 * scale);   // 8px 列间距
+  const dividerWidth = colWidth * 2 + colGap;
+  
+  // 使用 opentype 绘制文字的辅助函数（支持对齐）
+  const drawOTFText = (font, text, x, y, size, color, align = 'left') => {
+    if (!font) return;
+    
+    // 先获取 path，再从 path 获取边界框
+    const tempPath = font.getPath(text, 0, 0, size);
+    const bbox = tempPath.getBoundingBox();
+    const textWidth = bbox.x2 - bbox.x1;
+    
+    // 根据对齐调整 x 位置
+    let drawX = x;
+    if (align === 'right') {
+      drawX = x - textWidth;
+    } else if (align === 'center') {
+      drawX = x - textWidth / 2;
+    }
+    
+    // 绘制文字（opentype y 是 baseline，需要 +size/3 居中）
+    const path = font.getPath(text, drawX, y + size / 3, size);
+    ctx.fillStyle = color;
+    path.draw(ctx);
+  };
+  
+  // 与预览一致的居中计算
+  // 文字区域 = squareSize - margin*2 - drawWidth
+  // 文字中心 = margin + drawWidth + textAreaWidth/2
+  const textAreaWidth = canvasWidth - margin * 2 - drawWidth;
+  const textCenterOffset = margin + drawWidth + textAreaWidth / 2;
+  
+  // 垂直方向：靠下，从底部 5% 开始
+  const bottomMarginPx = canvasHeight * 0.05;
+  let y = canvasHeight - bottomMarginPx;
+  
+  // Logo - 在最下方，距离底部 5%
+  let logoY = y;
+  
+  // 先计算需要多少行来确定起始位置（从下往上排）
+  const rows = [];
+  
+  if (settings.signatureText) {
+    rows.push({ label: 'PhotoBy', value: settings.signatureText, type: 'photoby' });
+  }
+  if (settings.customModel && settings.showModel) {
+    rows.unshift({ label: 'ShotOn', value: settings.customModel, type: 'shoton' });
+  }
+  if (settings.iso) {
+    rows.unshift({ label: 'ISO', value: String(settings.iso), type: 'iso' });
+  }
+  if (settings.exposureTime) {
+    rows.unshift({ label: 'Shutter', value: `${settings.exposureTime}s`, type: 'shutter' });
+  }
+  if (settings.fNumber) {
+    rows.unshift({ label: 'Aperture', value: `f/${settings.fNumber}`, type: 'aperture' });
+  }
+  if (settings.focalLength) {
+    rows.unshift({ label: 'Focal', value: `${String(settings.focalLength).replace(/mm$/i, '')}mm`, type: 'focal' });
+  }
+  if (settings.dateTime && settings.showTime) {
+    rows.unshift({ label: 'ShotAt', value: `${new Date(settings.dateTime).getFullYear()}/${String(new Date(settings.dateTime).getMonth() + 1).padStart(2, '0')}/${String(new Date(settings.dateTime).getDate()).padStart(2, '0')}`, type: 'shotat' });
+  }
+  
+  // 计算总高度（用于垂直居中）
+  const rowHeight = fontSize + lineGap;
+  let totalHeight = rows.length * rowHeight;
+  // 加上分隔线高度
+  if (settings.dateTime && settings.showTime) totalHeight += lineGap;
+  if (settings.iso) totalHeight += lineGap;
+  // 加上 Logo 空间（缩放）
+  if (settings.selectedLogo && settings.showLogo) totalHeight += Math.round(36 * scale) + Math.round(40 * scale);
+  
+  // 从底部向上计算起始位置
+  y = canvasHeight - bottomMarginPx - totalHeight;
+  
+  // 两列布局的 X 坐标
+  const leftColX = textCenterOffset - colGap / 2 - colWidth;
+  const rightColX = textCenterOffset + colGap / 2;
+  const dividerStartX = textCenterOffset - dividerWidth / 2;
+  
   ctx.textBaseline = 'middle';
   
-  let y = startY;
-  
-  // Logo
-  if (settings.selectedLogo && settings.showLogo) {
-    const logoHeight = fontSize * 2;
-    await drawLogoTypeB(ctx, settings.selectedLogo, centerX, y + logoHeight / 2, logoHeight, textColor);
-    y += logoHeight + lineGap;
-  }
-  
-  // 机型
-  if (settings.showModel && settings.customModel) {
-    ctx.font = `${fontSize}px 'MiSans', sans-serif`;
-    ctx.fillText(settings.customModel, centerX, y);
-    y += fontSize + lineGap * 0.5;
-  }
-  
-  // 参数
-  if (settings.showParams && (settings.fNumber || settings.exposureTime || settings.iso)) {
-    const params = [];
-    if (settings.fNumber) params.push(`f/${settings.fNumber}`);
-    if (settings.exposureTime) params.push(`${settings.exposureTime}s`);
-    if (settings.iso) params.push(`ISO${settings.iso}`);
-    ctx.font = `${fontSize}px 'MiSans', sans-serif`;
-    ctx.fillText(params.join(' '), centerX, y);
-    y += fontSize + lineGap * 0.5;
-  }
-  
-  // 时间
-  if (settings.showTime && settings.dateTime) {
+  // ShotAt - 时间
+  if (settings.dateTime && settings.showTime) {
     const dt = new Date(settings.dateTime);
-    const timeStr = `${dt.getFullYear()}/${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
-    ctx.font = `${fontSize}px 'MiSans', sans-serif`;
-    ctx.fillText(timeStr, centerX, y);
-    y += fontSize + lineGap * 0.5;
+    const timeStr = `${dt.getFullYear()}/${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')}`;
+    // 使用 opentype 绘制：标签右对齐 + 数值左对齐
+    drawOTFText(fonts.fontNormal, 'ShotAt', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontNormal, timeStr, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+    
+    // 分隔线 - ShotAt 后
+    ctx.fillStyle = grayColor;
+    ctx.fillRect(dividerStartX, y - lineGap / 2, dividerWidth, 1);
+    y += lineGap;
   }
   
-  // 署名
-  if (settings.showSignature && settings.signatureText) {
-    ctx.font = `${fontSize}px 'MiSans', sans-serif`;
-    ctx.fillText(settings.signatureText, centerX, y);
+  // Focal - 焦距
+  if (settings.focalLength) {
+    const focalVal = String(settings.focalLength).replace(/mm$/i, '');
+    drawOTFText(fonts.fontNormal, 'Focal', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontNormal, `${focalVal}mm`, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+  }
+  
+  // Aperture - 光圈
+  if (settings.fNumber) {
+    drawOTFText(fonts.fontNormal, 'Aperture', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontNormal, `f/${settings.fNumber}`, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+  }
+  
+  // Shutter - 快门
+  if (settings.exposureTime) {
+    drawOTFText(fonts.fontNormal, 'Shutter', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontNormal, `${settings.exposureTime}s`, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+  }
+  
+  // ISO
+  if (settings.iso) {
+    drawOTFText(fonts.fontNormal, 'ISO', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontNormal, String(settings.iso), rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+    
+    // 分隔线 - ISO 后
+    ctx.fillStyle = grayColor;
+    ctx.fillRect(dividerStartX, y - lineGap / 2, dividerWidth, 1);
+    y += lineGap;
+  }
+  
+  // ShotOn - 机型
+  if (settings.customModel && settings.showModel) {
+    drawOTFText(fonts.fontMedium, 'ShotOn', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontMedium, settings.customModel, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+  }
+  
+  // PhotoBy - 署名（仅在有值时显示）
+  if (settings.signatureText) {
+    drawOTFText(fonts.fontSemibold, 'PhotoBy', leftColX + colWidth, y, fontSize, grayColor, 'right');
+    drawOTFText(fonts.fontSemibold, settings.signatureText, rightColX, y, fontSize, textColor, 'left');
+    y += fontSize + lineGap;
+  }
+  
+  // Logo - 在最下方，距离参数 36px
+  if (settings.selectedLogo && settings.showLogo) {
+    y += Math.round(36 * scale);
+    await drawLogoTypeB(ctx, settings.selectedLogo, textCenterOffset, y, scale);
   }
 }
 
 /**
  * 绘制 Logo (Type B)
+ * 方形 logo 放大到 40px，非方形 20px
  */
-async function drawLogoTypeB(ctx, logoName, x, y, height, textColor) {
+async function drawLogoTypeB(ctx, logoName, x, y, scale) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     
     img.onload = () => {
-      const width = (img.width / img.height) * height;
-      ctx.drawImage(img, x - width / 2, y - height / 2, width, height);
+      const ratio = img.naturalWidth / img.naturalHeight;
+      let logoHeight;
+      if (ratio >= 0.8 && ratio <= 1.2) {
+        // 方形 logo，放大到 40px
+        logoHeight = Math.round(40 * scale);
+      } else {
+        // 非方形 logo，20px
+        logoHeight = Math.round(20 * scale);
+      }
+      const logoWidth = (img.width / img.height) * logoHeight;
+      ctx.drawImage(img, x - logoWidth / 2, y - logoHeight / 2, logoWidth, logoHeight);
       resolve();
     };
     

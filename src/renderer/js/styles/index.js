@@ -14,6 +14,10 @@ import { typeAPreview } from './type-a-preview.js';
 import { typeAExport } from './type-a-export.js';
 import { typeBPreview } from './type-b-preview.js';
 import { typeBExport } from './type-b-export.js';
+import { typeCPreview } from './type-c-preview.js';
+import { typeCExport } from './type-c-export.js';
+import { typeDPreview } from './type-d-preview.js';
+import { typeDExport } from './type-d-export.js';
 
 /**
  * @typedef {Object} StyleModule
@@ -30,6 +34,14 @@ export const styles = {
   'type-b': {
     preview: typeBPreview,
     export: typeBExport
+  },
+  'type-c': {
+    preview: typeCPreview,
+    export: typeCExport
+  },
+  'type-d': {
+    preview: typeDPreview,
+    export: typeDExport
   }
 };
 
@@ -76,3 +88,9 @@ export { typeBPreview } from './type-b-preview.js';
 
 // 重新导出 Type A Preview（供 editor.js 使用）
 export { typeAPreview } from './type-a-preview.js';
+
+// 重新导出 Type C Preview
+export { typeCPreview } from './type-c-preview.js';
+
+// 重新导出 Type D Preview
+export { typeDPreview } from './type-d-preview.js';
