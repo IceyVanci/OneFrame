@@ -18,6 +18,8 @@ import { typeCPreview } from './type-c-preview.js';
 import { typeCExport } from './type-c-export.js';
 import { typeDPreview } from './type-d-preview.js';
 import { typeDExport } from './type-d-export.js';
+import { typeEPreview } from './type-e-preview.js';
+import { typeEExport } from './type-e-export.js';
 
 /**
  * @typedef {Object} StyleModule
@@ -42,6 +44,10 @@ export const styles = {
   'type-d': {
     preview: typeDPreview,
     export: typeDExport
+  },
+  'type-e': {
+    preview: typeEPreview,
+    export: typeEExport
   }
 };
 
@@ -94,3 +100,6 @@ export { typeCPreview } from './type-c-preview.js';
 
 // 重新导出 Type D Preview
 export { typeDPreview } from './type-d-preview.js';
+
+// 重新导出 Type E Preview
+export { typeEPreview } from './type-e-preview.js';

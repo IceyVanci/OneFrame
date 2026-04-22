@@ -279,6 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const preview = getPreview(previousStyle);
     if (previousStyle === 'type-b') {
       typeBPreview.reset();
+    } else if (previousStyle === 'type-e') {
+      // Type E 重置
+      if (preview && preview.reset) preview.reset();
     } else if (preview && preview.reset) {
       preview.reset();
     } else {
@@ -345,6 +348,30 @@ document.addEventListener('DOMContentLoaded', () => {
         borderContent: document.getElementById('borderContent')
       });
       typeBPreview.update({ naturalHeight: userImage.naturalHeight, naturalWidth: userImage.naturalWidth }, getDisplaySettings());
+    } else if (currentStyle === 'type-e') {
+      // 使用 Type E Preview 模块（与 Type B 一致的 API）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      preview.reset();
+      
+      // 计算尺寸
+      const { squareSize, margin, canvasHeight } = preview.calcSize({
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      
+      preview.updateFrameWrapper(squareSize);
+      preview.updatePreview(squareSize, margin, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      updateBorderContent();
     } else {
       // 使用对应样式 Preview 模块
       const frameWrapper = document.getElementById('frameWrapper');

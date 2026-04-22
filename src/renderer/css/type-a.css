@@ -4,8 +4,9 @@
  */
 
 /* Type A 样式 - 原始 flex 布局 */
+/* 注意：排除 type-b 和 type-e，它们使用自己的布局 */
 .frame-wrapper.type-a,
-.frame-wrapper:not(.type-b) {
+.frame-wrapper:not(.type-b):not(.type-e) {
   max-width: 900px;
   width: 100%;
   max-height: 100%;

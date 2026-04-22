@@ -6,7 +6,7 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 设计/使用中 | 50+ | 按设计预期运行，无需修改 |
+| ✅ 设计/使用中 | 55+ | 按设计预期运行，无需修改 |
 | ⚠️ 未使用/预留 | 12 | 功能已废弃或预留，未被调用 |
 
 ---
@@ -25,33 +25,37 @@ src/
     │   ├── type-a.css      # Type A 样式（白色下边框）
     │   ├── type-b.css      # Type B 样式（黑色下边框）
     │   ├── type-c.css      # Type C 样式
-    │   └── type-d.css      # Type D 样式
+    │   ├── type-d.css      # Type D 样式
+    │   └── type-e.css      # Type E 样式（3:2纵向，顶部1:1正方形）
     ├── js/
     │   ├── app.js          # 主逻辑入口
-    │   ├── events.js        # 事件处理
+    │   ├── events.js       # 事件处理
     │   ├── state.js        # 状态管理
     │   ├── exif.js         # EXIF 读取 (exifreader)
     │   ├── exif-exporter.js # EXIF 导出 (piexifjs)
     │   ├── exporter.js      # 图片导出
     │   ├── logo-utils.js    # Logo 工具函数
     │   ├── components/
-    │   │   ├── index.js    # 组件导出
-    │   │   ├── home.js     # 首页视图
-    │   │   ├── editor.js   # 编辑器视图
+    │   │   ├── index.js     # 组件导出
+    │   │   ├── home.js      # 首页视图
+    │   │   ├── editor.js    # 编辑器视图
     │   │   ├── type-a-editor-panel.js  # Type A 编辑面板配置
     │   │   ├── type-b-editor-panel.js  # Type B 编辑面板配置
     │   │   ├── type-c-editor-panel.js  # Type C 编辑面板配置
-    │   │   └── type-d-editor-panel.js  # Type D 编辑面板配置
+    │   │   ├── type-d-editor-panel.js  # Type D 编辑面板配置
+    │   │   └── type-e-editor-panel.js  # Type E 编辑面板配置
     │   └── styles/
     │       ├── index.js     # 样式注册表
     │       ├── type-a-preview.js   # Type A 预览
     │       ├── type-b-preview.js   # Type B 预览
     │       ├── type-c-preview.js   # Type C 预览
     │       ├── type-d-preview.js   # Type D 预览
+    │       ├── type-e-preview.js   # Type E 预览
     │       ├── type-a-export.js    # Type A 导出
     │       ├── type-b-export.js    # Type B 导出
     │       ├── type-c-export.js    # Type C 导出
-    │       └── type-d-export.js    # Type D 导出
+    │       ├── type-d-export.js    # Type D 导出
+    │       └── type-e-export.js    # Type E 导出
     ├── logos/               # 相机厂商 Logo (SVG)
     └── fonts/               # 字体文件 (MiSans)
 ```
@@ -68,21 +72,24 @@ src/
 | **预览** | `type-b-preview.js` | Type B 边框预览渲染（黑色下边框） | Type B |
 | **预览** | `type-c-preview.js` | Type C 边框预览渲染 | Type C |
 | **预览** | `type-d-preview.js` | Type D 边框预览渲染 | Type D |
+| **预览** | `type-e-preview.js` | Type E 边框预览渲染（3:2纵向，顶部1:1图片，底部参数） | Type E |
 | **导出** | `type-a-export.js` | Type A Canvas 绘制导出 | Type A |
 | **导出** | `type-b-export.js` | Type B Canvas 绘制导出 | Type B |
 | **导出** | `type-c-export.js` | Type C Canvas 绘制导出 | Type C |
 | **导出** | `type-d-export.js` | Type D Canvas 绘制导出 | Type D |
+| **导出** | `type-e-export.js` | Type E Canvas 绘制导出 | Type E |
 | **面板配置** | `type-a-editor-panel.js` | Type A 编辑面板配置 | Type A |
 | **面板配置** | `type-b-editor-panel.js` | Type B 编辑面板配置 | Type B |
 | **面板配置** | `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
 | **面板配置** | `type-d-editor-panel.js` | Type D 编辑面板配置 | Type D |
+| **面板配置** | `type-e-editor-panel.js` | Type E 编辑面板配置 | Type E |
 | **样式注册表** | `index.js` | 统一管理样式模块 | 通用 |
 
 ### 共享模块
 
 | 模块 | 文件 | 职责 | 说明 |
 |------|------|------|------|
-| **主入口** | `app.js` | 主逻辑入口 | 混合处理 Type A/B/C/D |
+| **主入口** | `app.js` | 主逻辑入口 | 混合处理 Type A/B/C/D/E |
 | **EXIF 读取** | `exif.js` | 读取图片 EXIF 信息 | 使用 exifreader |
 | **EXIF 导出** | `exif-exporter.js` | 嵌入 EXIF 到输出图 | 使用 piexifjs |
 | **图片导出** | `exporter.js` | Canvas 绘制导出 | 通用逻辑 |
@@ -141,6 +148,23 @@ src/
 | `updateContentPreview(elements, settings)` | ✅ | 更新边框内容 |
 | `reset()` | ✅ | 重置预览状态 |
 
+### styles/type-e-preview.js (3:2纵向，顶部1:1正方形，底部参数)
+
+| 函数名 | 状态 | 说明 |
+|--------|------|------|
+| `init(elements)` | ✅ | 初始化 Type E 预览 |
+| `setOriginalDimensions(width, height)` | ✅ | 设置原始图片尺寸 |
+| `calcSize(settings)` | ✅ | 计算尺寸（正方形 + 3:2比例） |
+| `updateFrameWrapper(squareSize)` | ✅ | 更新 frameWrapper 为 3:2 |
+| `updatePreview(squareSize, margin, imgDimensions)` | ✅ | 更新 1:1 正方形图片预览 |
+| `updateContentPreview(elements, settings)` | ✅ | 更新底部参数布局 |
+| `getImageOffset()` | ✅ | 获取图片偏移量（用于导出） |
+| `resetImageOffset()` | ✅ | 重置图片偏移 |
+| `reset()` | ✅ | 重置预览状态 |
+| `getMaxOffset()` | ✅ | 获取最大偏移量（拖动限制） |
+| `startDrag/onDrag/endDrag` | ✅ | 图片拖动功能 |
+| `updateDragHint()` | ✅ | 拖动提示文字 |
+
 ### styles/type-a-export.js
 
 | 函数名 | 状态 | 说明 |
@@ -173,29 +197,20 @@ src/
 | `dataURLtoBlob(dataUrl)` | ✅ | DataURL 转 Blob |
 | `renderImage(img, options)` | ✅ | Type D Canvas 导出 |
 
-### components/type-a-editor-panel.js
+### styles/type-e-export.js
 
 | 函数名 | 状态 | 说明 |
 |--------|------|------|
-| `configureEditPanel()` | ✅ | 配置 Type A 编辑面板显示 |
+| `loadFonts()` | ✅ | 预加载 MiSans 字体 |
+| `drawBorderContentTypeE(ctx, canvasWidth, canvasHeight, settings, fonts)` | ✅ | 绘制 Type E 底部参数 |
+| `drawLogoTypeE(ctx, logoName, x, y, scale, yearFontSize)` | ✅ | 绘制 Logo（按比例） |
+| `renderImage(img, options)` | ✅ | Type E Canvas 导出（3:2纵向） |
 
-### components/type-b-editor-panel.js
-
-| 函数名 | 状态 | 说明 |
-|--------|------|------|
-| `configureEditPanel()` | ✅ | 配置 Type B 编辑面板（隐藏高级选项） |
-
-### components/type-c-editor-panel.js
+### components/type-*-editor-panel.js
 
 | 函数名 | 状态 | 说明 |
 |--------|------|------|
-| `configureEditPanel()` | ✅ | 配置 Type C 编辑面板 |
-
-### components/type-d-editor-panel.js
-
-| 函数名 | 状态 | 说明 |
-|--------|------|------|
-| `configureEditPanel()` | ✅ | 配置 Type D 编辑面板 |
+| `configureEditPanel()` | ✅ | 配置对应类型的编辑面板 |
 
 ### app.js
 
@@ -208,13 +223,13 @@ src/
 | `loadImageWithExif` | ✅ | 导入文件 | 读取 EXIF → 更新表单 | 浏览器环境 |
 | `loadImageInElectron` | ✅ | 选择图片 | IPC 读取 EXIF | Electron 环境 |
 | `updateExifDisplay` | ✅ | EXIF 更新 | 自动填充表单 | UX 优化 |
-| `showEditor` | ✅ | 进入编辑器 | 配置编辑面板 | Type A/B/C/D 分支 |
-| `hideEditor` | ✅ | 返回主页 | 重置状态 | Type A/B/C/D 分支 |
+| `showEditor` | ✅ | 进入编辑器 | 配置编辑面板 | Type A/B/C/D/E 分支 |
+| `hideEditor` | ✅ | 返回主页 | 重置状态 | Type A/B/C/D/E 分支 |
 | `resetForm` | ✅ | 返回主页 | 清空表单 | UI |
-| `updateBorder` | ✅ | 颜色/高度变化 | 更新边框 | Type A/B/C/D 分支 |
-| `updateBorderContent` | ✅ | 内容变化 | 更新边框内容 | Type A/B/C/D 分支 |
-| `getDisplaySettings` | ✅ | 预览更新 | 收集显示设置 | Type A/B/C/D 默认值不同 |
-| `getEditSettings` | ✅ | 导出时 | 收集编辑设置 | Type A/B/C/D 默认值不同 |
+| `updateBorder` | ✅ | 颜色/高度变化 | 更新边框 | Type A/B/C/D/E 分支 |
+| `updateBorderContent` | ✅ | 内容变化 | 更新边框内容 | Type A/B/C/D/E 分支 |
+| `getDisplaySettings` | ✅ | 预览更新 | 收集显示设置 | Type A/B/C/D/E 默认值不同 |
+| `getEditSettings` | ✅ | 导出时 | 收集编辑设置 | Type A/B/C/D/E 默认值不同 |
 | `exportImageHandler` | ✅ | 点击导出 | 调用 exporter | 文件系统 |
 
 ### exporter.js
@@ -280,15 +295,15 @@ src/
 ┌─────────────────────────────────────┐
 │  loadImageWithExif / loadImageInElectron  │
 └────────────────┬────────────────────┘
-                 │
-                 ▼
+                  │
+                  ▼
 ┌─────────────────────────────────────┐
 │            getExif(file)            │
 │  - 动态加载 exifreader             │
 │  - 解析 EXIF 字段                  │
 └────────────────┬────────────────────┘
-                 │
-                 ▼
+                  │
+                  ▼
 ┌─────────────────────────────────────┐
 │         updateExifDisplay           │
 │  - 自动选择 Logo                   │
@@ -305,8 +320,8 @@ src/
 ┌─────────────────────────────────────┐
 │  currentStyle = card.dataset.style │
 └────────────────┬────────────────────┘
-                 │
-                 ▼
+                  │
+                  ▼
 ┌─────────────────────────────────────┐
 │          showEditor()               │
 │  - 调用 configureEditPanel()       │
@@ -324,7 +339,7 @@ src/
 ┌─────────────────────────────────────┐
 │        updateBorder()              │
 │  - 获取当前样式预览模块             │
-│  - 调用 preview.update()            │
+│  - 调用 preview.update()           │
 └─────────────────────────────────────┘
 ```
 
@@ -339,15 +354,15 @@ src/
 │  - 计算边框高度                     │
 │  - 收集编辑设置                     │
 └────────────────┬────────────────────┘
-                 │
-                 ▼
+                  │
+                  ▼
 ┌─────────────────────────────────────┐
 │       getExport(currentStyle)       │
 │  - 获取对应样式导出模块             │
 │  - 调用 renderImage()              │
 └─────────────────────────────────────┘
-                 │
-                 ▼
+                  │
+                  ▼
 ┌─────────────────────────────────────┐
 │  Canvas 绘制 → 嵌入 EXIF → Blob   │
 └─────────────────────────────────────┘
@@ -355,13 +370,54 @@ src/
 
 ---
 
+## Type E 特殊布局说明
+
+### Type E 画布结构
+
+```
+┌─────────────────────────────────┐
+│                                 │
+│         1:1 正方形图片            │  ← 顶部 squareSize × squareSize
+│       (可拖动裁剪区域)            │
+│                                 │
+├─────────────────────────────────┤
+│  March              f/2.8       │
+│  2024            50mm 1/125   │  ← 底部白色区域
+│                   ISO 400       │    canvasHeight × 0.5
+│ [Logo]            Model          │
+│                 Signature        │
+└─────────────────────────────────┘
+
+画布尺寸：squareSize × (squareSize × 1.5)
+```
+
+### Type E 布局规则
+
+| 位置 | 内容 | 样式 |
+|------|------|------|
+| 左上 | 月份（英文首字母大写） | font-size: 24px, 高度是其他文字的 2 倍 |
+| 左上（月份下方） | 年份 | font-size: 12px |
+| 左下（年份下方） | Logo | 方形：高度=年份高度；横向：宽度=年份×2 |
+| 右上 | 光圈 f/X.X | font-size: 14px |
+| 右上 | 焦距 + 快门 | font-size: 12px |
+| 右上 | ISO | font-size: 12px |
+| 右上 | 机型 | font-size: 12px, 灰色 |
+| 右上 | 署名 | font-size: 12px, 浅灰 |
+
+### Type E 拖动机制
+
+- 纵向图片：只能上下拖动，可拖动范围 = (原始高度 - squareSize) / 2
+- 横向/方形图片：只能左右拖动，可拖动范围 = (原始宽度 - squareSize) / 2
+
+---
+
 ## 📊 统计
 
 | 分类 | 数量 |
 |------|------|
-| 设计/使用中 | 50+ |
+| 设计/使用中 | 55+ |
 | 未使用/预留 | 12 |
-| **总计分析** | 62+ |
+| **总计分析** | 67+ |
 
 ---
 
@@ -402,9 +458,9 @@ src/
 
 | 模块 | 分离状态 |
 |------|----------|
-| 样式预览 (`type-a/b/c/d-preview.js`) | ✅ 完全分离 |
-| 样式导出 (`type-a/b/c/d-export.js`) | ✅ 完全分离 |
-| 编辑面板配置 (`type-a/b/c/d-editor-panel.js`) | ✅ 完全分离 |
+| 样式预览 (`type-a/b/c/d/e-preview.js`) | ✅ 完全分离 |
+| 样式导出 (`type-a/b/c/d/e-export.js`) | ✅ 完全分离 |
+| 编辑面板配置 (`type-a/b/c/d/e-editor-panel.js`) | ✅ 完全分离 |
 | 主逻辑 (`app.js`) | ⚠️ 部分混合 |
 
 详细分析请查看 `style_separation_analysis.md`。
