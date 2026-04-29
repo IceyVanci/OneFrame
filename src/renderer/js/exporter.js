@@ -90,7 +90,9 @@ export async function exportImage(img, options) {
     borderColor,
     borderHeight,
     quality,
-    settings
+    settings,
+    imageOffset: options.imageOffset || { x: 0, y: 0 },
+    previewSquareSize: options.previewSquareSize || 0
   });
 
   // 从原图文件读取 EXIF

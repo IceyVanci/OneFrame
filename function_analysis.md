@@ -159,11 +159,12 @@ src/
 | `updatePreview(squareSize, margin, imgDimensions)` | ✅ | 更新 1:1 正方形图片预览 |
 | `updateContentPreview(elements, settings)` | ✅ | 更新底部参数布局 |
 | `getImageOffset()` | ✅ | 获取图片偏移量（用于导出） |
+| `getState()` | ✅ | 获取完整 state（用于导出 normalizedOffset） |
+| `getNormalizedOffset()` | ✅ | 获取归一化偏移量（用于导出） |
 | `resetImageOffset()` | ✅ | 重置图片偏移 |
 | `reset()` | ✅ | 重置预览状态 |
 | `getMaxOffset()` | ✅ | 获取最大偏移量（拖动限制） |
 | `startDrag/onDrag/endDrag` | ✅ | 图片拖动功能 |
-| `updateDragHint()` | ✅ | 拖动提示文字 |
 
 ### styles/type-a-export.js
 
@@ -203,7 +204,8 @@ src/
 |--------|------|------|
 | `loadFonts()` | ✅ | 预加载 MiSans 字体 |
 | `drawBorderContentTypeE(ctx, canvasWidth, canvasHeight, settings, fonts)` | ✅ | 绘制 Type E 底部参数 |
-| `drawLogoTypeE(ctx, logoName, x, y, scale, yearFontSize)` | ✅ | 绘制 Logo（按比例） |
+| `drawLogoTypeEFixed(ctx, logoName, x, bottomY, scale, yearFontSize)` | ✅ | 绘制 Logo（固定在底部） |
+| `drawLogoTypeE(ctx, logoName, x, y, scale, yearFontSize)` | ⚠️ | 已废弃，改用 drawLogoTypeEFixed |
 | `renderImage(img, options)` | ✅ | Type E Canvas 导出（3:2纵向） |
 
 ### components/type-*-editor-panel.js
@@ -395,14 +397,12 @@ src/
 
 | 位置 | 内容 | 样式 |
 |------|------|------|
-| 左上 | 月份（英文首字母大写） | font-size: 24px, 高度是其他文字的 2 倍 |
-| 左上（月份下方） | 年份 | font-size: 12px |
-| 左下（年份下方） | Logo | 方形：高度=年份高度；横向：宽度=年份×2 |
-| 右上 | 光圈 f/X.X | font-size: 14px |
-| 右上 | 焦距 + 快门 | font-size: 12px |
-| 右上 | ISO | font-size: 12px |
-| 右上 | 机型 | font-size: 12px, 灰色 |
-| 右上 | 署名 | font-size: 12px, 浅灰 |
+| 左上 | 月份（英文首字母大写） | font-size: 48px（是其他文字的 2 倍） |
+| 左上（月份下方） | 年份 | font-size: 24px |
+| 左下 | Logo | 固定在底部，距离下边缘 5% |
+| 右上 | 光圈 + 焦距 + 快门 + ISO | 合并在一行，font-size: 21px |
+| 右上 | 机型 | font-size: 18px, 灰色 #666666 |
+| 右上 | 署名 | font-size: 18px, 浅灰 #888888 |
 
 ### Type E 拖动机制
 

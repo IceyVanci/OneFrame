@@ -30,7 +30,7 @@ window.handleLogoLoad = function(img) {
   console.log('[TypeE] Logo loaded, ratio:', ratio, 'naturalSize:', img.naturalWidth, 'x', img.naturalHeight);
   
   // 动态测量年份文字的像素宽度
-  const yearFontSize = 12; // 与 CSS 中的 font-size 一致
+  const yearFontSize = 24; // 与 CSS 中的 font-size 一致
   const yearFont = `${yearFontSize}px MiSans Medium, sans-serif`;
   
   // 创建临时 canvas 测量文字
@@ -43,16 +43,16 @@ window.handleLogoLoad = function(img) {
   
   console.log('[TypeE] Year metrics:', yearText, 'width:', yearWidth, 'height:', yearHeight);
   
-  // 方形 Logo：宽高比在 0.8-1.2 之间，高度 = 年份行高
+  // 方形 Logo：宽高比在 0.8-1.2 之间，高度 = 年份文字宽度
   if (ratio >= 0.8 && ratio <= 1.2) {
-    img.style.height = yearHeight + 'px';
-    img.style.width = 'auto';
-    console.log('[TypeE] Square logo: height =', yearHeight);
+    img.style.height = yearWidth + 'px';
+    img.style.width = Math.round(yearWidth * ratio) + 'px';
+    console.log('[TypeE] Square logo: height =', yearWidth, 'width =', Math.round(yearWidth * ratio));
   } else {
     // 横向 Logo：宽度 = 年份宽度 × 2
-    const logoWidth = yearWidth * 2;
+    const logoWidth = Math.round(yearWidth * 2);
     img.style.width = logoWidth + 'px';
-    img.style.height = 'auto';
+    img.style.height = ''; // 清空
     console.log('[TypeE] Landscape logo: width =', logoWidth);
   }
 };
@@ -254,11 +254,27 @@ export function updateContentPreview(elements, settings) {
           ${dateTime && showTime ? getDateRows(dateTime) : ''}
           ${selectedLogo && showLogo ? `<div class="type-e-logo"><img src="logos/${selectedLogo}.svg" alt="" onload="handleLogoLoad(this)"></div>` : ''}
         </div>
-        <div class="type-e-right">
+        <div class="type-e-right" id="typeEParams">
           ${getRightParams(fNumber, focalLength, exposureTime, iso, customModel, showModel, signatureText)}
         </div>
       </div>
     `;
+    
+    // 计算年份顶部位置，让右侧参数与年份顶部对齐
+    // 使用 document.fonts.ready + requestAnimationFrame 确保字体加载且浏览器完成布局后再测量
+    document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        const yearEl = state.borderContent.querySelector('.type-e-year');
+        const paramsEl = state.borderContent.querySelector('#typeEParams');
+        if (yearEl && paramsEl) {
+          const yearRect = yearEl.getBoundingClientRect();
+          const paramsRect = paramsEl.getBoundingClientRect();
+          // 计算年份与参数的相对位置差，而非年份的绝对位置
+          paramsEl.style.marginTop = `${yearRect.top - paramsRect.top}px`;
+          console.log('[TypeE] Params aligned to year top, offset:', yearRect.top - paramsRect.top);
+        }
+      });
+    });
 
     console.log('[TypeE] borderContent updated');
   } else {
@@ -293,37 +309,36 @@ function getDateRows(dateTimeStr) {
 
 /**
  * 获取右侧参数 HTML
+ * 布局：光圈 + 焦距 + 快门 + ISO 合并在同一行
  */
 function getRightParams(fNumber, focalLength, exposureTime, iso, customModel, showModel, signatureText) {
   let html = '<div class="type-e-params">';
   
-  // 第一行：光圈（如果有）
+  // 第一行：光圈 + 焦距 + 快门 + ISO（合并在一行）
+  const parts = [];
   if (fNumber) {
-    html += `<div class="type-e-param-line type-e-fnumber">f/${fNumber}</div>`;
+    parts.push(`f/${fNumber}`);
   }
-  
-  // 第二行：焦距 + 快门（如果有）
-  if (focalLength && exposureTime) {
+  if (focalLength) {
     const focal = String(focalLength).replace(/mm$/i, '');
-    html += `<div class="type-e-param-line type-e-others">${focal}mm ${exposureTime}s</div>`;
-  } else if (focalLength) {
-    const focal = String(focalLength).replace(/mm$/i, '');
-    html += `<div class="type-e-param-line type-e-others">${focal}mm</div>`;
-  } else if (exposureTime) {
-    html += `<div class="type-e-param-line type-e-others">${exposureTime}s</div>`;
+    parts.push(`${focal}mm`);
   }
-  
-  // 第三行：ISO（如果有）
+  if (exposureTime) {
+    parts.push(`${exposureTime}s`);
+  }
   if (iso) {
-    html += `<div class="type-e-param-line type-e-others">ISO ${iso}</div>`;
+    parts.push(`ISO ${iso}`);
+  }
+  if (parts.length > 0) {
+    html += `<div class="type-e-param-line type-e-fnumber">${parts.join(' ')}</div>`;
   }
   
-  // 第四行：机型（如果有）
+  // 第二行：机型（如果有）
   if (customModel && showModel) {
     html += `<div class="type-e-param-line type-e-model">${customModel}</div>`;
   }
   
-  // 第五行：署名（如果有）
+  // 第三行：署名（如果有）
   if (signatureText) {
     html += `<div class="type-e-param-line type-e-signature">${signatureText}</div>`;
   }
@@ -515,6 +530,32 @@ export function getImageOffset() {
 }
 
 /**
+ * 获取当前状态（只读副本）
+ */
+export function getState() {
+  return {
+    squareSize: state.squareSize,
+    canvasHeight: state.canvasHeight,
+    footerHeight: state.footerHeight,
+    imageOffset: { ...state.imageOffset }
+  };
+}
+
+/**
+ * 获取归一化的图片偏移量（-0.5 到 0.5 范围）
+ * 用于跨分辨率一致地传递裁剪偏移到导出模块
+ */
+export function getNormalizedOffset() {
+  if (state.squareSize > 0) {
+    return {
+      x: state.imageOffset.x / state.squareSize,
+      y: state.imageOffset.y / state.squareSize
+    };
+  }
+  return { x: 0, y: 0 };
+}
+
+/**
  * 重置图片偏移量
  */
 export function resetImageOffset() {
@@ -535,9 +576,9 @@ function updateDragHint() {
   
   console.log('[TypeE] updateDragHint called, img dimensions:', originalImageDimensions);
   
-  // 移除旧的提示
-  const oldHint = document.querySelector('.type-e-drag-hint');
-  if (oldHint) oldHint.remove();
+  // 先移除所有已存在的拖动提示，避免重复创建
+  const existingHints = state.frameWrapper.parentElement?.querySelectorAll('.type-e-drag-hint');
+  existingHints?.forEach(hint => hint.remove());
   
   // 判断图片方向
   const isPortrait = originalImageDimensions.naturalHeight > originalImageDimensions.naturalWidth;
@@ -580,5 +621,7 @@ export const typeEPreview = {
   update: null,
   reset,
   getImageOffset,
+  getState,
+  getNormalizedOffset,
   resetImageOffset
 };

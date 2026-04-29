@@ -8,6 +8,12 @@
 
 ---
 
+## 📜 开发历程
+
+本项目最初使用 Minimax M2.7 进行开发，后入选 **Xiaomi MiMo Orbit-百万亿 Token 创造者激励计划**，改用 Xiaomi Mimo-v2.5/v2.5pro 进行开发，感谢 **Xiaomi MiMo Orbit** 提供的免费 Token。
+
+---
+
 ## ✨ 功能特性
 
 ### 📷 智能 EXIF 读取
@@ -21,6 +27,7 @@
 - **Type B**：黑色下边框 - 固定边框比例，简化编辑面板
 - **Type C**：横向布局 - Logo 在左侧，参数在右侧
 - **Type D**：横向布局 - Logo 居中，左侧时间+署名，右侧机型+参数
+- **Type E**：3:2 纵向 - 顶部 1:1 正方形图片，底部白色区域显示参数，支持拖动裁剪
 
 ### 📝 边框信息编辑
 - Logo 显示开关
@@ -67,7 +74,8 @@ OneFrame/
 │       │   ├── type-a.css   # Type A 样式（白色下边框）
 │       │   ├── type-b.css   # Type B 样式（黑色下边框）
 │       │   ├── type-c.css   # Type C 样式
-│       │   └── type-d.css   # Type D 样式
+│       │   ├── type-d.css   # Type D 样式
+│       │   └── type-e.css   # Type E 样式（3:2纵向）
 │       ├── js/
 │       │   ├── app.js        # 主逻辑入口
 │       │   ├── events.js     # 事件处理
@@ -83,17 +91,20 @@ OneFrame/
 │       │   │   ├── type-a-editor-panel.js  # Type A 面板配置
 │       │   │   ├── type-b-editor-panel.js  # Type B 面板配置
 │       │   │   ├── type-c-editor-panel.js  # Type C 面板配置
-│       │   │   └── type-d-editor-panel.js  # Type D 面板配置
+│       │   │   ├── type-d-editor-panel.js  # Type D 面板配置
+│       │   │   └── type-e-editor-panel.js  # Type E 面板配置
 │       │   └── styles/        # 样式模块
 │       │       ├── index.js   # 样式注册表
 │       │       ├── type-a-preview.js   # Type A 预览
 │       │       ├── type-b-preview.js   # Type B 预览
 │       │       ├── type-c-preview.js   # Type C 预览
 │       │       ├── type-d-preview.js   # Type D 预览
+│       │       ├── type-e-preview.js   # Type E 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
-│       │       └── type-d-export.js    # Type D 导出
+│       │       ├── type-d-export.js    # Type D 导出
+│       │       └── type-e-export.js    # Type E 导出
 │       ├── logos/            # 相机厂商 Logo (SVG)
 │       ├── fonts/            # 字体文件 (MiSans)
 │       └── assets/
@@ -227,3 +238,4 @@ npm run build
 - [opentype.js](https://github.com/opentypejs/opentype.js) - 字体渲染
 - [Font Awesome](https://fontawesome.com/) - 图标库
 - [MiSans](https://hyperos.mi.com/font) - 小米 MiSans 字体
+- [Xiaomi MiMo](https://mimo.xiaomi.com/) - Xiaomi MiMo Orbit-百万亿 Token 创造者激励计划提供了免费的TokenPlan

@@ -1,7 +1,7 @@
 // OneFrame 主程序
 import { getExif, formatDateTime, getFocalLength } from './exif.js';
 import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-utils.js';
-import { getStyle, getPreview, typeBPreview } from './styles/index.js';
+import { getStyle, getPreview, typeBPreview, typeEPreview } from './styles/index.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appContainer.style.display = 'none';
     editorView.classList.remove('hidden');
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = currentStyle === 'type-b' ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e') ? 'none' : 'block';
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
     if (currentStyle === 'type-b') {
@@ -260,6 +260,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (switchParams) switchParams.style.display = 'none';
       const switchTime = document.getElementById('switchTime');
       if (switchTime) switchTime.style.display = 'none';
+    }
+    
+    // Type E: 删除"原始比例"选项，隐藏所有"显示"开关
+    if (currentStyle === 'type-e') {
+      const aspectRatio = document.getElementById('aspectRatio');
+      if (aspectRatio) {
+        const originalOption = aspectRatio.querySelector('option[value="original"]');
+        if (originalOption) originalOption.remove();
+      }
+      // 隐藏"显示相机 Logo"、"显示拍摄参数"、"显示拍摄时间"开关
+      ['switchLogo', 'switchParams', 'switchTime'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const switchGroup = el.closest('.switch-group');
+          if (switchGroup) switchGroup.style.display = 'none';
+        }
+      });
     }
     if (userImage.complete) updateBorder();
   }
@@ -490,14 +507,22 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSave.disabled = true;
       btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       const settings = getEditSettings();
-      const blob = await exportImage(userImage, {
+      const exportOptions = {
         file: currentFile,
         imagePath: currentImagePath,
         borderColor: settings.borderColor,
         borderHeight: settings.borderHeight,
         quality: 1.0,
         settings: settings
-      });
+      };
+      
+      // Type E 需要传递图片偏移量和预览 squareSize（用于裁剪区域和文字缩放）
+      if (currentStyle === 'type-e') {
+        exportOptions.imageOffset = typeEPreview.getNormalizedOffset();
+        exportOptions.previewSquareSize = typeEPreview.getState().squareSize;
+      }
+      
+      const blob = await exportImage(userImage, exportOptions);
       if (window.electronAPI) {
         let exportFilename = 'output-OneFrame.jpg';
         if (currentImagePath) {
