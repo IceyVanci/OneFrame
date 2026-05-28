@@ -17,14 +17,19 @@
     <!-- 顶部标题栏 -->
     <header class="app-header">
       <h1 class="app-title">OneFrame</h1>
+      <button class="about-btn" id="aboutBtn">关于</button>
     </header>
 
     <!-- 边框样式图片墙 -->
     <main class="style-gallery">
       
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="params">参数</button>
+        <button class="tab-btn" data-tab="poster">海报</button>
+      </div>
       <div class="style-grid">
         <!-- 样式卡片 1: 白色下边框 -->
-        <div class="style-card" data-style="type-a">
+        <div class="style-card" data-style="type-a" data-category="params">
           <div class="style-preview">
             <div class="frame-container">
               <img src="TypeA-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -34,7 +39,7 @@
         </div>
 
         <!-- 样式卡片 2: 黑色下边框 -->
-        <div class="style-card" data-style="type-b">
+        <div class="style-card" data-style="type-b" data-category="poster">
           <div class="style-preview">
             <div class="frame-container style-b">
               <img src="TypeB-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -44,7 +49,7 @@
         </div>
 
         <!-- 样式卡片 3: Type C 样式 -->
-        <div class="style-card" data-style="type-c">
+        <div class="style-card" data-style="type-c" data-category="params">
           <div class="style-preview">
             <div class="frame-container">
               <img src="TypeC-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -54,7 +59,7 @@
         </div>
 
         <!-- 更多样式卡片 -->
-        <div class="style-card" data-style="type-d">
+        <div class="style-card" data-style="type-d" data-category="params">
           <div class="style-preview">
             <div class="frame-container">
               <img src="TypeD-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -64,7 +69,7 @@
         </div>
 
         <!-- 样式卡片 5: Type E 样式 -->
-        <div class="style-card" data-style="type-e">
+        <div class="style-card" data-style="type-e" data-category="poster">
           <div class="style-preview">
             <div class="frame-container">
               <img src="TypeE-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -258,6 +263,28 @@
           <i class="fas fa-download"></i>
           导出图片
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 关于模态框 -->
+  <div class="modal-overlay hidden" id="aboutModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">关于 OneFrame</span>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>OneFrame</strong> v1.0.0</p>
+        <p>一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。</p>
+        <hr>
+        <p><strong>GitHub：</strong><a href="https://github.com/IceyVanci/OneFrame" target="_blank">github.com/IceyVanci/OneFrame</a></p>
+        <p><strong>技术栈：</strong>Electron 28 + 原生 HTML/CSS/JS</p>
+        <p><strong>EXIF：</strong>exifreader + piexifjs</p>
+        <p><strong>字体：</strong>opentype.js + MiSans</p>
+        <hr>
+        <p class="modal-note">本项目入选 Xiaomi MiMo Orbit-百万亿 Token 创造者激励计划，感谢 Xiaomi MiMo Orbit 提供的免费 Token。</p>
+        <p><strong>许可证：</strong>MIT License</p>
       </div>
     </div>
   </div>

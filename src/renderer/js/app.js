@@ -249,6 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function showEditor() {
     appContainer.style.display = 'none';
     editorView.classList.remove('hidden');
+    // 监听窗口大小变化，重新计算预览布局
+    window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
     if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e') ? 'none' : 'block';
     
@@ -282,6 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function hideEditor() {
+    // 移除窗口大小变化监听
+    window.removeEventListener('resize', updateBorder);
     appContainer.style.display = 'flex';
     editorView.classList.add('hidden');
     userImage.src = '';
@@ -560,4 +564,53 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // ========== 标签页筛选逻辑 ==========
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const allStyleCards = document.querySelectorAll('.style-card');
+
+  function filterCards(category) {
+    allStyleCards.forEach(card => {
+      if (card.dataset.category === category) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterCards(btn.dataset.tab);
+    });
+  });
+
+  // 默认激活"参数"标签并筛选
+  filterCards('params');
+
+  // ========== 关于模态框逻辑 ==========
+  const aboutBtn = document.getElementById('aboutBtn');
+  const aboutModal = document.getElementById('aboutModal');
+  const modalClose = document.getElementById('modalClose');
+
+  if (aboutBtn && aboutModal) {
+    aboutBtn.addEventListener('click', () => {
+      aboutModal.classList.remove('hidden');
+    });
+
+    if (modalClose) {
+      modalClose.addEventListener('click', () => {
+        aboutModal.classList.add('hidden');
+      });
+    }
+
+    // 点击遮罩区域关闭模态框
+    aboutModal.addEventListener('click', (e) => {
+      if (e.target === aboutModal) {
+        aboutModal.classList.add('hidden');
+      }
+    });
+  }
 });

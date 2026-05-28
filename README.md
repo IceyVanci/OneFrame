@@ -2,7 +2,7 @@
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -160,7 +160,7 @@ npm run build
 ## 📖 使用说明
 
 ### 1. 选择边框样式
-启动应用后，点击首页的样式卡片（Type A / Type B / Type C / Type D）。
+启动应用后，点击首页的样式卡片（Type A / Type B / Type C / Type D / Type E）。
 
 ### 2. 选择图片
 选择样式后，系统会弹出文件选择器，选择要处理的图片。
@@ -236,6 +236,7 @@ npm run build
 - [exifreader](https://github.com/mattiasw/ExifReader) - EXIF 信息读取
 - [piexifjs](https://github.com/hMatoba/piexifjs) - EXIF 信息写入
 - [opentype.js](https://github.com/opentypejs/opentype.js) - 字体渲染
+- [Copicseal](https://github.com/copicseal) - 可图匠，部分代码逻辑来自 Copicseal
 - [Font Awesome](https://fontawesome.com/) - 图标库
 - [MiSans](https://hyperos.mi.com/font) - 小米 MiSans 字体
 - [Xiaomi MiMo](https://mimo.xiaomi.com/) - Xiaomi MiMo Orbit-百万亿 Token 创造者激励计划提供了免费的TokenPlan

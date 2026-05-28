@@ -2,12 +2,12 @@
 
 ## 📊 概览
 
-| 模块 | Type A | Type B | Type C | Type D | 分离状态 | 说明 |
-|------|--------|--------|--------|--------|----------|------|
-| **样式预览** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-preview.js` |
-| **样式导出** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-export.js` |
-| **编辑面板配置** | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d-editor-panel.js` |
-| **主逻辑 (app.js)** | ⚠️ | ⚠️ | ⚠️ | ⚠️ | 部分混合 | 包含样式切换分支 |
+| 模块 | Type A | Type B | Type C | Type D | Type E | 分离状态 | 说明 |
+|------|--------|--------|--------|--------|--------|----------|------|
+| **样式预览** | ✅ | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d/e-preview.js` |
+| **样式导出** | ✅ | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d/e-export.js` |
+| **编辑面板配置** | ✅ | ✅ | ✅ | ✅ | ✅ | 完全分离 | 独立模块 `type-a/b/c/d/e-editor-panel.js` |
+| **主逻辑 (app.js)** | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | 部分混合 | 包含样式切换分支 |
 
 ---
 
@@ -21,6 +21,7 @@
 | `type-b-preview.js` | Type B 边框预览（黑色下边框） | Type B |
 | `type-c-preview.js` | Type C 边框预览 | Type C |
 | `type-d-preview.js` | Type D 边框预览（横向布局） | Type D |
+| `type-e-preview.js` | Type E 边框预览（3:2 纵向，顶部 1:1 正方形） | Type E |
 
 **调用方式：**
 ```javascript
@@ -40,6 +41,7 @@ preview.update(params, settings);
 | `type-b-export.js` | Type B 图片导出 | Type B |
 | `type-c-export.js` | Type C 图片导出 | Type C |
 | `type-d-export.js` | Type D 图片导出 | Type D |
+| `type-e-export.js` | Type E 图片导出（3:2 纵向） | Type E |
 
 ### 3. 编辑面板配置模块 (`components/`)
 
@@ -49,6 +51,7 @@ preview.update(params, settings);
 | `type-b-editor-panel.js` | Type B 编辑面板配置（简化版） | Type B |
 | `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
 | `type-d-editor-panel.js` | Type D 编辑面板配置 | Type D |
+| `type-e-editor-panel.js` | Type E 编辑面板配置（简化版） | Type E |
 
 **调用方式：**
 ```javascript
@@ -68,16 +71,16 @@ style.panel.configureEditPanel();
 
 **混合处理的部分：**
 
-| 函数/代码段 | Type A | Type B | Type C | Type D | 说明 |
-|-------------|--------|--------|--------|--------|------|
-| `loadImageWithExif` | ✅ | ✅ | ✅ | ✅ | 通用 EXIF 读取 |
-| `loadImageInElectron` | ✅ | ✅ | ✅ | ✅ | IPC 读取 |
-| `showEditor` | ✅ | ✅ | ✅ | ✅ | 配置面板分支 |
-| `hideEditor` | ✅ | ✅ | ✅ | ✅ | 重置预览分支 |
-| `updateBorder` | ✅ | ✅ | ✅ | ✅ | 使用样式预览模块 |
-| `updateBorderContent` | ✅ | ✅ | ✅ | ✅ | 调用样式预览模块 |
-| `getDisplaySettings` | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
-| `getEditSettings` | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
+| 函数/代码段 | Type A | Type B | Type C | Type D | Type E | 说明 |
+|-------------|--------|--------|--------|--------|--------|------|
+| `loadImageWithExif` | ✅ | ✅ | ✅ | ✅ | ✅ | 通用 EXIF 读取 |
+| `loadImageInElectron` | ✅ | ✅ | ✅ | ✅ | ✅ | IPC 读取 |
+| `showEditor` | ✅ | ✅ | ✅ | ✅ | ✅ | 配置面板分支 |
+| `hideEditor` | ✅ | ✅ | ✅ | ✅ | ✅ | 重置预览分支 |
+| `updateBorder` | ✅ | ✅ | ✅ | ✅ | ✅ | 使用样式预览模块 |
+| `updateBorderContent` | ✅ | ✅ | ✅ | ✅ | ✅ | 调用样式预览模块 |
+| `getDisplaySettings` | ✅ | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
+| `getEditSettings` | ✅ | ✅ | ✅ | ✅ | ✅ | 样式默认值不同 |
 
 ---
 
@@ -92,10 +95,12 @@ style.panel.configureEditPanel();
 | `type-b-preview.js` | Type B 边框预览渲染 | Type B |
 | `type-c-preview.js` | Type C 边框预览渲染 | Type C |
 | `type-d-preview.js` | Type D 边框预览渲染 | Type D |
+| `type-e-preview.js` | Type E 边框预览渲染（3:2 纵向） | Type E |
 | `type-a-export.js` | Type A Canvas 绘制导出 | Type A |
 | `type-b-export.js` | Type B Canvas 绘制导出 | Type B |
 | `type-c-export.js` | Type C Canvas 绘制导出 | Type C |
 | `type-d-export.js` | Type D Canvas 绘制导出 | Type D |
+| `type-e-export.js` | Type E Canvas 绘制导出 | Type E |
 
 ### components/ 模块
 
@@ -108,6 +113,7 @@ style.panel.configureEditPanel();
 | `type-b-editor-panel.js` | Type B 编辑面板配置（简化版） | Type B |
 | `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
 | `type-d-editor-panel.js` | Type D 编辑面板配置 | Type D |
+| `type-e-editor-panel.js` | Type E 编辑面板配置 | Type E |
 
 ### 共享模块
 
@@ -145,14 +151,21 @@ style.panel.configureEditPanel();
 - 右侧：机型 + 参数
 - 纵向图片文字缩小 0.85x
 
+### Type E - 3:2 纵向
+- 顶部 1:1 正方形图片，底部白色区域显示参数
+- 画布比例 3:2
+- 图片可拖动选择裁剪区域
+- 字号：月份 48px，年份 24px，参数行 18px
+- Logo 固定在底部左下角
+
 ---
 
 ## ✅ 结论
 
 **已实现完全分离的模块：**
-- 样式预览模块 (`type-a/b/c/d-preview.js`)
-- 样式导出模块 (`type-a/b/c/d-export.js`)
-- 编辑面板配置模块 (`type-a/b/c/d-editor-panel.js`)
+- 样式预览模块 (`type-a/b/c/d/e-preview.js`)
+- 样式导出模块 (`type-a/b/c/d/e-export.js`)
+- 编辑面板配置模块 (`type-a/b/c/d/e-editor-panel.js`)
 
 **需要改进的部分：**
 - app.js 中的样式处理逻辑可以考虑进一步抽取

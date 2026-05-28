@@ -4,27 +4,24 @@
 
 - **项目名称**: OneFrame
 - **项目目标**: 为图片添加边框的桌面工具
-- **技术框架**: Electron
+- **技术框架**: Electron 28 + 原生 HTML/CSS/JS
 - **交付形式**: 便携版单 exe 文件
+- **当前版本**: v1.0.1
 
 ---
 
 ## 技术栈
 
-### 已确定方案
-
 | 模块 | 技术方案 | 说明 |
 |------|----------|------|
-| **前端框架** | Electron + 原生 HTML/JS | 与 colorphoto 保持一致，无需构建工具 |
-| **图片预览** | CSS 渲染 | 用 CSS 样式实现边框效果，实时预览 |
-| **截图导出** | Puppeteer-core | 将 HTML 渲染为图片 |
-| **EXIF 处理** | piexifjs | 保留原图 EXIF 信息和 JPG 质量 |
-| **打包方式** | electron-builder (portable) | 单 exe 文件输出 |
-
-### 参考项目
-
-- **colorphoto** (`F:\colorphoto`): 使用原生 Electron + HTML/JS，已验证可行
-- **copicseal** (`F:\copicseal`): CSS 边框渲染 + Puppeteer 截图方案
+| **桌面框架** | Electron 28.0 | 跨平台桌面应用框架 |
+| **前端** | 原生 HTML/CSS/JS | 无需构建工具，轻量高效 |
+| **图片预览** | CSS 渲染 | 实时预览边框效果 |
+| **图片导出** | Canvas 绘制 | 使用 Canvas API 绘制并导出图片 |
+| **EXIF 读取** | exifreader | 浏览器端读取图片 EXIF 信息 |
+| **EXIF 写入** | piexifjs | 导出时保留原图 EXIF 数据 |
+| **字体渲染** | opentype.js | Canvas 精确字体渲染（MiSans 字体） |
+| **打包工具** | electron-builder | 生成便携版单 exe 文件 |
 
 ---
 
@@ -34,157 +31,157 @@
 OneFrame/
 ├── src/
 │   ├── main/
-│   │   ├── main.js           # Electron 主进程
-│   │   └── capture.js        # Puppeteer 截图逻辑
-│   ├── preload/
-│   │   └── preload.js        # 安全桥接
-│   ├── renderer/
-│   │   ├── index.html        # 主页面
-│   │   ├── index.css         # 样式
-│   │   ├── js/
-│   │   │   ├── app.js        # 主逻辑
-│   │   │   ├── frame.js      # 边框处理
-│   │   │   └── export.js     # 导出功能
-│   │   └── assets/
-│   │       └── piexif.js     # EXIF 处理
-│   └── assets/               # 静态资源
+│   │   ├── main.js              # Electron 主进程
+│   │   └── preload.js           # 安全桥接（IPC）
+│   └── renderer/
+│       ├── index.html           # 主页面（首页 + 编辑器）
+│       ├── index.css            # 全局样式
+│       ├── css/
+│       │   ├── type-a.css      # Type A：白色下边框
+│       │   ├── type-b.css      # Type B：黑色下边框
+│       │   ├── type-c.css      # Type C：横向布局
+│       │   ├── type-d.css      # Type D：横向居中
+│       │   └── type-e.css      # Type E：3:2 纵向，顶部 1:1 正方形
+│       ├── js/
+│       │   ├── app.js          # 主逻辑入口
+│       │   ├── exif.js         # EXIF 读取（exifreader）
+│       │   ├── exif-exporter.js # EXIF 导出（piexifjs）
+│       │   ├── exporter.js     # 图片导出（通用逻辑）
+│       │   ├── logo-utils.js   # Logo 工具函数
+│       │   ├── events.js       # 事件总线
+│       │   ├── state.js        # 状态管理
+│       │   ├── components/
+│       │   │   ├── index.js     # 组件统一导出
+│       │   │   ├── home.js     # 首页视图
+│       │   │   ├── editor.js   # 编辑器视图
+│       │   │   └── type-*-editor-panel.js  # 各类型面板配置
+│       │   └── styles/
+│       │       ├── index.js     # 样式注册表
+│       │       ├── type-a-preview.js   # Type A 预览
+│       │       ├── type-b-preview.js   # Type B 预览
+│       │       ├── type-c-preview.js   # Type C 预览
+│       │       ├── type-d-preview.js   # Type D 预览
+│       │       ├── type-e-preview.js   # Type E 预览
+│       │       ├── type-a-export.js    # Type A 导出
+│       │       ├── type-b-export.js    # Type B 导出
+│       │       ├── type-c-export.js    # Type C 导出
+│       │       ├── type-d-export.js    # Type D 导出
+│       │       └── type-e-export.js    # Type E 导出
+│       ├── logos/               # 相机厂商 Logo（SVG）
+│       ├── fonts/               # 字体文件（MiSans）
+│       └── assets/
+│           └── piexif.js       # piexifjs 库
 ├── package.json
-├── electron-builder.json
-└── README.md
+├── README.md
+├── DESIGN.md
+└── AI_PROJECT_GUIDE.md
 ```
 
 ---
 
 ## 核心功能
 
-### 用户界面流程
+### 1. 首页 - 边框样式图片墙
+
+- 以网格形式展示所有边框样式预览（Type A-E）
+- 每个样式卡片显示边框样式缩略图
+- 点击样式卡片 → 弹出文件选择器 → 选择图片 → 进入编辑页面
+
+### 2. 编辑页面 - 实时预览与参数调整
+
+- **左侧/中央**：实时预览区，显示带边框的用户图片
+- **右侧**：浮动操作按钮（换个模板、重选照片、编辑、保存）
+- **右侧滑出面板**：编辑面板，包含：
+  - 比例设置
+  - 边框颜色和高度
+  - Logo 选择（24 家相机厂商）
+  - 设备型号
+  - 拍摄参数（光圈、快门、ISO、焦距）
+  - 拍摄时间
+  - 署名文字
+
+### 3. 导出功能
+
+- Canvas 绘制带边框的图片
+- 自动嵌入原图 EXIF 信息（使用 piexifjs）
+- JPG 高质量输出
+- 保留原文件名并添加 `-OneFrame` 后缀
+
+---
+
+## 边框样式定义
+
+### Type A - 白色下边框
+- **布局**: 图片 + 底部白色边框
+- **特点**: 可调节边框高度（5%-30%），完整编辑面板
+- **适用**: 通用照片
+- **边框内容**: Logo + 机型 | 参数 | 署名 | 时间
+
+### Type B - 黑色下边框
+- **布局**: 图片 + 底部黑色边框
+- **特点**: 固定边框比例，简化编辑面板
+- **适用**: 纵向图片（自动检测）
+
+### Type C - 横向布局
+- **布局**: 横向边框，Logo 在左侧，参数在右侧
+- **特点**: Logo + 参数分区显示
+
+### Type D - 横向居中
+- **布局**: 横向边框，Logo 居中
+- **特点**: 左侧时间+署名，右侧机型+参数
+- **注意**: 纵向图片文字缩小 0.85x
+
+### Type E - 3:2 纵向
+- **布局**: 顶部 1:1 正方形图片，底部白色区域显示参数
+- **画布比例**: 3:2（宽:高）
+- **特殊功能**: 图片可拖动选择裁剪区域
+- **字号**: 月份 48px，年份 24px，参数行 18px
+
+---
+
+## 数据流
+
+### 图片导入流程
 ```
-┌─────────────────────────────────────────────────┐
-│                  OneFrame                        │
-│  ┌─────────────────────────────────────────────┐ │
-│  │              边框样式图片墙                   │ │
-│  │  ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ │ │
-│  │  │ 样式1 │ │ 样式2 │ │ 样式3 │ │ 样式4 │ │ │
-│  │  │[示例图]│ │[示例图]│ │[示例图]│ │[示例图]│ │ │
-│  │  └───────┘ └───────┘ └───────┘ └───────┘ │ │
-│  │  ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ │ │
-│  │  │ 样式5 │ │ 样式6 │ │ 样式7 │ │ 样式8 │ │ │
-│  │  │[示例图]│ │[示例图]│ │[示例图]│ │[示例图]│ │ │
-│  │  └───────┘ └───────┘ └───────┘ └───────┘ │ │
-│  └─────────────────────────────────────────────┘ │
-│                                                    │
-│  点击样式预览 → 弹出文件管理器 → 选择图片 → 进入编辑  │
-└─────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────┐
-│                  边框编辑页面                     │
-│  ┌─────────────────────────────────────────────┐ │
-│  │                  实时预览区                   │ │
-│  │           ┌─────────────────┐               │ │
-│  │           │   带边框的图片   │               │ │
-│  │           │   (用户图片)     │               │ │
-│  │           └─────────────────┘               │ │
-│  └─────────────────────────────────────────────┘ │
-│  ┌──────────────────┐  ┌──────────────────────┐  │
-│  │   边框参数调整    │  │    操作按钮          │  │
-│  │  - 颜色选择器     │  │  [导出图片]          │  │
-│  │  - 宽度滑块       │  │  [返回图片墙]        │  │
-│  │  - 阴影设置       │  │                      │  │
-│  │  - 其他样式选项   │  │                      │  │
-│  └──────────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────┘
-```
-
-### 交互流程说明
-1. **首页**：软件打开后显示边框样式图片墙，每种样式使用预设示例图片作为缩略图
-2. **选择样式**：用户点击任意样式预览图
-3. **导入图片**：弹出系统文件管理器，用户选择要处理的图片
-4. **进入编辑**：图片加载后自动进入该样式的编辑页面
-5. **调整参数**：在编辑页面调整边框参数（颜色、宽度、阴影等）
-6. **导出保存**：点击导出按钮，保存带边框的图片
-7. **返回首页**：点击返回按钮回到图片墙选择其他样式
-
-
-### 待确定
-- [ ] 边框样式类型（纯色、渐变、图案等）
-- [ ] 边框参数配置选项
-- [ ] 是否支持批量处理
-- [ ] 其他功能需求
-
-### 功能模块
-
-#### 1. 首页 - 边框样式图片墙
-- 以网格/瀑布流形式展示所有边框样式预览
-- 每个样式卡片显示：
-  - 边框样式缩略图（使用示例图片）
-  - 样式名称/分类标签
-- 点击进入对应样式的设计页面
-- 支持滚动加载更多样式
-
-#### 2. 设计页面 - 边框参数调整
-- 左侧/上方：实时预览区
-  - 拖拽/导入用户图片
-  - 实时显示边框效果
-- 右侧/下方：参数控制面板
-  - 边框宽度
-  - 边框颜色/渐变
-  - 阴影效果
-  - 圆角设置
-  - 其他样式参数
-
-#### 3. 导出功能
-- 读取并保存原图 EXIF 信息
-- CSS 渲染 + Puppeteer 截图
-- 使用 piexifjs 写入 EXIF
-- JPG 质量控制
-
-### 技术实现要点
-
-#### 边框渲染（参考 copicseal）
-```html
-<!-- 边框容器 -->
-<div class="frame-container" :style="{
-  '--border-width': '20px',
-  '--border-color': '#fff',
-  '--box-shadow': '0 0 10px rgba(0,0,0,0.5)',
-  '--border-radius': '0'
-}">
-  <img :src="userImage">
-</div>
-
-<style>
-.frame-container {
-  padding: var(--border-width);
-  background-color: var(--border-color);
-  box-shadow: var(--box-shadow);
-  border-radius: var(--border-radius);
-}
-.frame-container img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-</style>
+用户点击样式卡片 → 选择图片
+    ↓
+loadImageInElectron() / loadImageWithExif()
+    ↓
+getExif(file) → 解析 EXIF
+    ↓
+updateExifDisplay() → 自动填充表单 + 选择 Logo
+    ↓
+updateBorder() → 更新预览
 ```
 
-#### 截图导出（参考 copicseal/capture.ts）
-```javascript
-// 使用 puppeteer 截图
-await page.screenshot({
-  path: outputPath,
-  type: 'jpeg',
-  quality: 95  // JPG 质量控制
-});
-
-// 使用 piexifjs 写入 EXIF
-piexif.insert(exifBytes, outputPath);
+### 导出流程
 ```
+用户点击导出
+    ↓
+exportImageHandler() → 收集设置
+    ↓
+exportImage() → 获取对应样式导出模块
+    ↓
+renderImage() → Canvas 绘制
+    ↓
+embedExif() → 嵌入 EXIF → 返回 Blob
+    ↓
+saveBlob() → 保存文件
+```
+
+### EXIF 双轨机制
+
+| 特性 | 第一路（预览填充） | 第二路（导出写入） |
+|------|-------------------|-------------------|
+| **数据来源** | 原图 EXIF | 原图 EXIF |
+| **处理库** | exifreader | piexifjs |
+| **目标位置** | 编辑面板表单 + 边框预览文字 | 导出图片文件 |
+| **是否修改** | 不修改，读取展示 | 读取后原样写入 |
+| **时机** | 图片加载时立即执行 | 用户点击导出按钮时 |
 
 ---
 
 ## 打包配置
-
-参考 colorphoto 的 electron-builder 配置：
 
 ```json
 {
@@ -192,12 +189,8 @@ piexif.insert(exifBytes, outputPath);
     "appId": "com.oneframe.app",
     "productName": "OneFrame",
     "win": {
-      "target": [
-        {
-          "target": "portable",
-          "arch": ["x64"]
-        }
-      ]
+      "target": [{ "target": "portable", "arch": ["x64"] }],
+      "signAndEditExecutable": false
     },
     "portable": {
       "artifactName": "OneFrame.exe"
@@ -211,61 +204,10 @@ piexif.insert(exifBytes, outputPath);
 ## 打包体积预估
 
 - Electron 基础：~80MB
-- Puppeteer-core：~20MB
-- piexifjs：~50KB
-- **总计：~100-120MB 单 exe**
-
----
-
-## 开发计划
-
-### 阶段一：项目初始化
-1. 创建项目目录结构
-2. 编写 package.json
-3. 配置 electron-builder
-4. 搭建 Electron 基础架构
-
-### 阶段二：核心功能开发
-1. 图片导入模块
-2. 边框渲染模块
-3. 截图导出模块
-
-### 阶段三：UI 界面开发
-1. 拖拽区域
-2. 边框参数控制面板
-3. 预览区域
-4. 导出按钮
-
-### 阶段四：测试与打包
-
----
-
-## 边框样式定义
-
-### ✅ 已确定的边框样式
-
-**样式名称**: 白色下边框
-
-**参数**:
-- 边框位置: 图片下方
-- 边框颜色: 白色 (#fff)
-- 边框宽度: 图片短边的 10%
-
-**CSS 实现**:
-```css
-.frame-container {
-  background-color: #fff;
-  padding-bottom: calc(图片短边 × 10%);
-}
-```
-
----
-
-## 待讨论问题
-
-- [ ] 批量处理需求
-- [ ] 导出格式选项
-- [ ] 其他边框样式需求
+- exifreader + piexifjs + opentype.js：~1MB
+- MiSans 字体文件：~2MB
+- 相机 Logo SVG：~1MB
+- **总计：~85-90MB 单 exe**
 
 ---
 
@@ -273,5 +215,6 @@ piexif.insert(exifBytes, outputPath);
 
 - [Electron 官方文档](https://www.electronjs.org/)
 - [electron-builder 文档](https://www.electron.build/)
+- [exifreader GitHub](https://github.com/mattiasw/ExifReader)
 - [piexifjs GitHub](https://github.com/hMatoba/piexifjs)
-- [Puppeteer 文档](https://pptr.dev/)
+- [opentype.js GitHub](https://github.com/opentypejs/opentype.js)

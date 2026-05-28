@@ -73,26 +73,11 @@ export function init(elements) {
     borderContent: !!state.borderContent
   });
   
-  // 移除旧的 resize 监听（防止重复添加）
-  window.removeEventListener('resize', boundOnResize);
-  // 添加窗口缩放监听
-  window.addEventListener('resize', boundOnResize);
-  
   // 添加拖动事件监听
   state.img.addEventListener('mousedown', startDrag);
   window.addEventListener('mousemove', onDrag);
   window.addEventListener('mouseup', endDrag);
 }
-
-// 使用箭头函数保存引用，以便正确移除监听器
-const boundOnResize = () => {
-  console.log('[TypeE] window resized, recalculating...');
-  if (state.img && originalImageDimensions.naturalWidth > 0) {
-    const { squareSize, margin } = calcSize(originalImageDimensions);
-    updateFrameWrapper(squareSize);
-    updatePreview(squareSize, margin, originalImageDimensions);
-  }
-};
 
 /**
  * 设置原始图片尺寸（用于 resize 时重算）
