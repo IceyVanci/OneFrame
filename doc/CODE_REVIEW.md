@@ -18,9 +18,9 @@
 
 ---
 
-## 🔴 逻辑错误（需要修复）
+## 🔴 逻辑错误
 
-### BUG-01 + BUG-02：样式切换后 UI 状态互相干扰 ⏸️ 改用 reload 方案
+### BUG-01 + BUG-02：样式切换后 UI 状态互相干扰 ✅ 已修复（reload 方案）
 
 **文件**：`src/renderer/js/app.js`
 
@@ -55,7 +55,7 @@ function hideEditor() {
 
 ---
 
-### BUG-03：loadImageWithExif 缺少 resetForm() 调用
+### BUG-03：loadImageWithExif 缺少 resetForm() 调用 ✅ 已修复
 
 **文件**：`src/renderer/js/app.js` 第 145-163 行
 
@@ -106,7 +106,7 @@ async function loadImageWithExif(file) {
 
 ---
 
-### BUG-04：URL.createObjectURL 内存泄漏
+### BUG-04：URL.createObjectURL 内存泄漏 ✅ 已修复
 
 **文件**：`src/renderer/js/app.js` 第 155 行
 
@@ -150,9 +150,12 @@ function hideEditor() {
 
 ---
 
-## 🟠 调试日志未清理
+## 🟠 调试日志未清理 ⚠️ 部分完成
 
-**统计**：共 72 处 `console.log` 散布在生产代码中。
+**统计**：原 72 处 `console.log`，已清理约 36 处，剩余约 36 处待处理。
+
+**已完成清理的文件**：`type-e-preview.js`（~25处）、`exif.js`（2处）、`exporter.js`（2处）
+**待清理的文件**：`type-b-preview.js`（11处）、`type-a-export.js`（8处）、`type-c-export.js`（8处）、`type-d-export.js`（9处）
 
 **分布**：
 | 文件 | 数量 | 说明 |
@@ -198,30 +201,11 @@ export const error = console.error.bind(console);
 
 ---
 
-### OPT-03：Type E 拖动事件未清理
+### OPT-03：Type E 拖动事件未清理 ✅ 已修复
 
-**文件**：`src/renderer/js/styles/type-e-preview.js` 第 82-84 行
+**文件**：`src/renderer/js/styles/type-e-preview.js`
 
-**当前代码**：
-```javascript
-state.img.addEventListener('mousedown', startDrag);
-window.addEventListener('mousemove', onDrag);
-window.addEventListener('mouseup', endDrag);
-```
-
-**问题**：`mousemove` 和 `mouseup` 监听器添加在 `window` 上，但 `reset()` 中没有移除。切换样式时这些监听器会累积。
-
-**解决方法**：
-在 `reset()` 或专门的 `destroy()` 方法中移除：
-```javascript
-export function destroy() {
-  if (state.img) {
-    state.img.removeEventListener('mousedown', startDrag);
-  }
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', endDrag);
-}
-```
+**已添加** `destroy()` 方法，可在切换样式时清理拖动事件监听器。
 
 ---
 
@@ -237,9 +221,9 @@ export function destroy() {
 
 ---
 
-## 🔵 未使用的模块（需要清理）
+## 🔵 未使用的模块
 
-### UNUSED-04：exporter.js 中的 saveBlobToFile()
+### UNUSED-04：exporter.js 中的 saveBlobToFile() ✅ 已修复（已删除）
 
 **文件**：`src/renderer/js/exporter.js` 第 136-152 行
 
@@ -251,50 +235,36 @@ export function destroy() {
 
 ---
 
-### UNUSED-05：exif.js 中的未使用导出
+### UNUSED-05：exif.js 中的未使用导出 ✅ 已修复
 
 **文件**：`src/renderer/js/exif.js`
 
-| 导出 | 状态 |
-|------|------|
-| `getExifName` | 未使用 |
-| `SUPPORTED_MAKES` | 未使用（从 logoList 获取） |
-| `exifPrimaryKeys` | 未使用（仅定义） |
-| `primaryExif` | 未使用（仅定义） |
-
-**建议**：删除这些未使用的导出，减少包体积。
+已删除 `SUPPORTED_MAKES`、`exifPrimaryKeys`、`primaryExif`、`getExifName` 等未使用的导出。
 
 ---
 
-### UNUSED-06：logo-utils.js 中的未使用导出
+### UNUSED-06：logo-utils.js 中的未使用导出 ✅ 已修复
 
 **文件**：`src/renderer/js/logo-utils.js`
 
-| 导出 | 状态 | 原因 |
-|------|------|------|
-| `logoSvgMap` | 未使用 | 改用真实 SVG 文件 |
-| `getAutoLogoFilename` | 未使用 | 改用 CSS filter |
-| `getMakeLogoPath` | 未使用 | 改用相对路径直接拼接 |
-| `getMakeLogo` | 未使用 | 改用直接匹配 |
-
-**建议**：删除这些函数和 `logoSvgMap` 对象（约 50 行）。
+已删除 `logoSvgMap`、`getAutoLogoFilename`、`getMakeLogoPath`、`getMakeLogo`、`getMakeLogoSvg` 等未使用导出。
 
 ---
 
 ## 📋 修复优先级排序（仅活跃问题）
 
-| 顺序 | 问题 | 影响 | 工作量 |
-|------|------|------|--------|
-| 1 | BUG-01+02: reload 方案 | 用户体验严重受损 | 小 |
-| 2 | BUG-03: 缺少 resetForm | 浏览器环境表单残留 | 极小 |
-| 3 | BUG-04: 内存泄漏 | 长时间使用内存增长 | 小 |
-| 4 | OPT-03: 拖动事件未清理 | 事件监听器累积 | 小 |
-| 5 | 清理 console.log | 性能+代码整洁 | 中（72处） |
-| 6 | UNUSED-05: exif.js 未使用导出 | 代码整洁 | 极小 |
-| 7 | UNUSED-06: logo-utils.js 未使用导出 | 代码整洁 | 小 |
-| 8 | UNUSED-04: saveBlobToFile 未使用 | 代码整洁 | 极小 |
-| 9 | OPT-02: DOM 查询缓存 | 性能优化 | 小 |
-| 10 | OPT-04: editor.js 只支持 A/B | 未来扩展 | 低 |
+| 顺序 | 问题 | 影响 | 工作量 | 状态 |
+|------|------|------|--------|------|
+| 1 | BUG-01+02: reload 方案 | 用户体验严重受损 | 小 | ✅ 已修复 |
+| 2 | BUG-03: 缺少 resetForm | 浏览器环境表单残留 | 极小 | ✅ 已修复 |
+| 3 | BUG-04: 内存泄漏 | 长时间使用内存增长 | 小 | ✅ 已修复 |
+| 4 | OPT-03: 拖动事件未清理 | 事件监听器累积 | 小 | ✅ 已修复 |
+| 5 | 清理 console.log | 性能+代码整洁 | 中（72处） | ⚠️ 部分完成（~36/72） |
+| 6 | UNUSED-05: exif.js 未使用导出 | 代码整洁 | 极小 | ✅ 已修复 |
+| 7 | UNUSED-06: logo-utils.js 未使用导出 | 代码整洁 | 小 | ✅ 已修复 |
+| 8 | UNUSED-04: saveBlobToFile 未使用 | 代码整洁 | 极小 | ✅ 已修复 |
+| 9 | OPT-02: DOM 查询缓存 | 性能优化 | 小 | ❌ 未开始 |
+| 10 | OPT-04: editor.js 只支持 A/B | 未来扩展 | 低 | ❌ 未开始 |
 
 ---
 

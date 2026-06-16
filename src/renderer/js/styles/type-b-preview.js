@@ -23,17 +23,10 @@ let state = {
  * @param {HTMLElement} elements.borderContent - borderContent 元素
  */
 export function init(elements) {
-  console.log('[TypeB] init called', elements);
   state.img = elements.img;
   state.frameWrapper = elements.frameWrapper;
   state.photoFooter = elements.photoFooter;
   state.borderContent = elements.borderContent;
-  console.log('[TypeB] state after init:', { 
-    img: !!state.img, 
-    frameWrapper: !!state.frameWrapper, 
-    photoFooter: !!state.photoFooter,
-    borderContent: !!state.borderContent
-  });
 }
 
 /**
@@ -175,10 +168,7 @@ export function updatePreview(squareSize, margin, imgDimensions = {}) {
  * @param {Object} settings - 显示设置
  */
 export function updateContentPreview(settings) {
-  console.log('[TypeB] updateContentPreview called');
-  
   if (!state.borderContent) {
-    console.log('[TypeB] borderContent is null!');
     return;
   }
   

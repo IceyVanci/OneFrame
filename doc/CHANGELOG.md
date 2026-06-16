@@ -1,5 +1,43 @@
 # OneFrame 更新日志
 
+## v1.02 (2026-06-17)
+
+### ✨ 新功能
+
+#### 首页分类标签
+- 添加"参数"和"海报"两个标签页，快速筛选样式
+- 参数分类：Type A、Type C、Type D
+- 海报分类：Type B、Type E
+
+#### 关于弹框
+- 标题栏新增"关于"按钮，点击查看应用信息
+
+### 🐛 Bug 修复
+
+- 修复样式切换后 UI 控件互相干扰（Type B 隐藏的开关在切换到 Type A 后仍然隐藏）
+- 修复 Type E 的"原始比例"选项被永久删除问题
+- 修复浏览器环境下重选图片时表单值残留
+- 修复 URL.createObjectURL 内存泄漏
+- 修复 Type E 拖动事件监听器未清理问题
+
+### 🔧 优化
+
+- 移除未使用的 `electron-store` 依赖
+- 清理 exif.js 中未使用的导出（SUPPORTED_MAKES、primaryExif 等）
+- 清理 logo-utils.js 中未使用的导出（logoSvgMap、getAutoLogoFilename 等）
+- 清理 exporter.js 中未使用的 saveBlobToFile 函数
+- 清理部分调试日志
+
+### 📝 文档
+
+- 重写 DESIGN.md，与当前代码保持一致
+- 更新样式分离分析文档，添加 Type E 完整分析
+- 致谢添加 Copicseal（可图匠）
+- 创建 CODE_REVIEW.md 代码审查报告
+- 文档整理到 doc/ 文件夹
+
+---
+
 ## v1.01 (2026-05-28)
 
 ### ✨ 新功能

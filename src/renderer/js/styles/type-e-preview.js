@@ -27,7 +27,6 @@ let yearText = '';
 // Logo 加载完成后检测形状并应用对应样式
 window.handleLogoLoad = function(img) {
   const ratio = img.naturalWidth / img.naturalHeight;
-  console.log('[TypeE] Logo loaded, ratio:', ratio, 'naturalSize:', img.naturalWidth, 'x', img.naturalHeight);
   
   // 动态测量年份文字的像素宽度
   const yearFontSize = 24; // 与 CSS 中的 font-size 一致
@@ -39,21 +38,16 @@ window.handleLogoLoad = function(img) {
   ctx.font = yearFont;
   const yearMetrics = ctx.measureText(yearText || '2024');
   const yearWidth = yearMetrics.width;
-  const yearHeight = yearFontSize;
-  
-  console.log('[TypeE] Year metrics:', yearText, 'width:', yearWidth, 'height:', yearHeight);
   
   // 方形 Logo：宽高比在 0.8-1.2 之间，高度 = 年份文字宽度
   if (ratio >= 0.8 && ratio <= 1.2) {
     img.style.height = yearWidth + 'px';
     img.style.width = Math.round(yearWidth * ratio) + 'px';
-    console.log('[TypeE] Square logo: height =', yearWidth, 'width =', Math.round(yearWidth * ratio));
   } else {
     // 横向 Logo：宽度 = 年份宽度 × 2
     const logoWidth = Math.round(yearWidth * 2);
     img.style.width = logoWidth + 'px';
     img.style.height = ''; // 清空
-    console.log('[TypeE] Landscape logo: width =', logoWidth);
   }
 };
 
@@ -61,17 +55,10 @@ window.handleLogoLoad = function(img) {
  * 初始化 Type E 预览
  */
 export function init(elements) {
-  console.log('[TypeE] init called', elements);
   state.img = elements.img;
   state.frameWrapper = elements.frameWrapper;
   state.photoFooter = elements.photoFooter;
   state.borderContent = elements.borderContent;
-  console.log('[TypeE] state after init:', {
-    img: !!state.img,
-    frameWrapper: !!state.frameWrapper,
-    photoFooter: !!state.photoFooter,
-    borderContent: !!state.borderContent
-  });
   
   // 添加拖动事件监听
   state.img.addEventListener('mousedown', startDrag);
@@ -84,7 +71,6 @@ export function init(elements) {
  */
 export function setOriginalDimensions(width, height) {
   originalImageDimensions = { naturalWidth: width, naturalHeight: height };
-  console.log('[TypeE] original dimensions set:', originalImageDimensions);
 }
 
 /**
@@ -121,8 +107,6 @@ export function calcSize(settings) {
   const canvasHeight = Math.round(squareSize * 1.5);
   const margin = 0; // Type E 不需要边距
 
-  console.log('[TypeE] calcSize:', { imgShortEdge, availWidth, availHeight, squareSize, canvasHeight });
-
   return { squareSize, margin, canvasHeight };
 }
 
@@ -133,8 +117,6 @@ export function calcSize(settings) {
 export function updateFrameWrapper(squareSize) {
   if (!state.frameWrapper) return;
 
-  console.log('[TypeE] updateFrameWrapper called with squareSize:', squareSize);
-
   // 使用类名切换样式
   state.frameWrapper.classList.add('type-e');
   state.frameWrapper.classList.remove('type-a', 'type-b');
@@ -144,7 +126,6 @@ export function updateFrameWrapper(squareSize) {
   state.frameWrapper.style.width = `${squareSize}px`;
   state.frameWrapper.style.height = `${canvasHeight}px`;
 
-  console.log('[TypeE] frameWrapper size:', squareSize, 'x', canvasHeight);
 }
 
 /**
@@ -156,11 +137,8 @@ export function updateFrameWrapper(squareSize) {
  */
 export function updatePreview(squareSize, margin, imgDimensions = {}) {
   if (!state.img || !state.photoFooter) {
-    console.log('[TypeE] updatePreview: missing img or photoFooter', { img: !!state.img, photoFooter: !!state.photoFooter });
     return;
   }
-
-  console.log('[TypeE] updatePreview called', { squareSize, margin, imgDimensions });
 
   // 保存原始尺寸用于 resize 时重算
   if (imgDimensions.naturalWidth && imgDimensions.naturalHeight) {
@@ -210,7 +188,6 @@ export function updatePreview(squareSize, margin, imgDimensions = {}) {
   // 添加/更新拖动提示文字
   updateDragHint();
 
-  console.log('[TypeE] preview updated: footer at', squareSize, 'height', footerHeight);
 }
 
 /**
@@ -228,8 +205,6 @@ export function updatePreview(squareSize, margin, imgDimensions = {}) {
  */
 export function updateContentPreview(elements, settings) {
   const { selectedLogo, showLogo, showModel, customModel, fNumber, exposureTime, iso, focalLength, showTime, dateTime, signatureText } = settings;
-
-  console.log('[TypeE] updateContentPreview called', settings);
 
   // 清空并重建 borderContent
   if (state.borderContent) {
@@ -256,14 +231,10 @@ export function updateContentPreview(elements, settings) {
           const paramsRect = paramsEl.getBoundingClientRect();
           // 计算年份与参数的相对位置差，而非年份的绝对位置
           paramsEl.style.marginTop = `${yearRect.top - paramsRect.top}px`;
-          console.log('[TypeE] Params aligned to year top, offset:', yearRect.top - paramsRect.top);
         }
       });
     });
 
-    console.log('[TypeE] borderContent updated');
-  } else {
-    console.log('[TypeE] borderContent is null!');
   }
 }
 
@@ -279,7 +250,6 @@ function getDateRows(dateTimeStr) {
   
   // 保存年份用于 Logo 尺寸计算
   yearText = year;
-  console.log('[TypeE] getDateRows: yearText =', yearText);
   
   // 首字母大写
   const formattedMonth = month.charAt(0).toUpperCase() + month.slice(1).toLowerCase();
@@ -337,8 +307,6 @@ function getRightParams(fNumber, focalLength, exposureTime, iso, customModel, sh
  * 注意：不清空 state 对象，保留元素引用
  */
 export function reset() {
-  console.log('[TypeE] reset called');
-
   // 保存元素引用
   const { img, frameWrapper, photoFooter, borderContent } = state;
 
@@ -426,11 +394,9 @@ function getMaxOffset() {
     // 原始图片高度 > 显示高度，所以可以上下偏移
     // 可拖动偏移（预览像素）= (原始图片高度 - 显示高度) / 2
     maxOffsetY = Math.max(0, (naturalHeight - displaySize) / 2);
-    console.log('[TypeE] getMaxOffset: portrait, naturalHeight:', naturalHeight, 'displaySize:', displaySize, 'maxOffsetY:', maxOffsetY);
   } else {
     // 横向/方形图片：只能左右拖动
     maxOffsetX = Math.max(0, (naturalWidth - displaySize) / 2);
-    console.log('[TypeE] getMaxOffset: landscape, naturalWidth:', naturalWidth, 'displaySize:', displaySize, 'maxOffsetX:', maxOffsetX);
   }
   
   return { maxOffsetX, maxOffsetY };
@@ -454,8 +420,6 @@ function startDrag(e) {
   state.isDragging = true;
   state.dragStart = { x: e.clientX, y: e.clientY };
   state.offsetStart = { ...state.imageOffset };
-  
-  console.log('[TypeE] start drag:', state.dragStart);
 }
 
 /**
@@ -470,8 +434,6 @@ function onDrag(e) {
   
   const { maxOffsetX, maxOffsetY } = getMaxOffset();
   const isPortrait = originalImageDimensions.naturalHeight > originalImageDimensions.naturalWidth;
-  
-  console.log('[TypeE] onDrag:', { deltaX, deltaY, maxOffsetX, maxOffsetY, isPortrait });
   
   // 根据图片方向限制偏移
   let newX = state.offsetStart.x;
@@ -493,7 +455,6 @@ function onDrag(e) {
   
   // 应用 object-position
   const newPosition = calculateObjectPosition();
-  console.log('[TypeE] applying object-position:', newPosition);
   state.img.style.objectPosition = newPosition;
 }
 
@@ -501,9 +462,6 @@ function onDrag(e) {
  * 结束拖动
  */
 function endDrag() {
-  if (state.isDragging) {
-    console.log('[TypeE] end drag, offset:', state.imageOffset);
-  }
   state.isDragging = false;
 }
 
@@ -555,11 +513,8 @@ export function resetImageOffset() {
  */
 function updateDragHint() {
   if (!state.frameWrapper) {
-    console.log('[TypeE] updateDragHint: frameWrapper is null');
     return;
   }
-  
-  console.log('[TypeE] updateDragHint called, img dimensions:', originalImageDimensions);
   
   // 先移除所有已存在的拖动提示，避免重复创建
   const existingHints = state.frameWrapper.parentElement?.querySelectorAll('.type-e-drag-hint');
@@ -570,7 +525,6 @@ function updateDragHint() {
   
   // 计算偏移范围（用于判断是否需要显示提示）
   const { maxOffsetX, maxOffsetY } = getMaxOffset();
-  console.log('[TypeE] updateDragHint: isPortrait:', isPortrait, 'maxOffset:', { maxOffsetX, maxOffsetY });
   
   // 只有当可以拖动时才显示提示
   if (maxOffsetX > 5 || maxOffsetY > 5) {
@@ -586,10 +540,18 @@ function updateDragHint() {
     
     // 插入到 frameWrapper 后面（画布外）
     state.frameWrapper.parentElement?.insertBefore(hint, state.frameWrapper.nextSibling);
-    console.log('[TypeE] drag hint added outside frameWrapper');
-  } else {
-    console.log('[TypeE] drag hint not needed (image fits exactly)');
   }
+}
+
+/**
+ * 销毁拖动事件监听器（切换样式时调用）
+ */
+export function destroy() {
+  if (state.img) {
+    state.img.removeEventListener('mousedown', startDrag);
+  }
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('mouseup', endDrag);
 }
 
 /**

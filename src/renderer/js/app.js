@@ -152,6 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentFile = file;
     currentImagePath = null;
+    // 释放旧的 Object URL 内存
+    if (userImage.src && userImage.src.startsWith('blob:')) {
+      URL.revokeObjectURL(userImage.src);
+    }
+    resetForm();
     userImage.src = URL.createObjectURL(file);
     try {
       currentExif = await getExif(file);
@@ -286,34 +291,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function hideEditor() {
     // 移除窗口大小变化监听
     window.removeEventListener('resize', updateBorder);
-    appContainer.style.display = 'flex';
-    editorView.classList.add('hidden');
-    userImage.src = '';
-    const previousStyle = currentStyle;
-    currentStyle = null;
-    currentExif = null;
-    currentFile = null;
-    currentImagePath = null;
-    editPanel.classList.remove('visible');
-    
-    // 根据之前的样式重置
-    const preview = getPreview(previousStyle);
-    if (previousStyle === 'type-b') {
-      typeBPreview.reset();
-    } else if (previousStyle === 'type-e') {
-      // Type E 重置
-      if (preview && preview.reset) preview.reset();
-    } else if (preview && preview.reset) {
-      preview.reset();
-    } else {
-      // 重置 frameWrapper 类名
-      const frameWrapper = document.getElementById('frameWrapper');
-      if (frameWrapper) {
-        frameWrapper.classList.remove('type-b');
-        frameWrapper.classList.add(previousStyle || 'type-a');
-      }
+    // 释放 Object URL 内存
+    if (userImage.src && userImage.src.startsWith('blob:')) {
+      URL.revokeObjectURL(userImage.src);
     }
-    resetForm();
+    // 重载页面，彻底重置所有 DOM 状态（避免样式切换后 UI 互相干扰）
+    location.reload();
   }
 
   function resetForm() {

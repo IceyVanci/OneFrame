@@ -23,7 +23,6 @@ async function loadExifReader() {
               const script = await response.text();
               eval(script);
               ExifReader = window.ExifReader;
-              console.log('ExifReader loaded from:', url);
               break;
             }
           } catch (e) {
@@ -37,70 +36,6 @@ async function loadExifReader() {
   }
   return ExifReader;
 }
-
-// 支持的厂商列表
-export const SUPPORTED_MAKES = [
-  'Apple',
-  'Canon',
-  'DJI',
-  'Fujifilm',
-  'Google',
-  'GoPro',
-  'Hasselblad',
-  'Huawei',
-  'Insta360',
-  'Leica',
-  'Lumix',
-  'Nikon',
-  'Nokia',
-  'Olympus',
-  'OnePlus',
-  'OPPO',
-  'Pentax',
-  'Ricoh',
-  'Samsung',
-  'Sigma',
-  'Sony',
-  'Vivo',
-  'Xiaomi',
-  'xuzhou'
-];
-
-/** @type {string[]} */
-export const exifPrimaryKeys = [
-  'ImageWidth',
-  'ImageHeight',
-  'Make',
-  'Model',
-  'Software',
-  'DateTimeOriginal',
-  'LensModel',
-  'FocalLength',
-  'FNumber',
-  'ExposureTime',
-  'ExposureBiasValue',
-  'ExposureMode',
-  'WhiteBalance',
-  'MeteringMode',
-  'ISOSpeedRatings',
-];
-
-/** @type {{name: string, key: string}[]} */
-export const primaryExif = [
-  { name: '相机厂商', key: 'Make' },
-  { name: '相机型号', key: 'Model' },
-  { name: '软件', key: 'Software' },
-  { name: '拍摄日期', key: 'DateTimeOriginal' },
-  { name: '镜头型号', key: 'LensModel' },
-  { name: '焦距', key: 'FocalLength' },
-  { name: '光圈', key: 'FNumber' },
-  { name: '快门', key: 'ExposureTime' },
-  { name: '曝光补偿', key: 'ExposureBiasValue' },
-  { name: '曝光模式', key: 'ExposureMode' },
-  { name: '白平衡', key: 'WhiteBalance' },
-  { name: '测光模式', key: 'MeteringMode' },
-  { name: '感光度', key: 'ISOSpeedRatings' },
-];
 
 /**
  * 标准化厂商名称
@@ -130,16 +65,6 @@ export function getMakeName(make) {
   if (matchKey) return makeMap[matchKey];
 
   return make;
-}
-
-/**
- * 获取 EXIF 字段的中文名称
- * @param {string} key
- * @returns {string}
- */
-export function getExifName(key) {
-  const item = primaryExif.find(item => item.key === key);
-  return item ? item.name : key;
 }
 
 /**
@@ -259,7 +184,6 @@ export async function getExif(file) {
       }
     }
 
-    console.log('EXIF loaded:', result);
     return result;
   } catch (e) {
     console.error('Failed to load EXIF:', e);

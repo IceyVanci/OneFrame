@@ -3,7 +3,7 @@
  * 支持保留 EXIF 信息的高质量 JPG 输出
  */
 
-import { readExifFromFile, readExifFromPath, embedExif, dumpExif, hasExifData } from './exif-exporter.js';
+import { readExifFromFile, readExifFromPath, embedExif, hasExifData } from './exif-exporter.js';
 import { typeAExport } from './styles/type-a-export.js';
 import { typeBExport } from './styles/type-b-export.js';
 import { typeCExport } from './styles/type-c-export.js';
@@ -115,9 +115,6 @@ export async function exportImage(img, options) {
   
   if (exifObj && hasExifData(exifObj)) {
     try {
-      // 调试：确认 dataUrl 格式
-      console.log('dataUrl 前 50 字符:', dataUrl.substring(0, 50));
-      console.log('dataUrl 长度:', dataUrl.length);
       const newDataUrl = embedExif(dataUrl, exifObj);
       return dataURLtoBlob(newDataUrl);
     } catch (err) {
@@ -128,25 +125,3 @@ export async function exportImage(img, options) {
   return dataURLtoBlob(dataUrl);
 }
 
-/**
- * 保存 Blob 到文件
- * @param {Blob} blob - 要保存的数据
- * @param {string} filePath - 保存路径
- */
-export async function saveBlobToFile(blob, filePath) {
-  const arrayBuffer = await blob.arrayBuffer();
-  const buffer = Array.from(new Uint8Array(arrayBuffer));
-
-  // 通过 IPC 保存文件
-  if (window.electronAPI && window.electronAPI.saveBlob) {
-    return await window.electronAPI.saveBlob(buffer, filePath);
-  }
-
-  // 降级方案：使用 URL.createObjectURL 下载
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filePath || 'output.jpg';
-  a.click();
-  URL.revokeObjectURL(url);
-}

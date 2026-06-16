@@ -163,6 +163,7 @@ src/
 | `getNormalizedOffset()` | ✅ | 获取归一化偏移量（用于导出） |
 | `resetImageOffset()` | ✅ | 重置图片偏移 |
 | `reset()` | ✅ | 重置预览状态 |
+| `destroy()` | ✅ | 销毁拖动事件监听器（v1.02 新增） |
 | `getMaxOffset()` | ✅ | 获取最大偏移量（拖动限制） |
 | `startDrag/onDrag/endDrag` | ✅ | 图片拖动功能 |
 
@@ -260,7 +261,10 @@ src/
 | `getFocalLength` | ✅ | 焦距获取 | 优先等效焦距 |
 | `formatDateTime` | ✅ | 日期格式化 | EXIF 日期格式转换 |
 | `formatValue` | ✅ | 值格式化 | 提取 description/value |
-| `getExifName` | ⚠️ | 未使用 | UI 不显示 EXIF 详情 |
+| `getExifName` | ❌ | 已删除 | v1.02 清理 |
+| `SUPPORTED_MAKES` | ❌ | 已删除 | v1.02 清理 |
+| `exifPrimaryKeys` | ❌ | 已删除 | v1.02 清理 |
+| `primaryExif` | ❌ | 已删除 | v1.02 清理 |
 
 ### logo-utils.js
 
@@ -270,8 +274,12 @@ src/
 | `getLogoFilename` | ✅ | Logo URL | 获取 Logo 文件名 |
 | `getModelName` | ✅ | 机型格式化 | 去除冗余后缀 |
 | `getMakeName` | ✅ | Logo 选择 | 标准化厂商名称 |
-| `getMakeLogo` | ⚠️ | 未使用 | 改用直接匹配 |
-| `logoSvgMap` | ⚠️ | 未使用 | 改用真实 SVG 文件 |
+| `replaceTextVars` | ✅ | 文本替换 | 替换占位符变量 |
+| `getMakeLogo` | ❌ | 已删除 | v1.02 清理 |
+| `logoSvgMap` | ❌ | 已删除 | v1.02 清理 |
+| `getAutoLogoFilename` | ❌ | 已删除 | v1.02 清理 |
+| `getMakeLogoPath` | ❌ | 已删除 | v1.02 清理 |
+| `getMakeLogoSvg` | ❌ | 已删除 | v1.02 清理 |
 
 ### main.js
 
