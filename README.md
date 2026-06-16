@@ -109,9 +109,17 @@ OneFrame/
 │       ├── fonts/            # 字体文件 (MiSans)
 │       └── assets/
 │           └── piexif.js    # EXIF 处理库
+├── doc/
+│   ├── AI_PROJECT_GUIDE.md   # AI 项目认知指南
+│   ├── CHANGELOG.md          # 更新日志
+│   ├── CODE_REVIEW.md        # 代码审查报告
+│   ├── DESIGN.md             # 设计方案
+│   ├── EXIF_DESIGN.md        # EXIF 设计文档
+│   ├── function_analysis.md  # 函数分析
+│   ├── RELEASE.md            # 发布说明
+│   └── style_separation_analysis.md # 样式分离分析
 ├── package.json
 ├── README.md
-├── DESIGN.md
 └── .gitignore
 ```
 
@@ -225,8 +233,8 @@ npm run build
 
 ## 📚 相关文档
 
-- [function_analysis.md](./function_analysis.md) - 项目函数分析
-- [style_separation_analysis.md](./style_separation_analysis.md) - 样式分离状况分析
+- [function_analysis.md](./doc/function_analysis.md) - 项目函数分析
+- [style_separation_analysis.md](./doc/style_separation_analysis.md) - 样式分离状况分析
 
 ---
 
