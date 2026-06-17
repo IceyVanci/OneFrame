@@ -1,7 +1,8 @@
 // OneFrame 主程序
 import { getExif, formatDateTime, getFocalLength } from './exif.js';
 import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-utils.js';
-import { getStyle, getPreview, typeBPreview, typeEPreview } from './styles/index.js';
+import { getStyle, getPreview, typeBPreview, typeEPreview, typeFPreview } from './styles/index.js';
+import { configureEditPanel as configureTypeF } from './components/type-f-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -97,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signatureText = document.getElementById('signatureText');
 
   let selectedLogo = null;
+  let typeFCachedSize = null;  // Type F 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -152,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentFile = file;
     currentImagePath = null;
+    typeFCachedSize = null;  // 清除 Type F 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -177,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentImagePath = imagePath;
     currentFile = null;
+    typeFCachedSize = null;  // 清除 Type F 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -215,7 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const matchedLogo = allLogos.find(logo => makeName.toLowerCase().includes(logo.toLowerCase()));
       if (matchedLogo) selectLogo(matchedLogo);
     }
-    if (currentExif.Model) customModel.value = getModelName(currentExif.Model);
+    if (currentExif.Model) {
+      const modelName = getModelName(currentExif.Model);
+      if (currentStyle === 'type-f') {
+        const makeName = make ? getMakeName(make) : '';
+        customModel.value = makeName ? `${makeName} ${modelName}` : modelName;
+      } else {
+        customModel.value = modelName;
+      }
+    }
     if (currentExif.FNumber) fNumber.value = typeof currentExif.FNumber === 'string' ? currentExif.FNumber.replace('f/', '').replace('F', '') : currentExif.FNumber;
     if (currentExif.ExposureTime) exposureTime.value = currentExif.ExposureTime;
     const focal = getFocalLength(currentExif);
@@ -257,7 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f') ? 'none' : 'block';
+    
+    // Type F: 调用面板配置模块
+    if (currentStyle === 'type-f') {
+      configureTypeF();
+    }
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
     if (currentStyle === 'type-b') {
@@ -375,6 +392,39 @@ document.addEventListener('DOMContentLoaded', () => {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });
+      updateBorderContent();
+    } else if (currentStyle === 'type-f') {
+      // 使用 Type F Preview 模块
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      // 只在首次加载或切换图片时重新计算尺寸，resize 时使用缓存
+      if (!typeFCachedSize) {
+        typeFCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: fSize, canvasHeight: fH } = typeFCachedSize;
+      preview.updateFrameWrapper(fSize, fH);
+      preview.updatePreview(fSize, fH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      // 窗口缩小时等比缩放画布，保持宽高比和图片关系不变
+      const previewArea = frameWrapper?.parentElement;
+      if (previewArea) {
+        const availW = previewArea.clientWidth * 0.96;
+        const availH = previewArea.clientHeight * 0.96;
+        const needScale = Math.min(availW / fSize, availH / fH, 1);
+        frameWrapper.style.transformOrigin = 'top center';
+        frameWrapper.style.transform = needScale < 1 ? `scale(${needScale})` : 'none';
+      }
       updateBorderContent();
     } else {
       // 使用对应样式 Preview 模块

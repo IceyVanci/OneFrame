@@ -6,7 +6,7 @@
 - **项目目标**: 为图片添加边框的桌面工具
 - **技术框架**: Electron 28 + 原生 HTML/CSS/JS
 - **交付形式**: 便携版单 exe 文件
-- **当前版本**: v1.0.2
+- **当前版本**: v1.0.3
 
 ---
 
@@ -41,7 +41,8 @@ OneFrame/
 │       │   ├── type-b.css      # Type B：黑色下边框
 │       │   ├── type-c.css      # Type C：横向布局
 │       │   ├── type-d.css      # Type D：横向居中
-│       │   └── type-e.css      # Type E：3:2 纵向，顶部 1:1 正方形
+│       │   ├── type-e.css      # Type E：3:2 纵向，顶部 1:1 正方形
+│       │   └── type-f.css      # Type F：画中画风格
 │       ├── js/
 │       │   ├── app.js          # 主逻辑入口
 │       │   ├── exif.js         # EXIF 读取（exifreader）
@@ -62,11 +63,13 @@ OneFrame/
 │       │       ├── type-c-preview.js   # Type C 预览
 │       │       ├── type-d-preview.js   # Type D 预览
 │       │       ├── type-e-preview.js   # Type E 预览
+│       │       ├── type-f-preview.js   # Type F 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
 │       │       ├── type-d-export.js    # Type D 导出
-│       │       └── type-e-export.js    # Type E 导出
+│       │       ├── type-e-export.js    # Type E 导出
+│       │       └── type-f-export.js    # Type F 导出
 │       ├── logos/               # 相机厂商 Logo（SVG）
 │       ├── fonts/               # 字体文件（MiSans）
 │       └── assets/
@@ -136,6 +139,14 @@ OneFrame/
 - **画布比例**: 3:2（宽:高）
 - **特殊功能**: 图片可拖动选择裁剪区域
 - **字号**: 月份 48px，年份 24px，参数行 18px
+
+### Type F - 画中画风格
+- **布局**: 上方 5% 白色留白 + 中部 92%×80% 照片展示区 + 下方 15% 文字信息区
+- **画布比例**: 图片比例（宽度 = 图片宽度，高度 = 图片高度 / 0.8）
+- **特殊功能**: 文字区域使用绝对定位，署名不影响前两行位置；窗口缩放时使用 transform scale 保持宽高比
+- **字号**: 动态缩放（基准 900px 宽度对应 14px）
+- **文字布局**: 第一行 "Shot on"（灰色）+ 品牌型号（黑色），第二行参数（灰色），第三行署名（灰色，可选）
+- **编辑面板**: 隐藏边框颜色/高度/比例/Logo，设备型号自动包含品牌名
 
 ---
 

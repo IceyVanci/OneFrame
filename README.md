@@ -1,8 +1,8 @@
-# OneFrame 🎨
+﻿# OneFrame 🎨
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.0.2-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.3-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -28,6 +28,7 @@
 - **Type C**：横向布局 - Logo 在左侧，参数在右侧
 - **Type D**：横向布局 - Logo 居中，左侧时间+署名，右侧机型+参数
 - **Type E**：3:2 纵向 - 顶部 1:1 正方形图片，底部白色区域显示参数，支持拖动裁剪
+- **Type F**：画中画风格 - 上方白色留白，中部照片展示区（92%宽度，80%高度），下方居中文字信息
 
 ### 📝 边框信息编辑
 - Logo 显示开关
@@ -61,7 +62,11 @@ Apple、Canon、DJI、Fujifilm、Google、GoPro、Hasselblad、Leica、Lumix、N
 
 ## 📂 项目结构
 
-```
+`<details>
+<summary>📒 项目结构（点击展开）
+</summary>
+
+`
 OneFrame/
 ├── src/
 │   ├── main/
@@ -75,7 +80,8 @@ OneFrame/
 │       │   ├── type-b.css   # Type B 样式（黑色下边框）
 │       │   ├── type-c.css   # Type C 样式
 │       │   ├── type-d.css   # Type D 样式
-│       │   └── type-e.css   # Type E 样式（3:2纵向）
+│       │   ├── type-e.css   # Type E 样式（3:2纵向）
+│       │   └── type-f.css   # Type F 样式（画中画风格）
 │       ├── js/
 │       │   ├── app.js        # 主逻辑入口
 │       │   ├── events.js     # 事件处理
@@ -92,7 +98,8 @@ OneFrame/
 │       │   │   ├── type-b-editor-panel.js  # Type B 面板配置
 │       │   │   ├── type-c-editor-panel.js  # Type C 面板配置
 │       │   │   ├── type-d-editor-panel.js  # Type D 面板配置
-│       │   │   └── type-e-editor-panel.js  # Type E 面板配置
+│       │   │   ├── type-e-editor-panel.js  # Type E 面板配置
+│       │   │   └── type-f-editor-panel.js  # Type F 面板配置
 │       │   └── styles/        # 样式模块
 │       │       ├── index.js   # 样式注册表
 │       │       ├── type-a-preview.js   # Type A 预览
@@ -100,11 +107,13 @@ OneFrame/
 │       │       ├── type-c-preview.js   # Type C 预览
 │       │       ├── type-d-preview.js   # Type D 预览
 │       │       ├── type-e-preview.js   # Type E 预览
+│       │       ├── type-f-preview.js   # Type F 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
 │       │       ├── type-d-export.js    # Type D 导出
-│       │       └── type-e-export.js    # Type E 导出
+│       │       ├── type-e-export.js    # Type E 导出
+│       │       └── type-f-export.js    # Type F 导出
 │       ├── logos/            # 相机厂商 Logo (SVG)
 │       ├── fonts/            # 字体文件 (MiSans)
 │       └── assets/
@@ -117,11 +126,14 @@ OneFrame/
 │   ├── EXIF_DESIGN.md        # EXIF 设计文档
 │   ├── function_analysis.md  # 函数分析
 │   ├── RELEASE.md            # 发布说明
-│   └── style_separation_analysis.md # 样式分离分析
+│   ├── style_separation_analysis.md # 样式分离分析
+│   └── V1.03_CHANGES.md      # v1.0.3 修改说明
 ├── package.json
 ├── README.md
 └── .gitignore
 ```
+
+</details>
 
 ---
 

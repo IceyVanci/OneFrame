@@ -167,6 +167,17 @@ src/
 | `getMaxOffset()` | ✅ | 获取最大偏移量（拖动限制） |
 | `startDrag/onDrag/endDrag` | ✅ | 图片拖动功能 |
 
+### styles/type-f-preview.js (画中画风格，上方留白+照片+下方文字)
+
+| 函数名 | 状态 | 说明 |
+|--------|------|------|
+| `init(elements)` | ✅ | 初始化 Type F 预览 |
+| `calcSize(settings)` | ✅ | 计算画布尺寸（canvasWidth = naturalWidth, canvasHeight = naturalHeight / 0.8） |
+| `updateFrameWrapper(squareSize, canvasHeight)` | ✅ | 设置 frameWrapper 样式和动态字号 |
+| `updatePreview(squareSize, canvasHeight, imgDimensions)` | ✅ | 更新照片区域样式 |
+| `updateContentPreview(elements, settings)` | ✅ | 使用绝对定位更新文字内容（与导出一致） |
+| `reset()` | ✅ | 重置预览状态 |
+
 ### styles/type-a-export.js
 
 | 函数名 | 状态 | 说明 |
