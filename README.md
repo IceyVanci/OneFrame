@@ -62,11 +62,11 @@ Apple、Canon、DJI、Fujifilm、Google、GoPro、Hasselblad、Leica、Lumix、N
 
 ## 📂 项目结构
 
-`<details>
+<details>
 <summary>📒 项目结构（点击展开）
 </summary>
 
-`
+```
 OneFrame/
 ├── src/
 │   ├── main/
