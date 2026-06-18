@@ -45,26 +45,8 @@ export function calcSize(settings) {
   // 画布高度 = 图片高度 / 0.8（照片占 80%）
   const canvasHeight = Math.round(naturalHeight / 0.8);
   
-  // 获取预览区域可用尺寸
-  const previewArea = state.frameWrapper?.parentElement;
-  const availWidth = previewArea?.clientWidth || 500;
-  const availHeight = previewArea?.clientHeight || 600;
-  
-  // 计算缩放比例（留 4% 边距）
-  const maxWidth = availWidth * 0.96;
-  const maxHeight = availHeight * 0.96;
-  const scale = Math.min(maxWidth / canvasWidth, maxHeight / canvasHeight);
-  
-  let squareSize, margin;
-  if (scale < 1) {
-    squareSize = Math.round(canvasWidth * scale);
-    margin = Math.round(canvasHeight * scale);
-  } else {
-    squareSize = canvasWidth;
-    margin = canvasHeight;
-  }
-  
-  return { squareSize, margin, canvasHeight: scale < 1 ? margin : canvasHeight };
+  // 返回原始画布尺寸，显示缩放在 app.js 中根据预览区域大小计算
+  return { squareSize: canvasWidth, canvasHeight };
 }
 
 /**

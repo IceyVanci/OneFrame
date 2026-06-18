@@ -1,5 +1,34 @@
 # OneFrame 更新日志
 
+## v1.0.4 (2026-06-19)
+
+### 🐛 Bug 修复
+
+#### 修复 Type F 预览缩放问题
+- 修复窗口大小变化后图框与图片相对位置/比例关系错乱的问题
+- 修复非初始窗口大小下导入图片时图框比例错误的问题
+- 修复横向窗口变小时图框不缩放（只减小横向宽度）的问题
+- 修复纵向窗口变大时图框只增大纵向高度、横向不跟随的问题
+
+**根因**：两个独立问题
+1. `calcSize()` 内部做了预览区域缩放（返回已缩小的像素值），与 `app.js` 的 `transform: scale()` 产生双重缩放
+2. `type-a.css` 中 `.frame-wrapper:not(.type-b):not(.type-e)` 通用选择器意外匹配了 Type F，施加了 `max-width: 900px`、`width: 100%`、`max-height: 100%` 约束
+
+**修复**：
+- `type-f-preview.js` 的 `calcSize()` 移除预览缩放，只返回原始画布尺寸
+- `app.js` 的 `updateBorder()` Type F 分支去掉 `transform: scale()`，改为每次 resize 动态计算显示尺寸
+- `type-f.css` 添加 `max-width: none !important` 和 `max-height: none !important` 覆盖继承约束
+
+### 📝 文档
+
+- 生成 doc/V1.04_CHANGES.md 详细修改说明
+- 归档 doc/CODE_REVIEW.md → doc/CODE_REVIEW_2026-06-17.md
+- 更新 doc/style_separation_analysis.md 添加 Type F 和 CSS 干扰分析
+- 更新 doc/AI_PROJECT_GUIDE.md 添加 Type F 说明
+- 更新所有文档版本号到 v1.0.4
+
+---
+
 ## v1.0.3 (2026-06-18)
 
 ### ✨ 新功能

@@ -403,28 +403,28 @@ document.addEventListener('DOMContentLoaded', () => {
         photoFooter: photoFooter,
         borderContent: borderContent
       });
-      // 只在首次加载或切换图片时重新计算尺寸，resize 时使用缓存
+      // 只在首次加载或切换图片时计算原始画布尺寸
       if (!typeFCachedSize) {
         typeFCachedSize = preview.calcSize({
           naturalWidth: userImage.naturalWidth,
           naturalHeight: userImage.naturalHeight
         });
       }
-      const { squareSize: fSize, canvasHeight: fH } = typeFCachedSize;
-      preview.updateFrameWrapper(fSize, fH);
-      preview.updatePreview(fSize, fH, {
+      const { squareSize: canvasW, canvasHeight: canvasH } = typeFCachedSize;
+      // 根据当前预览区域大小计算显示尺寸
+      const previewArea = frameWrapper?.parentElement;
+      const availW = (previewArea?.clientWidth || 500) * 0.96;
+      const availH = (previewArea?.clientHeight || 600) * 0.96;
+      const displayScale = Math.min(availW / canvasW, availH / canvasH, 1);
+      const displayW = Math.round(canvasW * displayScale);
+      const displayH = Math.round(canvasH * displayScale);
+      // 设置 frameWrapper 为显示尺寸（与预览区域匹配）
+      preview.updateFrameWrapper(displayW, displayH);
+      preview.updatePreview(displayW, displayH, {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });
-      // 窗口缩小时等比缩放画布，保持宽高比和图片关系不变
-      const previewArea = frameWrapper?.parentElement;
-      if (previewArea) {
-        const availW = previewArea.clientWidth * 0.96;
-        const availH = previewArea.clientHeight * 0.96;
-        const needScale = Math.min(availW / fSize, availH / fH, 1);
-        frameWrapper.style.transformOrigin = 'top center';
-        frameWrapper.style.transform = needScale < 1 ? `scale(${needScale})` : 'none';
-      }
+      frameWrapper.style.transform = 'none';
       updateBorderContent();
     } else {
       // 使用对应样式 Preview 模块

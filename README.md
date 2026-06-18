@@ -2,7 +2,7 @@
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.0.3-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.4-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -127,7 +127,9 @@ OneFrame/
 │   ├── function_analysis.md  # 函数分析
 │   ├── RELEASE.md            # 发布说明
 │   ├── style_separation_analysis.md # 样式分离分析
-│   └── V1.03_CHANGES.md      # v1.0.3 修改说明
+│   ├── V1.03_CHANGES.md      # v1.0.3 修改说明
+│   ├── V1.04_CHANGES.md      # v1.0.4 修改说明
+│   ├── CODE_REVIEW_2026-06-17.md # 代码审查报告（已归档）
 ├── package.json
 ├── README.md
 └── .gitignore

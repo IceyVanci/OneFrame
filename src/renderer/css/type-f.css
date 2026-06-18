@@ -11,7 +11,10 @@
   display: block !important;
   position: relative;
   background: #ffffff;
-  /* 尺寸由 JS 动态设置 */
+  /* 覆盖 type-a.css 中 .frame-wrapper:not(.type-b):not(.type-e) 继承的属性 */
+  max-width: none !important;
+  max-height: none !important;
+  /* 尺寸由 JS 通过 inline style 设置 */
 }
 
 /* 照片区：居中，92% 宽度，80% 高度 */
