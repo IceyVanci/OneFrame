@@ -1,35 +1,35 @@
-# OneFrame v1.0.4 更新发布！
+# OneFrame v1.0.5 发布说明
 
-一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机的 EXIF 信息。
+**发布日期**：2026-06-19
+
+---
+
+## 🎉 新功能
+
+### Type G 画中画样式
+- 新增第七种边框样式，第一行显示厂商 Logo，第二行显示「拍摄日期 | 拍摄参数 | 相机名称」（竖线分隔），第三行显示署名
+- 支持纵向图片自适应（白色区域减半）
+- 编辑面板隐藏所有显示开关，保留 Logo 选择区域
+- 机型名称只显示型号（不带品牌前缀）
+
+### Type F 纵向图片自适应
+- 纵向图片时顶部/底部白色区域减半，照片区域增大
+
+### Type E 预览文字缩放
+- 文字字号随画布大小动态缩放
 
 ## 🐛 Bug 修复
+- 修复 Type G 预览 Logo 居中问题
+- 修复 Type G 导出注册缺失
+- 修复 Type G 编辑面板开关显示问题
 
-### 修复 Type F 预览缩放问题
-- 修复窗口大小变化后图框与图片相对位置/比例关系错乱的问题
-- 修复非初始窗口大小下导入图片时图框比例错误的问题
-- 修复横向窗口变小时图框不缩放的问题
-- 修复纵向窗口变大时图框只增大纵向高度的问题
+## 📦 构建
+- `dist/OneFrame.exe` — Windows 便携版
 
-**根因**：`calcSize()` 内部预览缩放与 `transform: scale()` 双重缩放 + `type-a.css` 通用选择器意外匹配 Type F 施加 CSS 约束。
+## � 文档
+- 新增 `doc/V1.05_CHANGES.md`、`doc/TYPE_G_CENTERING_ANALYSIS.md`
+- 更新 `AI_PROJECT_GUIDE.md`、`CHANGELOG.md`、`function_analysis.md`
 
-**修复**：去掉 `transform: scale()`，改为每次 resize 动态计算显示尺寸；通过 `!important` 覆盖继承的 CSS 约束。
+---
 
-## 📝 文档更新
-
-- 生成 doc/V1.04_CHANGES.md 详细修改说明
-- 归档 doc/CODE_REVIEW.md → doc/CODE_REVIEW_2026-06-17.md
-- 更新 doc/style_separation_analysis.md 添加 Type F 和 CSS 干扰分析
-- 更新 doc/AI_PROJECT_GUIDE.md 添加 Type F 说明
-- 更新所有文档版本号到 v1.0.4
-
-## 📥 下载
-
-下载 `OneFrame.exe` 即可直接运行。
-
-## 🙏 致谢
-
-本项目入选了 **Xiaomi MiMo Orbit-百万亿 Token 创造者激励计划**。感谢 **Xiaomi MiMo Orbit** 提供的免费 Token。
-
-## 📄 许可证
-
-MIT License
+**下载**：[dist/OneFrame.exe](./dist/OneFrame.exe)

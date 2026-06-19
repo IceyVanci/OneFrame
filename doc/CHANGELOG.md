@@ -1,5 +1,43 @@
 # OneFrame 更新日志
 
+## v1.0.5 (2026-06-19)
+
+### ✨ 新功能
+
+#### Type G 画中画样式
+- 新增 Type G 边框样式：第一行显示厂商 Logo，第二行显示「拍摄日期 | 拍摄参数 | 相机名称」，第三行显示署名
+- 纵向图片自适应：白色区域减半（顶部 2.5%，底部 7.5%），照片区域增大到 90%
+- Logo 大小规则：横向图片高度 = 画布 2.5%，纵向图片高度 = 画布 1.25%
+- 编辑面板：隐藏所有显示开关（所有元素默认显示），保留 Logo 选择区域
+- 机型名称只显示型号（不带品牌前缀）
+- 文字颜色统一为黑色
+
+#### Type F 纵向图片自适应
+- 纵向图片（高度 > 宽度）时，顶部/底部白色区域减半，照片区域增大到 90%
+
+#### Type E 预览文字缩放
+- CSS font-size 从 px 改为 em 单位，文字随画布大小自动缩放
+- Logo 加载时从 borderContent 读取动态基准字号
+
+### 🐛 Bug 修复
+
+- 修复 Type G 预览 Logo 无法水平居中（CSS 后代选择器误匹配 → 子代选择器）
+- 修复 Type G 导出未注册到 exporter.js（缺失 typeGExport 映射）
+- 修复 Type G 编辑面板显示开关问题（默认激活所有开关）
+
+### 📝 文档
+
+- 新增 doc/V1.05_CHANGES.md 详细修改记录
+- 新增 doc/TYPE_G_CENTERING_ANALYSIS.md Logo 居中问题分析报告
+- 归档 doc/CODE_REVIEW_2026-06-17.md、DESIGN.md、EXIF_DESIGN.md、style_separation_analysis.md 到 doc/archive/
+- 更新版本号到 v1.0.5
+
+### 📦 其他
+
+- 构建输出 dist/OneFrame.exe
+
+---
+
 ## v1.0.4 (2026-06-19)
 
 ### 🐛 Bug 修复

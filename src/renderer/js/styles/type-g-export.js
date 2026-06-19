@@ -154,9 +154,9 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
   const line1Y = textCenterY - groupHeight / 2 + (hasLogo ? lineHeight1 / 2 : 0);
   const line2Y = line1Y + lineHeight1 / 2 + lineGap + lineHeight2 / 2;
   
-  // 绘制第一行：Logo（纵向高度 = 画布顶部边框高度 = canvasHeight × 2.5%，横向 = canvasHeight × 5%）
+  // 绘制第一行：Logo（纵向高度再减半，横向 = canvasHeight × 2.5%，纵向 = canvasHeight × 1.25%）
   if (hasLogo) {
-    const logoMaxHeight = Math.round(canvasHeight * (isPortrait ? 0.025 : 0.05));
+    const logoMaxHeight = Math.round(canvasHeight * (isPortrait ? 0.0125 : 0.025));
     await drawLogoG(ctx, settings.selectedLogo, centerX, line1Y, logoMaxHeight);
   }
   

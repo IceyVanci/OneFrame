@@ -1,264 +1,264 @@
-ï»¿# OneFrame ğŸ¨
+# OneFrame ??
 
-ä¸€æ¬¾ç®€æ´ä¼˜é›…çš„å›¾ç‰‡è¾¹æ¡†æ·»åŠ å·¥å…·ï¼Œä¸ºæ‚¨çš„ç…§ç‰‡è‡ªåŠ¨æ·»åŠ ç²¾ç¾çš„åº•éƒ¨è¾¹æ¡†ï¼Œå¹¶æ™ºèƒ½æ˜¾ç¤ºç›¸æœº EXIF ä¿¡æ¯ã€‚
+Ò»¿î¼ò½àÓÅÑÅµÄÍ¼Æ¬±ß¿òÌí¼Ó¹¤¾ß£¬ÎªÄúµÄÕÕÆ¬×Ô¶¯Ìí¼Ó¾«ÃÀµÄµ×²¿±ß¿ò£¬²¢ÖÇÄÜÏÔÊ¾Ïà»ú EXIF ĞÅÏ¢¡£
 
-![OneFrame](https://img.shields.io/badge/version-1.0.4-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.5-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
 ---
 
-## ğŸ“œ å¼€å‘å†ç¨‹
+## ?? ¿ª·¢Àú³Ì
 
-æœ¬é¡¹ç›®æœ€åˆä½¿ç”¨ Minimax M2.7 è¿›è¡Œå¼€å‘ï¼Œåå…¥é€‰ **Xiaomi MiMo Orbit-ç™¾ä¸‡äº¿ Token åˆ›é€ è€…æ¿€åŠ±è®¡åˆ’**ï¼Œæ”¹ç”¨ Xiaomi Mimo-v2.5/v2.5pro è¿›è¡Œå¼€å‘ï¼Œæ„Ÿè°¢ **Xiaomi MiMo Orbit** æä¾›çš„å…è´¹ Tokenã€‚
-
----
-
-## âœ¨ åŠŸèƒ½ç‰¹æ€§
-
-### ğŸ“· æ™ºèƒ½ EXIF è¯»å–
-- è‡ªåŠ¨è¯†åˆ«ç›¸æœºå‚å•†å¹¶æ˜¾ç¤ºå¯¹åº” Logo
-- æå–å¹¶å±•ç¤ºæ‹æ‘„å‚æ•°ï¼ˆå…‰åœˆã€å¿«é—¨ã€ISOã€ç„¦è·ï¼‰
-- è‡ªåŠ¨è¯»å–æ‹æ‘„æ—¶é—´å’Œè®¾å¤‡å‹å·
-
-### ğŸ¨ è¾¹æ¡†æ ·å¼
-æ”¯æŒå¤šç§è¾¹æ¡†æ ·å¼ï¼š
-- **Type A**ï¼šç™½è‰²ä¸‹è¾¹æ¡† - å¯è°ƒèŠ‚è¾¹æ¡†é«˜åº¦ï¼ˆ5%-30%ï¼‰ï¼Œå®Œæ•´ç¼–è¾‘é¢æ¿
-- **Type B**ï¼šé»‘è‰²ä¸‹è¾¹æ¡† - å›ºå®šè¾¹æ¡†æ¯”ä¾‹ï¼Œç®€åŒ–ç¼–è¾‘é¢æ¿
-- **Type C**ï¼šæ¨ªå‘å¸ƒå±€ - Logo åœ¨å·¦ä¾§ï¼Œå‚æ•°åœ¨å³ä¾§
-- **Type D**ï¼šæ¨ªå‘å¸ƒå±€ - Logo å±…ä¸­ï¼Œå·¦ä¾§æ—¶é—´+ç½²åï¼Œå³ä¾§æœºå‹+å‚æ•°
-- **Type E**ï¼š3:2 çºµå‘ - é¡¶éƒ¨ 1:1 æ­£æ–¹å½¢å›¾ç‰‡ï¼Œåº•éƒ¨ç™½è‰²åŒºåŸŸæ˜¾ç¤ºå‚æ•°ï¼Œæ”¯æŒæ‹–åŠ¨è£å‰ª
-- **Type F**ï¼šç”»ä¸­ç”»é£æ ¼ - ä¸Šæ–¹ç™½è‰²ç•™ç™½ï¼Œä¸­éƒ¨ç…§ç‰‡å±•ç¤ºåŒºï¼ˆ92%å®½åº¦ï¼Œ80%é«˜åº¦ï¼‰ï¼Œä¸‹æ–¹å±…ä¸­æ–‡å­—ä¿¡æ¯
-
-### ğŸ“ è¾¹æ¡†ä¿¡æ¯ç¼–è¾‘
-- Logo æ˜¾ç¤ºå¼€å…³
-- æ‹æ‘„å‚æ•°æ˜¾ç¤ºå¼€å…³
-- æ‹æ‘„æ—¶é—´æ˜¾ç¤ºå¼€å…³
-- æ”¯æŒè‡ªå®šä¹‰ç½²å
-
-### ğŸ”’ EXIF ä¿ç•™
-- å¯¼å‡ºæ—¶è‡ªåŠ¨ä¿ç•™åŸå›¾ EXIF ä¿¡æ¯
-- æ”¯æŒ JPG é«˜è´¨é‡è¾“å‡º
-
-### ğŸ“ å¹¿æ³›çš„ç›¸æœºæ”¯æŒ
-æ”¯æŒä»¥ä¸‹ç›¸æœºå‚å•†çš„ Logo å’Œä¿¡æ¯è¯†åˆ«ï¼š
-Appleã€Canonã€DJIã€Fujifilmã€Googleã€GoProã€Hasselbladã€Leicaã€Lumixã€Nikonã€Nokiaã€Olympusã€Oneplusã€Pentaxã€Ricohã€Sigmaã€Sonyã€Vivoã€Xiaomi ç­‰
+±¾ÏîÄ¿×î³õÊ¹ÓÃ Minimax M2.7 ½øĞĞ¿ª·¢£¬ºóÈëÑ¡ **Xiaomi MiMo Orbit-°ÙÍòÒÚ Token ´´ÔìÕß¼¤Àø¼Æ»®**£¬¸ÄÓÃ Xiaomi Mimo-v2.5/v2.5pro ½øĞĞ¿ª·¢£¬¸ĞĞ» **Xiaomi MiMo Orbit** Ìá¹©µÄÃâ·Ñ Token¡£
 
 ---
 
-## ğŸ›  æŠ€æœ¯æ¶æ„
+## ? ¹¦ÄÜÌØĞÔ
 
-| æ¨¡å— | æŠ€æœ¯æ–¹æ¡ˆ | è¯´æ˜ |
+### ?? ÖÇÄÜ EXIF ¶ÁÈ¡
+- ×Ô¶¯Ê¶±ğÏà»ú³§ÉÌ²¢ÏÔÊ¾¶ÔÓ¦ Logo
+- ÌáÈ¡²¢Õ¹Ê¾ÅÄÉã²ÎÊı£¨¹âÈ¦¡¢¿ìÃÅ¡¢ISO¡¢½¹¾à£©
+- ×Ô¶¯¶ÁÈ¡ÅÄÉãÊ±¼äºÍÉè±¸ĞÍºÅ
+
+### ?? ±ß¿òÑùÊ½
+Ö§³Ö¶àÖÖ±ß¿òÑùÊ½£º
+- **Type A**£º°×É«ÏÂ±ß¿ò - ¿Éµ÷½Ú±ß¿ò¸ß¶È£¨5%-30%£©£¬ÍêÕû±à¼­Ãæ°å
+- **Type B**£ººÚÉ«ÏÂ±ß¿ò - ¹Ì¶¨±ß¿ò±ÈÀı£¬¼ò»¯±à¼­Ãæ°å
+- **Type C**£ººáÏò²¼¾Ö - Logo ÔÚ×ó²à£¬²ÎÊıÔÚÓÒ²à
+- **Type D**£ººáÏò²¼¾Ö - Logo ¾ÓÖĞ£¬×ó²àÊ±¼ä+ÊğÃû£¬ÓÒ²à»úĞÍ+²ÎÊı
+- **Type E**£º3:2 ×İÏò - ¶¥²¿ 1:1 Õı·½ĞÎÍ¼Æ¬£¬µ×²¿°×É«ÇøÓòÏÔÊ¾²ÎÊı£¬Ö§³ÖÍÏ¶¯²Ã¼ô
+- **Type F**£º»­ÖĞ»­·ç¸ñ - ÉÏ·½°×É«Áô°×£¬ÖĞ²¿ÕÕÆ¬Õ¹Ê¾Çø£¨92%¿í¶È£¬80%¸ß¶È£©£¬ÏÂ·½¾ÓÖĞÎÄ×ÖĞÅÏ¢
+
+### ?? ±ß¿òĞÅÏ¢±à¼­
+- Logo ÏÔÊ¾¿ª¹Ø
+- ÅÄÉã²ÎÊıÏÔÊ¾¿ª¹Ø
+- ÅÄÉãÊ±¼äÏÔÊ¾¿ª¹Ø
+- Ö§³Ö×Ô¶¨ÒåÊğÃû
+
+### ?? EXIF ±£Áô
+- µ¼³öÊ±×Ô¶¯±£ÁôÔ­Í¼ EXIF ĞÅÏ¢
+- Ö§³Ö JPG ¸ßÖÊÁ¿Êä³ö
+
+### ?? ¹ã·ºµÄÏà»úÖ§³Ö
+Ö§³ÖÒÔÏÂÏà»ú³§ÉÌµÄ Logo ºÍĞÅÏ¢Ê¶±ğ£º
+Apple¡¢Canon¡¢DJI¡¢Fujifilm¡¢Google¡¢GoPro¡¢Hasselblad¡¢Leica¡¢Lumix¡¢Nikon¡¢Nokia¡¢Olympus¡¢Oneplus¡¢Pentax¡¢Ricoh¡¢Sigma¡¢Sony¡¢Vivo¡¢Xiaomi µÈ
+
+---
+
+## ?? ¼¼Êõ¼Ü¹¹
+
+| Ä£¿é | ¼¼Êõ·½°¸ | ËµÃ÷ |
 |------|----------|------|
-| **æ¡Œé¢æ¡†æ¶** | Electron 28.0 | è·¨å¹³å°æ¡Œé¢åº”ç”¨æ¡†æ¶ |
-| **å‰ç«¯** | åŸç”Ÿ HTML/CSS/JS | æ— éœ€æ„å»ºå·¥å…·ï¼Œè½»é‡é«˜æ•ˆ |
-| **å›¾ç‰‡é¢„è§ˆ** | CSS æ¸²æŸ“ | å®æ—¶é¢„è§ˆè¾¹æ¡†æ•ˆæœ |
-| **EXIF è¯»å–** | exifreader | è¯»å–å›¾ç‰‡ EXIF ä¿¡æ¯ |
-| **EXIF å†™å…¥** | piexifjs | ä¿ç•™åŸå›¾ EXIF æ•°æ® |
-| **å­—ä½“æ¸²æŸ“** | opentype.js | ç²¾ç¡®å­—ä½“æ¸²æŸ“ |
-| **æ‰“åŒ…å·¥å…·** | electron-builder | ç”Ÿæˆä¾¿æºç‰ˆå• exe æ–‡ä»¶ |
+| **×ÀÃæ¿ò¼Ü** | Electron 28.0 | ¿çÆ½Ì¨×ÀÃæÓ¦ÓÃ¿ò¼Ü |
+| **Ç°¶Ë** | Ô­Éú HTML/CSS/JS | ÎŞĞè¹¹½¨¹¤¾ß£¬ÇáÁ¿¸ßĞ§ |
+| **Í¼Æ¬Ô¤ÀÀ** | CSS äÖÈ¾ | ÊµÊ±Ô¤ÀÀ±ß¿òĞ§¹û |
+| **EXIF ¶ÁÈ¡** | exifreader | ¶ÁÈ¡Í¼Æ¬ EXIF ĞÅÏ¢ |
+| **EXIF Ğ´Èë** | piexifjs | ±£ÁôÔ­Í¼ EXIF Êı¾İ |
+| **×ÖÌåäÖÈ¾** | opentype.js | ¾«È·×ÖÌåäÖÈ¾ |
+| **´ò°ü¹¤¾ß** | electron-builder | Éú³É±ãĞ¯°æµ¥ exe ÎÄ¼ş |
 
 ---
 
-## ğŸ“‚ é¡¹ç›®ç»“æ„
+## ?? ÏîÄ¿½á¹¹
 
 <details>
-<summary>ğŸ“’ é¡¹ç›®ç»“æ„ï¼ˆç‚¹å‡»å±•å¼€ï¼‰
+<summary>?? ÏîÄ¿½á¹¹£¨µã»÷Õ¹¿ª£©
 </summary>
 
 ```
 OneFrame/
-â”œâ”€â”€ src/
-â”‚   â”œâ”€â”€ main/
-â”‚   â”‚   â”œâ”€â”€ main.js          # Electron ä¸»è¿›ç¨‹
-â”‚   â”‚   â””â”€â”€ preload.js       # å®‰å…¨æ¡¥æ¥
-â”‚   â””â”€â”€ renderer/
-â”‚       â”œâ”€â”€ index.html       # ä¸»é¡µé¢
-â”‚       â”œâ”€â”€ index.css        # å…¨å±€æ ·å¼
-â”‚       â”œâ”€â”€ css/
-â”‚       â”‚   â”œâ”€â”€ type-a.css   # Type A æ ·å¼ï¼ˆç™½è‰²ä¸‹è¾¹æ¡†ï¼‰
-â”‚       â”‚   â”œâ”€â”€ type-b.css   # Type B æ ·å¼ï¼ˆé»‘è‰²ä¸‹è¾¹æ¡†ï¼‰
-â”‚       â”‚   â”œâ”€â”€ type-c.css   # Type C æ ·å¼
-â”‚       â”‚   â”œâ”€â”€ type-d.css   # Type D æ ·å¼
-â”‚       â”‚   â”œâ”€â”€ type-e.css   # Type E æ ·å¼ï¼ˆ3:2çºµå‘ï¼‰
-â”‚       â”‚   â””â”€â”€ type-f.css   # Type F æ ·å¼ï¼ˆç”»ä¸­ç”»é£æ ¼ï¼‰
-â”‚       â”œâ”€â”€ js/
-â”‚       â”‚   â”œâ”€â”€ app.js        # ä¸»é€»è¾‘å…¥å£
-â”‚       â”‚   â”œâ”€â”€ events.js     # äº‹ä»¶å¤„ç†
-â”‚       â”‚   â”œâ”€â”€ state.js      # çŠ¶æ€ç®¡ç†
-â”‚       â”‚   â”œâ”€â”€ exif.js       # EXIF è¯»å– (exifreader)
-â”‚       â”‚   â”œâ”€â”€ exif-exporter.js  # EXIF å¯¼å‡º (piexifjs)
-â”‚       â”‚   â”œâ”€â”€ exporter.js    # å›¾ç‰‡å¯¼å‡º
-â”‚       â”‚   â”œâ”€â”€ logo-utils.js  # Logo å·¥å…·
-â”‚       â”‚   â”œâ”€â”€ components/    # UI ç»„ä»¶
-â”‚       â”‚   â”‚   â”œâ”€â”€ index.js    # ç»„ä»¶å¯¼å‡º
-â”‚       â”‚   â”‚   â”œâ”€â”€ home.js    # é¦–é¡µè§†å›¾
-â”‚       â”‚   â”‚   â”œâ”€â”€ editor.js  # ç¼–è¾‘å™¨è§†å›¾
-â”‚       â”‚   â”‚   â”œâ”€â”€ type-a-editor-panel.js  # Type A é¢æ¿é…ç½®
-â”‚       â”‚   â”‚   â”œâ”€â”€ type-b-editor-panel.js  # Type B é¢æ¿é…ç½®
-â”‚       â”‚   â”‚   â”œâ”€â”€ type-c-editor-panel.js  # Type C é¢æ¿é…ç½®
-â”‚       â”‚   â”‚   â”œâ”€â”€ type-d-editor-panel.js  # Type D é¢æ¿é…ç½®
-â”‚       â”‚   â”‚   â”œâ”€â”€ type-e-editor-panel.js  # Type E é¢æ¿é…ç½®
-â”‚       â”‚   â”‚   â””â”€â”€ type-f-editor-panel.js  # Type F é¢æ¿é…ç½®
-â”‚       â”‚   â””â”€â”€ styles/        # æ ·å¼æ¨¡å—
-â”‚       â”‚       â”œâ”€â”€ index.js   # æ ·å¼æ³¨å†Œè¡¨
-â”‚       â”‚       â”œâ”€â”€ type-a-preview.js   # Type A é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-b-preview.js   # Type B é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-c-preview.js   # Type C é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-d-preview.js   # Type D é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-e-preview.js   # Type E é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-f-preview.js   # Type F é¢„è§ˆ
-â”‚       â”‚       â”œâ”€â”€ type-a-export.js    # Type A å¯¼å‡º
-â”‚       â”‚       â”œâ”€â”€ type-b-export.js    # Type B å¯¼å‡º
-â”‚       â”‚       â”œâ”€â”€ type-c-export.js    # Type C å¯¼å‡º
-â”‚       â”‚       â”œâ”€â”€ type-d-export.js    # Type D å¯¼å‡º
-â”‚       â”‚       â”œâ”€â”€ type-e-export.js    # Type E å¯¼å‡º
-â”‚       â”‚       â””â”€â”€ type-f-export.js    # Type F å¯¼å‡º
-â”‚       â”œâ”€â”€ logos/            # ç›¸æœºå‚å•† Logo (SVG)
-â”‚       â”œâ”€â”€ fonts/            # å­—ä½“æ–‡ä»¶ (MiSans)
-â”‚       â””â”€â”€ assets/
-â”‚           â””â”€â”€ piexif.js    # EXIF å¤„ç†åº“
-â”œâ”€â”€ doc/
-â”‚   â”œâ”€â”€ AI_PROJECT_GUIDE.md   # AI é¡¹ç›®è®¤çŸ¥æŒ‡å—
-â”‚   â”œâ”€â”€ CHANGELOG.md          # æ›´æ–°æ—¥å¿—
-â”‚   â”œâ”€â”€ CODE_REVIEW.md        # ä»£ç å®¡æŸ¥æŠ¥å‘Š
-â”‚   â”œâ”€â”€ DESIGN.md             # è®¾è®¡æ–¹æ¡ˆ
-â”‚   â”œâ”€â”€ EXIF_DESIGN.md        # EXIF è®¾è®¡æ–‡æ¡£
-â”‚   â”œâ”€â”€ function_analysis.md  # å‡½æ•°åˆ†æ
-â”‚   â”œâ”€â”€ RELEASE.md            # å‘å¸ƒè¯´æ˜
-â”‚   â”œâ”€â”€ style_separation_analysis.md # æ ·å¼åˆ†ç¦»åˆ†æ
-â”‚   â”œâ”€â”€ V1.03_CHANGES.md      # v1.0.3 ä¿®æ”¹è¯´æ˜
-â”‚   â”œâ”€â”€ V1.04_CHANGES.md      # v1.0.4 ä¿®æ”¹è¯´æ˜
-â”‚   â”œâ”€â”€ CODE_REVIEW_2026-06-17.md # ä»£ç å®¡æŸ¥æŠ¥å‘Šï¼ˆå·²å½’æ¡£ï¼‰
-â”œâ”€â”€ package.json
-â”œâ”€â”€ README.md
-â””â”€â”€ .gitignore
+©À©¤©¤ src/
+©¦   ©À©¤©¤ main/
+©¦   ©¦   ©À©¤©¤ main.js          # Electron Ö÷½ø³Ì
+©¦   ©¦   ©¸©¤©¤ preload.js       # °²È«ÇÅ½Ó
+©¦   ©¸©¤©¤ renderer/
+©¦       ©À©¤©¤ index.html       # Ö÷Ò³Ãæ
+©¦       ©À©¤©¤ index.css        # È«¾ÖÑùÊ½
+©¦       ©À©¤©¤ css/
+©¦       ©¦   ©À©¤©¤ type-a.css   # Type A ÑùÊ½£¨°×É«ÏÂ±ß¿ò£©
+©¦       ©¦   ©À©¤©¤ type-b.css   # Type B ÑùÊ½£¨ºÚÉ«ÏÂ±ß¿ò£©
+©¦       ©¦   ©À©¤©¤ type-c.css   # Type C ÑùÊ½
+©¦       ©¦   ©À©¤©¤ type-d.css   # Type D ÑùÊ½
+©¦       ©¦   ©À©¤©¤ type-e.css   # Type E ÑùÊ½£¨3:2×İÏò£©
+©¦       ©¦   ©¸©¤©¤ type-f.css   # Type F ÑùÊ½£¨»­ÖĞ»­·ç¸ñ£©
+©¦       ©À©¤©¤ js/
+©¦       ©¦   ©À©¤©¤ app.js        # Ö÷Âß¼­Èë¿Ú
+©¦       ©¦   ©À©¤©¤ events.js     # ÊÂ¼ş´¦Àí
+©¦       ©¦   ©À©¤©¤ state.js      # ×´Ì¬¹ÜÀí
+©¦       ©¦   ©À©¤©¤ exif.js       # EXIF ¶ÁÈ¡ (exifreader)
+©¦       ©¦   ©À©¤©¤ exif-exporter.js  # EXIF µ¼³ö (piexifjs)
+©¦       ©¦   ©À©¤©¤ exporter.js    # Í¼Æ¬µ¼³ö
+©¦       ©¦   ©À©¤©¤ logo-utils.js  # Logo ¹¤¾ß
+©¦       ©¦   ©À©¤©¤ components/    # UI ×é¼ş
+©¦       ©¦   ©¦   ©À©¤©¤ index.js    # ×é¼şµ¼³ö
+©¦       ©¦   ©¦   ©À©¤©¤ home.js    # Ê×Ò³ÊÓÍ¼
+©¦       ©¦   ©¦   ©À©¤©¤ editor.js  # ±à¼­Æ÷ÊÓÍ¼
+©¦       ©¦   ©¦   ©À©¤©¤ type-a-editor-panel.js  # Type A Ãæ°åÅäÖÃ
+©¦       ©¦   ©¦   ©À©¤©¤ type-b-editor-panel.js  # Type B Ãæ°åÅäÖÃ
+©¦       ©¦   ©¦   ©À©¤©¤ type-c-editor-panel.js  # Type C Ãæ°åÅäÖÃ
+©¦       ©¦   ©¦   ©À©¤©¤ type-d-editor-panel.js  # Type D Ãæ°åÅäÖÃ
+©¦       ©¦   ©¦   ©À©¤©¤ type-e-editor-panel.js  # Type E Ãæ°åÅäÖÃ
+©¦       ©¦   ©¦   ©¸©¤©¤ type-f-editor-panel.js  # Type F Ãæ°åÅäÖÃ
+©¦       ©¦   ©¸©¤©¤ styles/        # ÑùÊ½Ä£¿é
+©¦       ©¦       ©À©¤©¤ index.js   # ÑùÊ½×¢²á±í
+©¦       ©¦       ©À©¤©¤ type-a-preview.js   # Type A Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-b-preview.js   # Type B Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-c-preview.js   # Type C Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-d-preview.js   # Type D Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-e-preview.js   # Type E Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-f-preview.js   # Type F Ô¤ÀÀ
+©¦       ©¦       ©À©¤©¤ type-a-export.js    # Type A µ¼³ö
+©¦       ©¦       ©À©¤©¤ type-b-export.js    # Type B µ¼³ö
+©¦       ©¦       ©À©¤©¤ type-c-export.js    # Type C µ¼³ö
+©¦       ©¦       ©À©¤©¤ type-d-export.js    # Type D µ¼³ö
+©¦       ©¦       ©À©¤©¤ type-e-export.js    # Type E µ¼³ö
+©¦       ©¦       ©¸©¤©¤ type-f-export.js    # Type F µ¼³ö
+©¦       ©À©¤©¤ logos/            # Ïà»ú³§ÉÌ Logo (SVG)
+©¦       ©À©¤©¤ fonts/            # ×ÖÌåÎÄ¼ş (MiSans)
+©¦       ©¸©¤©¤ assets/
+©¦           ©¸©¤©¤ piexif.js    # EXIF ´¦Àí¿â
+©À©¤©¤ doc/
+©¦   ©À©¤©¤ AI_PROJECT_GUIDE.md   # AI ÏîÄ¿ÈÏÖªÖ¸ÄÏ
+©¦   ©À©¤©¤ CHANGELOG.md          # ¸üĞÂÈÕÖ¾
+©¦   ©À©¤©¤ CODE_REVIEW.md        # ´úÂëÉó²é±¨¸æ
+©¦   ©À©¤©¤ DESIGN.md             # Éè¼Æ·½°¸
+©¦   ©À©¤©¤ EXIF_DESIGN.md        # EXIF Éè¼ÆÎÄµµ
+©¦   ©À©¤©¤ function_analysis.md  # º¯Êı·ÖÎö
+©¦   ©À©¤©¤ RELEASE.md            # ·¢²¼ËµÃ÷
+©¦   ©À©¤©¤ style_separation_analysis.md # ÑùÊ½·ÖÀë·ÖÎö
+©¦   ©À©¤©¤ V1.03_CHANGES.md      # v1.0.3 ĞŞ¸ÄËµÃ÷
+©¦   ©À©¤©¤ V1.04_CHANGES.md      # v1.0.4 ĞŞ¸ÄËµÃ÷
+©¦   ©À©¤©¤ CODE_REVIEW_2026-06-17.md # ´úÂëÉó²é±¨¸æ£¨ÒÑ¹éµµ£©
+©À©¤©¤ package.json
+©À©¤©¤ README.md
+©¸©¤©¤ .gitignore
 ```
 
 </details>
 
 ---
 
-## ğŸš€ å®‰è£…å’Œè¿è¡Œ
+## ?? °²×°ºÍÔËĞĞ
 
-### ç¯å¢ƒè¦æ±‚
+### »·¾³ÒªÇó
 - Node.js 16+
-- pnpm æˆ– npm
+- pnpm »ò npm
 
-### å®‰è£…ä¾èµ–
+### °²×°ÒÀÀµ
 
 ```bash
-# ä½¿ç”¨ pnpmï¼ˆæ¨èï¼‰
+# Ê¹ÓÃ pnpm£¨ÍÆ¼ö£©
 pnpm install
 
-# æˆ–ä½¿ç”¨ npm
+# »òÊ¹ÓÃ npm
 npm install
 ```
 
-### è¿è¡Œå¼€å‘ç‰ˆæœ¬
+### ÔËĞĞ¿ª·¢°æ±¾
 
 ```bash
-# ä½¿ç”¨ pnpm
+# Ê¹ÓÃ pnpm
 pnpm run dev
 
-# æˆ–ä½¿ç”¨ npm
+# »òÊ¹ÓÃ npm
 npm run dev
 ```
 
-### æ„å»ºæ‰“åŒ…
+### ¹¹½¨´ò°ü
 
 ```bash
-# ä½¿ç”¨ pnpm
+# Ê¹ÓÃ pnpm
 pnpm run build
 
-# æˆ–ä½¿ç”¨ npm
+# »òÊ¹ÓÃ npm
 npm run build
 ```
 
-æ„å»ºå®Œæˆåï¼Œå¯æ‰§è¡Œæ–‡ä»¶ä½äº `dist/OneFrame.exe`
+¹¹½¨Íê³Éºó£¬¿ÉÖ´ĞĞÎÄ¼şÎ»ÓÚ `dist/OneFrame.exe`
 
 ---
 
-## ğŸ“– ä½¿ç”¨è¯´æ˜
+## ?? Ê¹ÓÃËµÃ÷
 
-### 1. é€‰æ‹©è¾¹æ¡†æ ·å¼
-å¯åŠ¨åº”ç”¨åï¼Œç‚¹å‡»é¦–é¡µçš„æ ·å¼å¡ç‰‡ï¼ˆType A / Type B / Type C / Type D / Type Eï¼‰ã€‚
+### 1. Ñ¡Ôñ±ß¿òÑùÊ½
+Æô¶¯Ó¦ÓÃºó£¬µã»÷Ê×Ò³µÄÑùÊ½¿¨Æ¬£¨Type A / Type B / Type C / Type D / Type E£©¡£
 
-### 2. é€‰æ‹©å›¾ç‰‡
-é€‰æ‹©æ ·å¼åï¼Œç³»ç»Ÿä¼šå¼¹å‡ºæ–‡ä»¶é€‰æ‹©å™¨ï¼Œé€‰æ‹©è¦å¤„ç†çš„å›¾ç‰‡ã€‚
+### 2. Ñ¡ÔñÍ¼Æ¬
+Ñ¡ÔñÑùÊ½ºó£¬ÏµÍ³»áµ¯³öÎÄ¼şÑ¡ÔñÆ÷£¬Ñ¡ÔñÒª´¦ÀíµÄÍ¼Æ¬¡£
 
-### 3. è°ƒæ•´è®¾ç½®
-åœ¨å³ä¾§ç¼–è¾‘é¢æ¿ä¸­ï¼Œæ‚¨å¯ä»¥ï¼š
-- è°ƒæ•´è¾¹æ¡†é¢œè‰²å’Œé«˜åº¦
-- é€‰æ‹©æ˜¯å¦æ˜¾ç¤ºç›¸æœº Logo
-- ç¼–è¾‘æˆ–è‡ªåŠ¨å¡«å……æ‹æ‘„å‚æ•°
-- æ·»åŠ è‡ªå®šä¹‰ç½²å
-- è®¾ç½®æ‹æ‘„æ—¶é—´
+### 3. µ÷ÕûÉèÖÃ
+ÔÚÓÒ²à±à¼­Ãæ°åÖĞ£¬Äú¿ÉÒÔ£º
+- µ÷Õû±ß¿òÑÕÉ«ºÍ¸ß¶È
+- Ñ¡ÔñÊÇ·ñÏÔÊ¾Ïà»ú Logo
+- ±à¼­»ò×Ô¶¯Ìî³äÅÄÉã²ÎÊı
+- Ìí¼Ó×Ô¶¨ÒåÊğÃû
+- ÉèÖÃÅÄÉãÊ±¼ä
 
-### 4. å¯¼å‡ºå›¾ç‰‡
-ç‚¹å‡»"ä¿å­˜"æˆ–"å¯¼å‡º"æŒ‰é’®ï¼Œé€‰æ‹©ä¿å­˜è·¯å¾„å³å¯ã€‚
-
----
-
-## âš™ï¸ é…ç½®è¯´æ˜
-
-### è¾¹æ¡†é«˜åº¦
-è¾¹æ¡†é«˜åº¦é»˜è®¤è®¾ç½®ä¸ºå›¾ç‰‡çŸ­è¾¹çš„ 12%ï¼Œå¯åœ¨ 5%-30% èŒƒå›´å†…è°ƒæ•´ã€‚
-
-### Logo æ™ºèƒ½é€‚é…
-- æµ…è‰²è¾¹æ¡†èƒŒæ™¯ï¼šä½¿ç”¨åŸå§‹ Logo
-- æ·±è‰²è¾¹æ¡†èƒŒæ™¯ï¼šæ·±è‰² Logo è‡ªåŠ¨è½¬æ¢ä¸ºç™½è‰²
-
-### æ”¯æŒçš„ EXIF å­—æ®µ
-- Make: ç›¸æœºå‚å•†
-- Model: ç›¸æœºå‹å·
-- DateTimeOriginal: æ‹æ‘„æ—¶é—´
-- FNumber: å…‰åœˆå€¼
-- ExposureTime: å¿«é—¨é€Ÿåº¦
-- ISOSpeedRatings: ISO æ„Ÿå…‰åº¦
-- FocalLength/FocalLengthIn35mmFilm: ç„¦è·
+### 4. µ¼³öÍ¼Æ¬
+µã»÷"±£´æ"»ò"µ¼³ö"°´Å¥£¬Ñ¡Ôñ±£´æÂ·¾¶¼´¿É¡£
 
 ---
 
-## ğŸ”§ å¼€å‘æŒ‡å—
+## ?? ÅäÖÃËµÃ÷
 
-### æ·»åŠ æ–°çš„ç›¸æœºå‚å•† Logo
+### ±ß¿ò¸ß¶È
+±ß¿ò¸ß¶ÈÄ¬ÈÏÉèÖÃÎªÍ¼Æ¬¶Ì±ßµÄ 12%£¬¿ÉÔÚ 5%-30% ·¶Î§ÄÚµ÷Õû¡£
 
-1. å‡†å¤‡ Logo æ–‡ä»¶ï¼ˆSVG æ ¼å¼ï¼‰
-2. å°†æ–‡ä»¶æ”¾å…¥ `src/renderer/logos/` ç›®å½•
-3. æ–‡ä»¶å‘½åè§„èŒƒï¼š`{å‚å•†å}.svg`ï¼ˆå¦‚ `Sony.svg`ï¼‰
-4. åœ¨ `src/renderer/js/logo-utils.js` çš„ `logoList` æ•°ç»„ä¸­æ·»åŠ å‚å•†åç§°
+### Logo ÖÇÄÜÊÊÅä
+- Ç³É«±ß¿ò±³¾°£ºÊ¹ÓÃÔ­Ê¼ Logo
+- ÉîÉ«±ß¿ò±³¾°£ºÉîÉ« Logo ×Ô¶¯×ª»»Îª°×É«
 
-### æ·»åŠ æ–°çš„è¾¹æ¡†æ ·å¼
-
-1. åœ¨ `src/renderer/index.html` ä¸­æ·»åŠ æ–°çš„æ ·å¼å¡ç‰‡
-2. åœ¨ `src/renderer/css/` ä¸­æ·»åŠ å¯¹åº”çš„ CSS æ ·å¼æ–‡ä»¶
-3. åœ¨ `src/renderer/js/styles/` ä¸­æ·»åŠ é¢„è§ˆå’Œå¯¼å‡ºæ¨¡å—
-4. åœ¨ `src/renderer/js/components/` ä¸­æ·»åŠ é¢æ¿é…ç½®æ¨¡å—
-5. åœ¨ `src/renderer/js/styles/index.js` ä¸­æ³¨å†Œæ–°æ ·å¼
-
----
-
-## ğŸ“„ è®¸å¯è¯
-
-æœ¬é¡¹ç›®åŸºäº MIT è®¸å¯è¯å¼€æºã€‚
+### Ö§³ÖµÄ EXIF ×Ö¶Î
+- Make: Ïà»ú³§ÉÌ
+- Model: Ïà»úĞÍºÅ
+- DateTimeOriginal: ÅÄÉãÊ±¼ä
+- FNumber: ¹âÈ¦Öµ
+- ExposureTime: ¿ìÃÅËÙ¶È
+- ISOSpeedRatings: ISO ¸Ğ¹â¶È
+- FocalLength/FocalLengthIn35mmFilm: ½¹¾à
 
 ---
 
-## ğŸ“š ç›¸å…³æ–‡æ¡£
+## ?? ¿ª·¢Ö¸ÄÏ
 
-- [function_analysis.md](./doc/function_analysis.md) - é¡¹ç›®å‡½æ•°åˆ†æ
-- [style_separation_analysis.md](./doc/style_separation_analysis.md) - æ ·å¼åˆ†ç¦»çŠ¶å†µåˆ†æ
+### Ìí¼ÓĞÂµÄÏà»ú³§ÉÌ Logo
+
+1. ×¼±¸ Logo ÎÄ¼ş£¨SVG ¸ñÊ½£©
+2. ½«ÎÄ¼ş·ÅÈë `src/renderer/logos/` Ä¿Â¼
+3. ÎÄ¼şÃüÃû¹æ·¶£º`{³§ÉÌÃû}.svg`£¨Èç `Sony.svg`£©
+4. ÔÚ `src/renderer/js/logo-utils.js` µÄ `logoList` Êı×éÖĞÌí¼Ó³§ÉÌÃû³Æ
+
+### Ìí¼ÓĞÂµÄ±ß¿òÑùÊ½
+
+1. ÔÚ `src/renderer/index.html` ÖĞÌí¼ÓĞÂµÄÑùÊ½¿¨Æ¬
+2. ÔÚ `src/renderer/css/` ÖĞÌí¼Ó¶ÔÓ¦µÄ CSS ÑùÊ½ÎÄ¼ş
+3. ÔÚ `src/renderer/js/styles/` ÖĞÌí¼ÓÔ¤ÀÀºÍµ¼³öÄ£¿é
+4. ÔÚ `src/renderer/js/components/` ÖĞÌí¼ÓÃæ°åÅäÖÃÄ£¿é
+5. ÔÚ `src/renderer/js/styles/index.js` ÖĞ×¢²áĞÂÑùÊ½
 
 ---
 
-## ğŸ™ è‡´è°¢
+## ?? Ğí¿ÉÖ¤
 
-- [Electron](https://www.electronjs.org/) - æ¡Œé¢åº”ç”¨æ¡†æ¶
-- [exifreader](https://github.com/mattiasw/ExifReader) - EXIF ä¿¡æ¯è¯»å–
-- [piexifjs](https://github.com/hMatoba/piexifjs) - EXIF ä¿¡æ¯å†™å…¥
-- [opentype.js](https://github.com/opentypejs/opentype.js) - å­—ä½“æ¸²æŸ“
-- [Copicseal](https://github.com/copicseal) - å¯å›¾åŒ ï¼Œéƒ¨åˆ†ä»£ç é€»è¾‘æ¥è‡ª Copicseal
-- [Font Awesome](https://fontawesome.com/) - å›¾æ ‡åº“
-- [MiSans](https://hyperos.mi.com/font) - å°ç±³ MiSans å­—ä½“
-- [Xiaomi MiMo](https://mimo.xiaomi.com/) - Xiaomi MiMo Orbit-ç™¾ä¸‡äº¿ Token åˆ›é€ è€…æ¿€åŠ±è®¡åˆ’æä¾›äº†å…è´¹çš„TokenPlan
+±¾ÏîÄ¿»ùÓÚ MIT Ğí¿ÉÖ¤¿ªÔ´¡£
+
+---
+
+## ?? Ïà¹ØÎÄµµ
+
+- [function_analysis.md](./doc/function_analysis.md) - ÏîÄ¿º¯Êı·ÖÎö
+- [style_separation_analysis.md](./doc/style_separation_analysis.md) - ÑùÊ½·ÖÀë×´¿ö·ÖÎö
+
+---
+
+## ?? ÖÂĞ»
+
+- [Electron](https://www.electronjs.org/) - ×ÀÃæÓ¦ÓÃ¿ò¼Ü
+- [exifreader](https://github.com/mattiasw/ExifReader) - EXIF ĞÅÏ¢¶ÁÈ¡
+- [piexifjs](https://github.com/hMatoba/piexifjs) - EXIF ĞÅÏ¢Ğ´Èë
+- [opentype.js](https://github.com/opentypejs/opentype.js) - ×ÖÌåäÖÈ¾
+- [Copicseal](https://github.com/copicseal) - ¿ÉÍ¼½³£¬²¿·Ö´úÂëÂß¼­À´×Ô Copicseal
+- [Font Awesome](https://fontawesome.com/) - Í¼±ê¿â
+- [MiSans](https://hyperos.mi.com/font) - Ğ¡Ã× MiSans ×ÖÌå
+- [Xiaomi MiMo](https://mimo.xiaomi.com/) - Xiaomi MiMo Orbit-°ÙÍòÒÚ Token ´´ÔìÕß¼¤Àø¼Æ»®Ìá¹©ÁËÃâ·ÑµÄTokenPlan

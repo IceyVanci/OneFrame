@@ -16,8 +16,8 @@
   /* 尺寸由 JS 通过 inline style 设置 */
 }
 
-/* 照片区：居中，92% 宽度，80% 高度 */
-.frame-wrapper.type-g img {
+/* 照片区：居中，92% 宽度，80% 高度（仅匹配直接子级 img，不匹配 Logo） */
+.frame-wrapper.type-g > img {
   position: absolute;
   top: 5%;
   left: 4%;

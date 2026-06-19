@@ -132,7 +132,7 @@ export function updateContentPreview(elements, settings) {
   
   // 第一行：显示厂商 Logo（高度 = 画布顶部边框高度 = canvasHeight × 5%）
   // textAreaHeight = canvasHeight × 15%，所以 canvasHeight × 5% = textAreaHeight / 3
-  const logoHeight = Math.round(textAreaHeight / 3);
+  const logoHeight = Math.round(textAreaHeight / 6);
   // Type G 始终显示所有元素（无开关控制）
   let line1Html = '';
   if (selectedLogo) {

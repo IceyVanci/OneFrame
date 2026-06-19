@@ -10,7 +10,7 @@
 
 ### 核心特性
 - 智能 EXIF 读取：自动识别相机厂商并显示对应 Logo
-- 多种边框样式：支持 Type A/B/C/D/E/F 六种样式
+- 多种边框样式：支持 Type A/B/C/D/E/F/G 七种样式
 - EXIF 保留：导出时自动保留原图 EXIF 信息
 - 跨平台支持：基于 Electron，可在 Windows/Mac/Linux 运行
 
@@ -44,7 +44,8 @@ OneFrame/
 │       │   ├── type-c.css      # Type C：横向布局
 │       │   ├── type-d.css      # Type D：横向居中
 │       │   ├── type-e.css      # Type E：3:2纵向，顶部1:1正方形
-│       │   └── type-f.css      # Type F：画中画风格
+│       │   ├── type-f.css      # Type F：画中画风格
+│       │   └── type-g.css      # Type G：Logo+参数画中画
 │       ├── js/
 │       │   ├── app.js          # 主逻辑入口（混合处理所有类型）
 │       │   ├── exif.js         # EXIF 读取（exifreader）
@@ -63,12 +64,14 @@ OneFrame/
 │       │       ├── type-d-preview.js   # Type D 预览
 │       │       ├── type-e-preview.js   # Type E 预览
 │       │       ├── type-f-preview.js   # Type F 预览
+│       │       ├── type-g-preview.js   # Type G 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
 │       │       ├── type-d-export.js    # Type D 导出
 │       │       ├── type-e-export.js    # Type E 导出
-│       │       └── type-f-export.js    # Type F 导出
+│       │       ├── type-f-export.js    # Type F 导出
+│       │       └── type-g-export.js    # Type G 导出
 │       ├── logos/               # 相机厂商 Logo（SVG）
 │       │   ├── Apple.svg        # 原始 Logo
 │       │   ├── Apple.auto.svg   # 自动配色版 Logo
@@ -136,6 +139,17 @@ OneFrame/
 - **字号**：动态缩放（基准 900px 宽度对应 14px）
 - **窗口缩放**：每次 resize 动态计算显示尺寸，所有元素等比缩放
 - **编辑面板**：隐藏边框颜色/高度/比例/Logo，设备型号自动包含品牌名
+
+### Type G - Logo 画中画风格
+- **特点**：第一行显示厂商 Logo，第二行显示拍摄日期 | 拍摄参数 | 相机名称，第三行显示署名
+- **布局**：与 Type F 类似，画布宽度 = 图片宽度，画布高度 = 图片高度 / 0.8
+- **照片区域**：92% 宽度 × 80% 高度，顶部 5% 留白，左右各 4%
+- **纵向图片自适应**：白色区域减半（顶部 2.5%，底部 7.5%），照片区域 90%
+- **Logo 大小**：横向图片高度 = 画布 2.5%，纵向图片高度 = 画布 1.25%
+- **字号**：动态缩放（基准 900px 宽度对应 14px）
+- **编辑面板**：隐藏边框颜色/高度/比例，隐藏所有显示开关（默认显示），保留 Logo 选择区域
+- **机型名称**：只显示型号，不带品牌前缀
+- **文字颜色**：全部黑色
 
 ---
 
