@@ -3,6 +3,7 @@ import { getExif, formatDateTime, getFocalLength } from './exif.js';
 import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-utils.js';
 import { getStyle, getPreview, typeBPreview, typeEPreview, typeFPreview } from './styles/index.js';
 import { configureEditPanel as configureTypeF } from './components/type-f-editor-panel.js';
+import { configureEditPanel as configureTypeG } from './components/type-g-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -99,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let selectedLogo = null;
   let typeFCachedSize = null;  // Type F 图框尺寸缓存
+  let typeGCachedSize = null;  // Type G 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -155,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentFile = file;
     currentImagePath = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
+    typeGCachedSize = null;  // 清除 Type G 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -181,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentImagePath = imagePath;
     currentFile = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
+    typeGCachedSize = null;  // 清除 Type G 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -269,11 +273,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g') ? 'none' : 'block';
     
     // Type F: 调用面板配置模块
     if (currentStyle === 'type-f') {
       configureTypeF();
+    }
+    
+    // Type G: 调用面板配置模块
+    if (currentStyle === 'type-g') {
+      configureTypeG();
     }
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
@@ -421,6 +430,39 @@ document.addEventListener('DOMContentLoaded', () => {
       // 设置 frameWrapper 为显示尺寸（与预览区域匹配）
       preview.updateFrameWrapper(displayW, displayH);
       preview.updatePreview(displayW, displayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-g') {
+      // 使用 Type G Preview 模块（与 Type F 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      // 只在首次加载或切换图片时计算原始画布尺寸
+      if (!typeGCachedSize) {
+        typeGCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: gCanvasW, canvasHeight: gCanvasH } = typeGCachedSize;
+      // 根据当前预览区域大小计算显示尺寸
+      const gPreviewArea = frameWrapper?.parentElement;
+      const gAvailW = (gPreviewArea?.clientWidth || 500) * 0.96;
+      const gAvailH = (gPreviewArea?.clientHeight || 600) * 0.96;
+      const gDisplayScale = Math.min(gAvailW / gCanvasW, gAvailH / gCanvasH, 1);
+      const gDisplayW = Math.round(gCanvasW * gDisplayScale);
+      const gDisplayH = Math.round(gCanvasH * gDisplayScale);
+      // 设置 frameWrapper 为显示尺寸（与预览区域匹配）
+      preview.updateFrameWrapper(gDisplayW, gDisplayH);
+      preview.updatePreview(gDisplayW, gDisplayH, {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });

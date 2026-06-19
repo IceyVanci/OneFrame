@@ -1,5 +1,5 @@
 /**
- * Type F 导出渲染模块
+ * Type G 导出渲染模块
  * 布局：白色背景 + 顶部5%留白 + 中部92%×80%照片 + 底部15%文字
  * 文字：第一行 "Shot on" 灰色 + 品牌黑色 + 机型黑色，第二行参数灰色
  */
@@ -106,15 +106,10 @@ function formatDateForDisplay(dateTimeStr) {
 }
 
 /**
- * 绘制 Type F 底部文字内容
- * 第一行："Shot on"（灰色）+ 品牌名称（黑色）+ 机型（黑色）
- * 第二行：日期 光圈 焦距 快门 ISO（全部灰色）
- * 
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} canvasWidth - 画布宽度
- * @param {number} canvasHeight - 画布高度
- * @param {Object} settings - 设置
- * @param {Object} fonts - 字体对象
+ * 绘制 Type G 底部内容
+ * 第一行：厂商 Logo
+ * 第二行：拍摄日期 | 拍摄参数 | 相机名称
+ * 第三行：© 署名
  */
 async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait = false) {
   // 底部文字区域：纵向 7.5%，横向 15%
@@ -124,79 +119,96 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
   const textCenterY = textAreaTop + textAreaHeight / 2;
   const centerX = canvasWidth / 2;
   
-  // 字号按画布宽度缩放（与 Type A 一致的方式：基于预览基准尺寸）
-  const baseScale = canvasWidth / 900;  // 预览基准宽度
-  const line1FontSize = Math.round(14 * baseScale);   // CSS: 14px
-  const line2FontSize = Math.round(12 * baseScale);   // CSS: 12px
-  const lineHeight1 = Math.round(line1FontSize * 1.4);  // CSS line-height: 1.4
+  // 字号按画布宽度缩放
+  const baseScale = canvasWidth / 900;
+  const line1FontSize = Math.round(14 * baseScale);
+  const line2FontSize = Math.round(14 * baseScale); // 与第一行相同字号
+  const lineHeight1 = Math.round(line1FontSize * 1.2); // Logo 行高
   const lineHeight2 = Math.round(line2FontSize * 1.4);
-  const lineGap = Math.round(6 * baseScale);           // CSS .type-f-lines-group gap: 6px
-  const signatureGap = Math.round(6 * baseScale);      // CSS .type-f-line3 margin-top: 6px
+  const lineGap = Math.round(6 * baseScale);
+  const signatureGap = Math.round(6 * baseScale);
   
-  // 设备型号（已含品牌名，如 "Sony A7M4"）
-  const modelName = (settings.showModel && settings.customModel) ? settings.customModel : '';
-  const line1Text = modelName ? `Shot on ${modelName}` : '';
+  // 第一行：Logo
+  const hasLogo = settings.selectedLogo && settings.showLogo;
   
-  // 构建第二行文字
+  // 第二行：拍摄日期 | 拍摄参数 | 相机名称
   const line2Parts = [];
   if (settings.dateTime && settings.showTime) {
     line2Parts.push(formatDateForDisplay(settings.dateTime));
   }
-  if (settings.showParams && settings.fNumber) line2Parts.push(`f/${settings.fNumber}`);
-  if (settings.showParams && settings.focalLength) line2Parts.push(`${String(settings.focalLength).replace(/mm$/i, '')}mm`);
-  if (settings.showParams && settings.exposureTime) line2Parts.push(`${settings.exposureTime}s`);
-  if (settings.showParams && settings.iso) line2Parts.push(`ISO${settings.iso}`);
-  const line2Text = line2Parts.join(' ');
+  const paramParts = [];
+  if (settings.showParams && settings.fNumber) paramParts.push(`f/${settings.fNumber}`);
+  if (settings.showParams && settings.focalLength) paramParts.push(`${String(settings.focalLength).replace(/mm$/i, '')}mm`);
+  if (settings.showParams && settings.exposureTime) paramParts.push(`${settings.exposureTime}s`);
+  if (settings.showParams && settings.iso) paramParts.push(`ISO${settings.iso}`);
+  if (paramParts.length > 0) line2Parts.push(paramParts.join(' '));
+  if (settings.showModel && settings.customModel) line2Parts.push(settings.customModel);
+  const line2Text = line2Parts.join(' | ');
   
-  // 构建第三行文字
+  // 第三行：署名
   const signatureText = settings.signatureText || '';
   const line3Text = signatureText ? `© ${signatureText}` : '';
   
-  // 计算前两行的总高度（lines-group）
-  const groupHeight = (line1Text ? lineHeight1 : 0) + lineGap + (line2Text ? lineHeight2 : 0);
-  // lines-group 垂直居中，第一行的 Y 坐标
-  const line1Y = textCenterY - groupHeight / 2 + (line1Text ? lineHeight1 / 2 : 0);
-  // 第二行的 Y 坐标 = 第一行 Y + 半行1高 + gap + 半行2高
+  // 计算布局位置
+  const groupHeight = (hasLogo ? lineHeight1 : 0) + lineGap + (line2Text ? lineHeight2 : 0);
+  const line1Y = textCenterY - groupHeight / 2 + (hasLogo ? lineHeight1 / 2 : 0);
   const line2Y = line1Y + lineHeight1 / 2 + lineGap + lineHeight2 / 2;
   
-  // 绘制第一行
-  if (line1Text) {
-    const shotOnPart = 'Shot on ';
-    const modelPart = modelName;
-    
-    ctx.font = `500 ${line1FontSize}px 'MiSans', sans-serif`;
-    const shotOnWidth = ctx.measureText(shotOnPart).width;
-    const totalWidth = ctx.measureText(line1Text).width;
-    const startX = centerX - totalWidth / 2;
-    
-    // "Shot on" 灰色
-    drawText(ctx, shotOnPart, startX + shotOnWidth / 2, line1Y, line1FontSize, {
-      color: '#888888', fontWeight: '500', align: 'center'
-    });
-    // 机型黑色
-    drawText(ctx, modelPart, startX + shotOnWidth + ctx.measureText(modelPart).width / 2, line1Y, line1FontSize, {
-      color: '#000000', fontWeight: '500', align: 'center'
-    });
+  // 绘制第一行：Logo（纵向高度 = 画布顶部边框高度 = canvasHeight × 2.5%，横向 = canvasHeight × 5%）
+  if (hasLogo) {
+    const logoMaxHeight = Math.round(canvasHeight * (isPortrait ? 0.025 : 0.05));
+    await drawLogoG(ctx, settings.selectedLogo, centerX, line1Y, logoMaxHeight);
   }
   
   // 绘制第二行
   if (line2Text) {
     drawText(ctx, line2Text, centerX, line2Y, line2FontSize, {
-      color: '#888888', fontWeight: 'normal', align: 'center'
+      color: '#000000', fontWeight: '500', align: 'center'
     });
   }
   
-  // 绘制第三行（署名，独立在下方）
+  // 绘制第三行（署名）
   if (line3Text) {
     const line3Y = line2Text ? line2Y + lineHeight2 / 2 + signatureGap + lineHeight2 / 2 : line2Y + signatureGap;
-    drawText(ctx, line3Text, centerX, line3Y, line2FontSize, {
-      color: '#888888', fontWeight: 'normal', align: 'center'
+    drawText(ctx, line3Text, centerX, line3Y, Math.round(12 * baseScale), {
+      color: '#000000', fontWeight: 'normal', align: 'center'
     });
   }
 }
 
 /**
- * 渲染 Type F 导出图片
+ * 绘制 Logo（Type G 专用）
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} logoName - Logo 文件名
+ * @param {number} centerX - 居中 X 坐标
+ * @param {number} centerY - Y 坐标（文字基线）
+ * @param {number} maxHeight - 最大高度
+ * @param {number} maxWidth - 最大宽度
+ */
+function drawLogoG(ctx, logoName, centerX, centerY, maxHeight) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      let drawWidth = img.naturalWidth;
+      let drawHeight = img.naturalHeight;
+      
+      // 始终缩放到目标高度（保持比例）
+      drawWidth = drawWidth * (maxHeight / drawHeight);
+      drawHeight = maxHeight;
+      
+      const x = centerX - drawWidth / 2;
+      const y = centerY - drawHeight / 2;
+      ctx.drawImage(img, x, y, drawWidth, drawHeight);
+      resolve();
+    };
+    img.onerror = () => resolve();
+    img.src = `logos/${logoName}.svg`;
+  });
+}
+
+/**
+ * 渲染 Type G 导出图片
  * @param {HTMLImageElement} img - 原始图片元素
  * @param {Object} options - 渲染选项
  * @returns {Promise<string>} DataURL
@@ -238,11 +250,9 @@ export async function renderImage(img, options) {
   let srcX = 0, srcY = 0, srcW = img.naturalWidth, srcH = img.naturalHeight;
   
   if (imgRatio > areaRatio) {
-    // 图片更宽，裁剪左右
     srcW = Math.round(img.naturalHeight * areaRatio);
     srcX = Math.round((img.naturalWidth - srcW) / 2);
   } else {
-    // 图片更高，裁剪上下
     srcH = Math.round(img.naturalWidth / areaRatio);
     srcY = Math.round((img.naturalHeight - srcH) / 2);
   }
@@ -256,10 +266,10 @@ export async function renderImage(img, options) {
 }
 
 /**
- * Type F 导出样式配置
+ * Type G 导出样式配置
  */
-export const typeFExport = {
-  id: 'type-f-export',
-  name: 'Type F Export',
+export const typeGExport = {
+  id: 'type-g-export',
+  name: 'Type G Export',
   renderImage
 };

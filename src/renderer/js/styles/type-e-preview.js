@@ -28,8 +28,11 @@ let yearText = '';
 window.handleLogoLoad = function(img) {
   const ratio = img.naturalWidth / img.naturalHeight;
   
-  // 动态测量年份文字的像素宽度
-  const yearFontSize = 24; // 与 CSS 中的 font-size 一致
+  // 从 borderContent 读取动态基准字号
+  const baseFontSize = state.borderContent
+    ? parseFloat(getComputedStyle(state.borderContent).fontSize)
+    : 24;
+  const yearFontSize = baseFontSize; // 年份 = 1em = baseFontSize
   const yearFont = `${yearFontSize}px MiSans Medium, sans-serif`;
   
   // 创建临时 canvas 测量文字
@@ -126,6 +129,11 @@ export function updateFrameWrapper(squareSize) {
   state.frameWrapper.style.width = `${squareSize}px`;
   state.frameWrapper.style.height = `${canvasHeight}px`;
 
+  // 动态设置基准字号，CSS 中的 em 单位会相对于此值缩放
+  if (state.borderContent) {
+    const baseFontSize = Math.max(8, Math.round(24 * squareSize / 480));
+    state.borderContent.style.fontSize = `${baseFontSize}px`;
+  }
 }
 
 /**
