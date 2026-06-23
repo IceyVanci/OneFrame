@@ -6,7 +6,7 @@
 
 | 状态 | 数量 | 说明 |
 |------|------|------|
-| ✅ 正常/使用中 | 60+ | 按设计预期运行，无需改动 |
+| ✅ 正常/使用中 | 70+ | 按设计预期运行，无需改动 |
 | ⚠️ 未使用/预留 | 12 | 功能冗余或预留，未被调用 |
 
 ---
@@ -28,7 +28,8 @@ src/
     │   ├── type-d.css      # Type D 样式
     │   ├── type-e.css      # Type E 样式（3:2竖向，顶部1:1正方形）
     │   ├── type-f.css      # Type F 样式（画中画风格）
-    │   └── type-g.css      # Type G 样式（顶部Logo+日期参数+签名）
+    │   ├── type-g.css      # Type G 样式（顶部Logo+日期参数+签名）
+    │   └── type-h.css      # Type H 样式（全画幅叠加文字，照片100%填满）
     ├── js/
     │   ├── app.js          # 主统一入口
     │   ├── events.js       # 事件处理
@@ -47,7 +48,8 @@ src/
     │   │   ├── type-d-editor-panel.js  # Type D 编辑面板配置
     │   │   ├── type-e-editor-panel.js  # Type E 编辑面板配置
     │   │   ├── type-f-editor-panel.js  # Type F 编辑面板配置
-    │   │   └── type-g-editor-panel.js  # Type G 编辑面板配置
+    │   │   ├── type-g-editor-panel.js  # Type G 编辑面板配置
+    │   │   └── type-h-editor-panel.js  # Type H 编辑面板配置（显示文字颜色选择）
     │   └── styles/
     │       ├── index.js     # 样式注册表
     │       ├── type-a-preview.js   # Type A 预览
@@ -57,13 +59,15 @@ src/
     │       ├── type-e-preview.js   # Type E 预览
     │       ├── type-f-preview.js   # Type F 预览
     │       ├── type-g-preview.js   # Type G 预览
+    │       ├── type-h-preview.js   # Type H 预览（全画幅叠加文字）
     │       ├── type-a-export.js    # Type A 导出
     │       ├── type-b-export.js    # Type B 导出
     │       ├── type-c-export.js    # Type C 导出
     │       ├── type-d-export.js    # Type D 导出
     │       ├── type-e-export.js    # Type E 导出
     │       ├── type-f-export.js    # Type F 导出
-    │       └── type-g-export.js    # Type G 导出
+    │       ├── type-g-export.js    # Type G 导出
+    │       └── type-h-export.js    # Type H 导出（全画幅叠加文字）
     ├── logos/               # 相机厂商 Logo (SVG)
     └── fonts/               # 字体文件 (MiSans)
 ```
@@ -83,6 +87,7 @@ src/
 | **预览** | `type-e-preview.js` | Type E 照片预览渲染（3:2竖向，顶部1:1照片，底部参数） | Type E |
 | **预览** | `type-f-preview.js` | Type F 照片预览渲染（画中画风格，上方留白+照片+下方文字） | Type F |
 | **预览** | `type-g-preview.js` | Type G 照片预览渲染（Logo+日期参数+签名，居中布局） | Type G |
+| **预览** | `type-h-preview.js` | Type H 照片预览渲染（全画幅叠加文字，照片100%填满） | Type H |
 | **导出** | `type-a-export.js` | Type A Canvas 绘制导出 | Type A |
 | **导出** | `type-b-export.js` | Type B Canvas 绘制导出 | Type B |
 | **导出** | `type-c-export.js` | Type C Canvas 绘制导出 | Type C |
@@ -90,6 +95,7 @@ src/
 | **导出** | `type-e-export.js` | Type E Canvas 绘制导出 | Type E |
 | **导出** | `type-f-export.js` | Type F Canvas 绘制导出 | Type F |
 | **导出** | `type-g-export.js` | Type G Canvas 绘制导出 | Type G |
+| **导出** | `type-h-export.js` | Type H Canvas 绘制导出（全画幅叠加文字） | Type H |
 | **面板配置** | `type-a-editor-panel.js` | Type A 编辑面板配置 | Type A |
 | **面板配置** | `type-b-editor-panel.js` | Type B 编辑面板配置 | Type B |
 | **面板配置** | `type-c-editor-panel.js` | Type C 编辑面板配置 | Type C |
@@ -97,13 +103,14 @@ src/
 | **面板配置** | `type-e-editor-panel.js` | Type E 编辑面板配置 | Type E |
 | **面板配置** | `type-f-editor-panel.js` | Type F 编辑面板配置 | Type F |
 | **面板配置** | `type-g-editor-panel.js` | Type G 编辑面板配置 | Type G |
+| **面板配置** | `type-h-editor-panel.js` | Type H 编辑面板配置（含文字颜色选择） | Type H |
 | **样式注册表** | `index.js` | 统一管理样式模块 | 通用 |
 
 ### 公共模块
 
 | 模块 | 文件 | 职责 | 说明 |
 |------|------|------|------|
-| **主入口** | `app.js` | 主统一入口 | 综合处理 Type A/B/C/D/E/F/G |
+| **主入口** | `app.js` | 主统一入口 | 综合处理 Type A-H |
 | **EXIF 读取** | `exif.js` | 读取照片 EXIF 信息 | 使用 exifreader |
 | **EXIF 导出** | `exif-exporter.js` | 嵌入 EXIF 到导出图 | 使用 piexifjs |
 | **照片导出** | `exporter.js` | Canvas 绘制导出 | 通用通道 |
@@ -200,7 +207,18 @@ src/
 | `calcSize(settings)` | ✅ | 计算画布尺寸（宽度=图片宽度，高度=图片高度/0.9或0.8） |
 | `updateFrameWrapper(squareSize, canvasHeight)` | ✅ | 设置 frameWrapper 样式和动态字号 |
 | `updatePreview(squareSize, canvasHeight, imgDimensions)` | ✅ | 更新照片区域样式（纵向图片覆盖 CSS 默认值） |
-| `updateContentPreview(elements, settings)` | ✅ | 更新文字和 Logo 内容预览（三行居中布局） |
+| `updateContentPreview(elements, settings)` | ✅ | 更新文字和 Logo 内容预览（三行居中布局，纯黑文字） |
+| `reset()` | ✅ | 重置预览状态 |
+
+### styles/type-h-preview.js (全画幅叠加文字，照片100%填满)
+
+| 函数名 | 状态 | 说明 |
+|--------|------|------|
+| `init(elements)` | ✅ | 初始化 Type H 预览 |
+| `calcSize(settings)` | ✅ | 计算画布尺寸（画布 = 图片原始大小） |
+| `updateFrameWrapper(squareSize, canvasHeight)` | ✅ | 设置 frameWrapper 样式和动态字号 |
+| `updatePreview(squareSize, canvasHeight, imgDimensions)` | ✅ | 更新照片区域样式（100%×100%） |
+| `updateContentPreview(elements, settings)` | ✅ | 更新文字和 Logo 内容预览（支持 textColor） |
 | `reset()` | ✅ | 重置预览状态 |
 
 ### styles/type-a-export.js
@@ -254,15 +272,26 @@ src/
 | `detectLogoBrightness(logoPath)` | ✅ | 检测 logo 图片的平均亮度 |
 | `borderColorIsLight(color)` | ✅ | 判断颜色是否为浅色 |
 | `formatDateForDisplay(dateTimeStr)` | ✅ | 格式化日期 |
-| `drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait)` | ✅ | 绘制底部文字内容（Logo+日期参数+签名） |
+| `drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait)` | ✅ | 绘制底部文字内容（Logo+日期参数+签名，纯黑文字） |
 | `drawLogoG(ctx, logoName, centerX, centerY, maxHeight)` | ✅ | 绘制 Logo（居中，按目标高度缩放） |
 | `renderImage(img, options)` | ✅ | Type G Canvas 导出 |
+
+### styles/type-h-export.js
+
+| 函数名 | 状态 | 说明 |
+|--------|------|------|
+| `loadFonts()` | ✅ | 预加载 MiSans 字体（Semibold/Medium/Normal） |
+| `drawText(ctx, text, x, y, fontSize, options)` | ✅ | 使用 ctx.fillText 绘制文字 |
+| `formatDateForDisplay(dateTimeStr)` | ✅ | 格式化日期 |
+| `drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts)` | ✅ | 绘制底部文字内容（Logo+日期参数+签名，支持 textColor） |
+| `drawLogoH(ctx, logoName, centerX, centerY, maxHeight)` | ✅ | 绘制 Logo（居中，按目标高度缩放） |
+| `renderImage(img, options)` | ✅ | Type H Canvas 导出（画布=图片原始大小） |
 
 ### components/type-*-editor-panel.js
 
 | 函数名 | 状态 | 说明 |
 |--------|------|------|
-| `configureEditPanel()` | ✅ | 配置对应型号的编辑面板 |
+| `configureEditPanel()` | ✅ | 配置对应型号的编辑面板（Type H 含文字颜色选择） |
 
 ### app.js
 
@@ -275,13 +304,13 @@ src/
 | `loadImageWithExif` | ✅ | 导入文件 | 读取 EXIF → 更新菜单 | 浏览器环境 |
 | `loadImageInElectron` | ✅ | 选择照片 | IPC 读取 EXIF | Electron 环境 |
 | `updateExifDisplay` | ✅ | EXIF 更新 | 自动填充菜单 | UX 优化 |
-| `showEditor` | ✅ | 进入编辑器 | 配置编辑面板 | Type A/B/C/D/E/F/G 分支 |
-| `hideEditor` | ✅ | 返回首页 | 重置状态 | Type A/B/C/D/E/F/G 分支 |
+| `showEditor` | ✅ | 进入编辑器 | 配置编辑面板 | Type A-H 分支 |
+| `hideEditor` | ✅ | 返回首页 | 重置状态 | Type A-H 分支 |
 | `resetForm` | ✅ | 返回首页 | 清空菜单 | UI |
-| `updateBorder` | ✅ | 颜色/高度变化 | 更新预览 | Type A/B/C/D/E/F/G 分支 |
-| `updateBorderContent` | ✅ | 内容变化 | 更新预览内容 | Type A/B/C/D/E/F/G 分支 |
-| `getDisplaySettings` | ✅ | 预览更新 | 收集显示设置 | Type A/B/C/D/E/F/G 高级值不同 |
-| `getEditSettings` | ✅ | 导出时 | 收集编辑设置 | Type A/B/C/D/E/F/G 高级值不同 |
+| `updateBorder` | ✅ | 颜色/高度变化 | 更新预览 | Type A-H 分支 |
+| `updateBorderContent` | ✅ | 内容变化 | 更新预览内容 | Type A-H 分支 |
+| `getDisplaySettings` | ✅ | 预览更新 | 收集显示设置 | Type A-H 高级值不同 |
+| `getEditSettings` | ✅ | 导出时 | 收集编辑设置 | Type A-H 高级值不同 |
 | `exportImageHandler` | ✅ | 点击导出 | 调用 exporter | 文件系统 |
 
 ### exporter.js
@@ -497,9 +526,58 @@ src/
 
 - 白色固定背景，无边框颜色/高度设置
 - 所有元素默认显示，无开关控制
+- 文字颜色固定为黑色 #000000
 - 机型名称不带品牌前缀（如 "A7M4" 而非 "SONY A7M4"）
 - 纵向图片：照片占 90%，白色区域减半（顶部 2.5%，底部 7.5%）
 - 横向图片：照片占 80%，顶部 5%，底部 15%
+
+---
+
+## Type H 特殊布局说明
+
+### Type H 画布结构
+
+```
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│         照片 100% 填满画布            │  ← 无白色边框
+│                                      │
+│                                      │
+│                                      │
+│         [Logo]  (居中)               │  ← 第一行：厂商 Logo
+│     2024/01/01 | f/2.8 50mm | A7M4  │  ← 第二行：日期 | 参数 | 机型
+│         © 署名  (居中)               │  ← 第三行：签名
+└──────────────────────────────────────┘
+```
+
+### Type H 布局规则
+
+| 位置 | 内容 | 样式 |
+|------|------|------|
+| 第一行 | 厂商 Logo | 居中，高度 = 文字区域高度 / 6 |
+| 第二行 | 日期 | 参数 | 机型 | 居中，用竖线分隔，font-size: 14px（基准 900px 宽度） |
+| 第三行 | © 署名 | 居中，font-size: 12px |
+
+### Type H 特性
+
+- 照片 100% 填满画布，无白色边框
+- 画布大小 = 图片原始大小
+- 文字叠加在照片底部内部
+- 支持文字颜色选择（黑/灰/白），默认白色
+- 所有元素默认显示，无开关控制
+- 机型名称不带品牌前缀（如 "A7M4" 而非 "SONY A7M4"）
+- 无纵向图片特殊处理
+
+### Type H 与 Type G 关键差异
+
+| 特性 | Type G | Type H |
+|------|--------|--------|
+| 画布大小 | 图片高度 ÷ 0.8（横向）/ 0.9（纵向） | 图片原始大小 |
+| 照片区域 | 92%×80%，顶部 5% 留白 | 100%×100% 填满画布 |
+| 文字颜色 | 黑色 #000000（固定） | 支持黑/灰/白选择，默认白色 |
+| 背景色 | 白色 #ffffff | 黑色 #000000（照片填满，背景不可见） |
+| 编辑面板 | 隐藏开关，显示 Logo 选择 | 相同 + 文字颜色选择 |
 
 ---
 
@@ -507,9 +585,9 @@ src/
 
 | 分类 | 数量 |
 |------|------|
-| 正常/使用中 | 60+ |
+| 正常/使用中 | 70+ |
 | 未使用/预留 | 12 |
-| **总计分析** | 72+ |
+| **总计分析** | 82+ |
 
 ---
 
@@ -551,9 +629,9 @@ src/
 
 | 模块 | 分离状态 |
 |------|----------|
-| 样式预览 (`type-a/b/c/d/e/f/g-preview.js`) | ✅ 完全分离 |
-| 样式导出 (`type-a/b/c/d/e/f/g-export.js`) | ✅ 完全分离 |
-| 编辑面板配置 (`type-a/b/c/d/e/f/g-editor-panel.js`) | ✅ 完全分离 |
+| 样式预览 (`type-a/b/c/d/e/f/g/h-preview.js`) | ✅ 完全分离 |
+| 样式导出 (`type-a/b/c/d/e/f/g/h-export.js`) | ✅ 完全分离 |
+| 编辑面板配置 (`type-a/b/c/d/e/f/g/h-editor-panel.js`) | ✅ 完全分离 |
 | 主入口 (`app.js`) | ⚠️ 部分混合 |
 
 详细分析请查看 `style_separation_analysis.md`。

@@ -2,7 +2,7 @@
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.0.5-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.6-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -30,6 +30,7 @@
 - **Type E**：3:2 纵向 - 顶部 1:1 正方形图片，底部白色区域显示参数，支持拖动裁剪
 - **Type F**：画中画风格 - 上方白色留白，中部照片展示区（92%宽度，80%高度），下方居中文字信息
 - **Type G**：居中布局 - 第一行厂商 Logo，第二行日期|参数|机型，第三行签名，白色固定背景
+- **Type H**：全画幅叠加文字 - 照片 100% 填满画布，Logo 和文字叠加在照片底部，支持文字颜色选择（黑/灰/白）
 
 ### ✏️ 边框信息编辑
 - Logo 显示开关
@@ -58,89 +59,6 @@ Apple、Canon、DJI、Fujifilm、Google、GoPro、Hasselblad、Leica、Lumix、N
 | **EXIF 写入** | piexifjs | 保留原图 EXIF 数据 |
 | **字体渲染** | opentype.js | 精确字体渲染 |
 | **打包工具** | electron-builder | 生成便携版单 exe 文件 |
-
----
-
-## 📂 项目结构
-
-<details>
-<summary>📂 项目结构（点击展开）
-</summary>
-
-```
-OneFrame/
-├── src/
-│   ├── main/
-│   │   ├── main.js          # Electron 主进程
-│   │   └── preload.js       # 安全桥接
-│   └── renderer/
-│       ├── index.html       # 主页面
-│       ├── index.css        # 全局样式
-│       ├── css/
-│       │   ├── type-a.css   # Type A 样式（白色下边框）
-│       │   ├── type-b.css   # Type B 样式（黑色下边框）
-│       │   ├── type-c.css   # Type C 样式
-│       │   ├── type-d.css   # Type D 样式
-│       │   ├── type-e.css   # Type E 样式（3:2纵向）
-│       │   ├── type-f.css   # Type F 样式（画中画风格）
-│       │   └── type-g.css   # Type G 样式（居中布局）
-│       ├── js/
-│       │   ├── app.js        # 主逻辑入口
-│       │   ├── events.js     # 事件处理
-│       │   ├── state.js      # 状态管理
-│       │   ├── exif.js       # EXIF 读取 (exifreader)
-│       │   ├── exif-exporter.js  # EXIF 导出 (piexifjs)
-│       │   ├── exporter.js    # 图片导出
-│       │   ├── logo-utils.js  # Logo 工具
-│       │   ├── components/    # UI 组件
-│       │   │   ├── index.js    # 组件导出
-│       │   │   ├── home.js    # 首页视图
-│       │   │   ├── editor.js  # 编辑器视图
-│       │   │   ├── type-a-editor-panel.js  # Type A 面板配置
-│       │   │   ├── type-b-editor-panel.js  # Type B 面板配置
-│       │   │   ├── type-c-editor-panel.js  # Type C 面板配置
-│       │   │   ├── type-d-editor-panel.js  # Type D 面板配置
-│       │   │   ├── type-e-editor-panel.js  # Type E 面板配置
-│       │   │   ├── type-f-editor-panel.js  # Type F 面板配置
-│       │   │   └── type-g-editor-panel.js  # Type G 面板配置
-│       │   └── styles/        # 样式模块
-│       │       ├── index.js   # 样式注册表
-│       │       ├── type-a-preview.js   # Type A 预览
-│       │       ├── type-b-preview.js   # Type B 预览
-│       │       ├── type-c-preview.js   # Type C 预览
-│       │       ├── type-d-preview.js   # Type D 预览
-│       │       ├── type-e-preview.js   # Type E 预览
-│       │       ├── type-f-preview.js   # Type F 预览
-│       │       ├── type-g-preview.js   # Type G 预览
-│       │       ├── type-a-export.js    # Type A 导出
-│       │       ├── type-b-export.js    # Type B 导出
-│       │       ├── type-c-export.js    # Type C 导出
-│       │       ├── type-d-export.js    # Type D 导出
-│       │       ├── type-e-export.js    # Type E 导出
-│       │       ├── type-f-export.js    # Type F 导出
-│       │       └── type-g-export.js    # Type G 导出
-│       ├── logos/            # 相机厂商 Logo (SVG)
-│       ├── fonts/            # 字体文件 (MiSans)
-│       └── assets/
-│           └── piexif.js    # EXIF 处理库
-├── doc/
-│   ├── AI_PROJECT_GUIDE.md   # AI 项目认知指南
-│   ├── CHANGELOG.md          # 更新日志
-│   ├── CODE_REVIEW.md        # 代码审查报告
-│   ├── DESIGN.md             # 设计方案
-│   ├── EXIF_DESIGN.md        # EXIF 设计文档
-│   ├── function_analysis.md  # 函数分析
-│   ├── RELEASE.md            # 发布说明
-│   ├── style_separation_analysis.md # 样式分离分析
-│   ├── V1.03_CHANGES.md      # v1.0.3 修改说明
-│   ├── V1.04_CHANGES.md      # v1.0.4 修改说明
-│   ├── CODE_REVIEW_2026-06-17.md # 代码审查报告（已归档）
-├── package.json
-├── README.md
-└── .gitignore
-```
-
-</details>
 
 ---
 
@@ -187,7 +105,7 @@ npm run build
 ## 📖 使用说明
 
 ### 1. 选择边框样式
-启动应用后，点击首页的样式卡片（Type A / Type B / Type C / Type D / Type E / Type F / Type G）。
+启动应用后，点击首页的样式卡片（Type A ~ Type H）。
 
 ### 2. 选择图片
 选择样式后，系统会弹出文件选择器，选择要处理的图片。

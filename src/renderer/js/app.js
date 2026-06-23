@@ -4,6 +4,7 @@ import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-
 import { getStyle, getPreview, typeBPreview, typeEPreview, typeFPreview } from './styles/index.js';
 import { configureEditPanel as configureTypeF } from './components/type-f-editor-panel.js';
 import { configureEditPanel as configureTypeG } from './components/type-g-editor-panel.js';
+import { configureEditPanel as configureTypeH } from './components/type-h-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -101,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedLogo = null;
   let typeFCachedSize = null;  // Type F 图框尺寸缓存
   let typeGCachedSize = null;  // Type G 图框尺寸缓存
+  let typeHCachedSize = null;  // Type H 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -158,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentImagePath = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
     typeGCachedSize = null;  // 清除 Type G 图框缓存
+    typeHCachedSize = null;  // 清除 Type H 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -185,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentFile = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
     typeGCachedSize = null;  // 清除 Type G 图框缓存
+    typeHCachedSize = null;  // 清除 Type H 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -273,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h') ? 'none' : 'block';
     
     // Type F: 调用面板配置模块
     if (currentStyle === 'type-f') {
@@ -283,6 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Type G: 调用面板配置模块
     if (currentStyle === 'type-g') {
       configureTypeG();
+    }
+    
+    // Type H: 调用面板配置模块
+    if (currentStyle === 'type-h') {
+      configureTypeH();
     }
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
@@ -353,14 +362,26 @@ document.addEventListener('DOMContentLoaded', () => {
   btnEdit.addEventListener('click', () => editPanel.classList.toggle('visible'));
   document.getElementById('btnClosePanel')?.addEventListener('click', () => editPanel.classList.remove('visible'));
 
-  document.querySelectorAll('.color-preset').forEach(btn => {
+  // 边框颜色预设按钮事件（仅 data-color 属性）
+  document.querySelectorAll('.color-preset[data-color]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.color-preset').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.color-preset[data-color]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       borderColor.value = btn.dataset.color;
       updateBorder();
     });
   });
+  
+  // 文字颜色预设按钮事件（仅 Type G 使用）
+  document.getElementById('textColorPresets')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-text-color]');
+    if (!btn) return;
+    document.querySelectorAll('#textColorPresets .color-preset').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('textColor').value = btn.dataset.textColor;
+    updateBorderContent();
+  });
+  
   document.getElementById('aspectRatio')?.addEventListener('change', updateBorder);
 
   function updateBorder() {
@@ -468,6 +489,36 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       frameWrapper.style.transform = 'none';
       updateBorderContent();
+    } else if (currentStyle === 'type-h') {
+      // 使用 Type H Preview 模块
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeHCachedSize) {
+        typeHCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: hCanvasW, canvasHeight: hCanvasH } = typeHCachedSize;
+      const hPreviewArea = frameWrapper?.parentElement;
+      const hAvailW = (hPreviewArea?.clientWidth || 500) * 0.96;
+      const hAvailH = (hPreviewArea?.clientHeight || 600) * 0.96;
+      const hDisplayScale = Math.min(hAvailW / hCanvasW, hAvailH / hCanvasH, 1);
+      const hDisplayW = Math.round(hCanvasW * hDisplayScale);
+      const hDisplayH = Math.round(hCanvasH * hDisplayScale);
+      preview.updateFrameWrapper(hDisplayW, hDisplayH);
+      preview.updatePreview(hDisplayW, hDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
     } else {
       // 使用对应样式 Preview 模块
       const frameWrapper = document.getElementById('frameWrapper');
@@ -505,7 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
       iso: iso?.value || '',
       showTime: document.getElementById('switchTime')?.classList.contains('active'),
       dateTime: dateTime?.value || '',
-      signatureText: signatureText?.value || ''
+      signatureText: signatureText?.value || '',
+      textColor: document.getElementById('textColor')?.value || '#000000'
     };
   }
 
@@ -537,8 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
           focalLength: focalLength?.value || '',
           showTime: document.getElementById('switchTime')?.classList.contains('active'),
           dateTime: dateTime?.value || '',
-          signatureText: signatureText?.value || '',
-          borderColor: borderColor.value
+      signatureText: signatureText?.value || '',
+      borderColor: borderColor.value,
+      textColor: document.getElementById('textColor')?.value || '#000000'
         }
       );
     }
@@ -573,7 +626,8 @@ document.addEventListener('DOMContentLoaded', () => {
       signatureText: signatureText?.value || '',
       borderColor: borderColor?.value || '#ffffff',
       borderHeight: borderHeight?.value || 12,
-      aspectRatio: document.getElementById('aspectRatio')?.value || 'default'
+      aspectRatio: document.getElementById('aspectRatio')?.value || 'default',
+      textColor: document.getElementById('textColor')?.value || '#000000'
     };
   }
 

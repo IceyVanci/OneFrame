@@ -2,13 +2,14 @@
  * Type G 编辑面板配置模块
  * 第一行显示 Logo，第二行显示日期 | 参数 | 相机名称
  * 所有元素默认显示，无需开关
+ * 支持文字颜色选择（黑/灰/白）
  */
 
 /**
  * 配置 Type G 编辑面板
  */
 export function configureEditPanel() {
-  // 边框颜色设置：隐藏（Type G 固定白色背景）
+  // 边框颜色设置：隐藏
   const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
   if (borderColorSection) borderColorSection.style.display = 'none';
   
@@ -34,9 +35,13 @@ export function configureEditPanel() {
     }
   });
   
-  // 设备型号标签：更新提示文字（Type G 不带品牌名称）
+  // 设备型号标签
   const customModel = document.getElementById('customModel');
   if (customModel) {
     customModel.placeholder = '型号（如 A7M4）';
   }
+  
+  // 显示文字颜色选择器
+  const textColorSection = document.getElementById('textColorSection');
+  if (textColorSection) textColorSection.style.display = '';
 }
