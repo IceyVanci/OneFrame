@@ -26,6 +26,10 @@ import { typeGPreview } from './type-g-preview.js';
 import { typeGExport } from './type-g-export.js';
 import { typeHPreview } from './type-h-preview.js';
 import { typeHExport } from './type-h-export.js';
+import { typeIPreview } from './type-i-preview.js';
+import { typeIExport } from './type-i-export.js';
+import { typeJPreview } from './type-j-preview.js';
+import { typeJExport } from './type-j-export.js';
 
 /**
  * @typedef {Object} StyleModule
@@ -66,6 +70,14 @@ export const styles = {
   'type-h': {
     preview: typeHPreview,
     export: typeHExport
+  },
+  'type-i': {
+    preview: typeIPreview,
+    export: typeIExport
+  },
+  'type-j': {
+    preview: typeJPreview,
+    export: typeJExport
   }
 };
 
@@ -129,3 +141,7 @@ export { typeFPreview } from './type-f-preview.js';
 export { typeGPreview } from './type-g-preview.js';
 
 export { typeHPreview } from './type-h-preview.js';
+
+export { typeIPreview } from './type-i-preview.js';
+
+export { typeJPreview } from './type-j-preview.js';

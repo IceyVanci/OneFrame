@@ -2,7 +2,7 @@
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.0.6-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.0.7-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -31,6 +31,8 @@
 - **Type F**：画中画风格 - 上方白色留白，中部照片展示区（92%宽度，80%高度），下方居中文字信息
 - **Type G**：居中布局 - 第一行厂商 Logo，第二行日期|参数|机型，第三行签名，白色固定背景
 - **Type H**：全画幅叠加文字 - 照片 100% 填满画布，Logo 和文字叠加在照片底部，支持文字颜色选择（黑/灰/白）
+- **Type I**：极简叠加文字 - 最大化照片展示面积，Logo 顶部居中，底部仅署名，适合纯净展示
+- **Type J**：署名+三栏参数行 - 不显示 Logo，署名替代 Logo 位置，参数行三栏布局（左机型/中参数/右时间）
 
 ### ✏️ 边框信息编辑
 - Logo 显示开关
@@ -105,7 +107,7 @@ npm run build
 ## 📖 使用说明
 
 ### 1. 选择边框样式
-启动应用后，点击首页的样式卡片（Type A ~ Type H）。
+启动应用后，点击首页的样式卡片（Type A ~ Type J）。
 
 ### 2. 选择图片
 选择样式后，系统会弹出文件选择器，选择要处理的图片。

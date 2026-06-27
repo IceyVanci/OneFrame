@@ -5,6 +5,8 @@ import { getStyle, getPreview, typeBPreview, typeEPreview, typeFPreview } from '
 import { configureEditPanel as configureTypeF } from './components/type-f-editor-panel.js';
 import { configureEditPanel as configureTypeG } from './components/type-g-editor-panel.js';
 import { configureEditPanel as configureTypeH } from './components/type-h-editor-panel.js';
+import { configureEditPanel as configureTypeI } from './components/type-i-editor-panel.js';
+import { configureEditPanel as configureTypeJ } from './components/type-j-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -103,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let typeFCachedSize = null;  // Type F 图框尺寸缓存
   let typeGCachedSize = null;  // Type G 图框尺寸缓存
   let typeHCachedSize = null;  // Type H 图框尺寸缓存
+  let typeICachedSize = null;  // Type I 图框尺寸缓存
+  let typeJCachedSize = null;  // Type J 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -161,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     typeFCachedSize = null;  // 清除 Type F 图框缓存
     typeGCachedSize = null;  // 清除 Type G 图框缓存
     typeHCachedSize = null;  // 清除 Type H 图框缓存
+    typeICachedSize = null;  // 清除 Type I 图框缓存
+    typeJCachedSize = null;  // 清除 Type J 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -189,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
     typeFCachedSize = null;  // 清除 Type F 图框缓存
     typeGCachedSize = null;  // 清除 Type G 图框缓存
     typeHCachedSize = null;  // 清除 Type H 图框缓存
+    typeICachedSize = null;  // 清除 Type I 图框缓存
+    typeJCachedSize = null;  // 清除 Type J 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -229,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (currentExif.Model) {
       const modelName = getModelName(currentExif.Model);
-      if (currentStyle === 'type-f') {
+      if (currentStyle === 'type-f' || currentStyle === 'type-j') {
         const makeName = make ? getMakeName(make) : '';
         customModel.value = makeName ? `${makeName} ${modelName}` : modelName;
       } else {
@@ -277,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j') ? 'none' : 'block';
     
     // Type F: 调用面板配置模块
     if (currentStyle === 'type-f') {
@@ -292,6 +300,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Type H: 调用面板配置模块
     if (currentStyle === 'type-h') {
       configureTypeH();
+    }
+    
+    // Type I: 调用面板配置模块
+    if (currentStyle === 'type-i') {
+      configureTypeI();
+    }
+    
+    // Type J: 调用面板配置模块
+    if (currentStyle === 'type-j') {
+      configureTypeJ();
     }
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
@@ -514,6 +532,66 @@ document.addEventListener('DOMContentLoaded', () => {
       const hDisplayH = Math.round(hCanvasH * hDisplayScale);
       preview.updateFrameWrapper(hDisplayW, hDisplayH);
       preview.updatePreview(hDisplayW, hDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-i') {
+      // 使用 Type I Preview 模块（与 Type H 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeICachedSize) {
+        typeICachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: iCanvasW, canvasHeight: iCanvasH } = typeICachedSize;
+      const iPreviewArea = frameWrapper?.parentElement;
+      const iAvailW = (iPreviewArea?.clientWidth || 500) * 0.96;
+      const iAvailH = (iPreviewArea?.clientHeight || 600) * 0.96;
+      const iDisplayScale = Math.min(iAvailW / iCanvasW, iAvailH / iCanvasH, 1);
+      const iDisplayW = Math.round(iCanvasW * iDisplayScale);
+      const iDisplayH = Math.round(iCanvasH * iDisplayScale);
+      preview.updateFrameWrapper(iDisplayW, iDisplayH);
+      preview.updatePreview(iDisplayW, iDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-j') {
+      // 使用 Type J Preview 模块（与 Type H 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeJCachedSize) {
+        typeJCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: jCanvasW, canvasHeight: jCanvasH } = typeJCachedSize;
+      const jPreviewArea = frameWrapper?.parentElement;
+      const jAvailW = (jPreviewArea?.clientWidth || 500) * 0.96;
+      const jAvailH = (jPreviewArea?.clientHeight || 600) * 0.96;
+      const jDisplayScale = Math.min(jAvailW / jCanvasW, jAvailH / jCanvasH, 1);
+      const jDisplayW = Math.round(jCanvasW * jDisplayScale);
+      const jDisplayH = Math.round(jCanvasH * jDisplayScale);
+      preview.updateFrameWrapper(jDisplayW, jDisplayH);
+      preview.updatePreview(jDisplayW, jDisplayH, {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });

@@ -10,7 +10,7 @@
 
 ### 核心特性
 - 智能 EXIF 读取：自动识别相机厂商并显示对应 Logo
-- 多种边框样式：支持 Type A/B/C/D/E/F/G 七种样式
+- 多种边框样式：支持 Type A/B/C/D/E/F/G/H/I/J 十种样式
 - EXIF 保留：导出时自动保留原图 EXIF 信息
 - 跨平台支持：基于 Electron，可在 Windows/Mac/Linux 运行
 
@@ -45,7 +45,10 @@ OneFrame/
 │       │   ├── type-d.css      # Type D：横向居中
 │       │   ├── type-e.css      # Type E：3:2纵向，顶部1:1正方形
 │       │   ├── type-f.css      # Type F：画中画风格
-│       │   └── type-g.css      # Type G：Logo+参数画中画
+│       │   ├── type-g.css      # Type G：Logo+参数画中画
+│       │   ├── type-h.css      # Type H：全画幅叠加文字
+│       │   ├── type-i.css      # Type I：极简叠加文字
+│       │   └── type-j.css      # Type J：署名+三栏参数行
 │       ├── js/
 │       │   ├── app.js          # 主逻辑入口（混合处理所有类型）
 │       │   ├── exif.js         # EXIF 读取（exifreader）
@@ -55,7 +58,11 @@ OneFrame/
 │       │   ├── components/
 │       │   │   ├── home.js     # 首页视图
 │       │   │   ├── editor.js   # 编辑器视图
-│       │   │   └── type-*-editor-panel.js  # 各类型面板配置
+│       │   │   ├── type-f-editor-panel.js  # Type F 面板配置
+│       │   │   ├── type-g-editor-panel.js  # Type G 面板配置
+│       │   │   ├── type-h-editor-panel.js  # Type H 面板配置
+│       │   │   ├── type-i-editor-panel.js  # Type I 面板配置
+│       │   │   └── type-j-editor-panel.js  # Type J 面板配置
 │       │   └── styles/
 │       │       ├── index.js     # 样式注册表
 │       │       ├── type-a-preview.js   # Type A 预览
@@ -65,13 +72,19 @@ OneFrame/
 │       │       ├── type-e-preview.js   # Type E 预览
 │       │       ├── type-f-preview.js   # Type F 预览
 │       │       ├── type-g-preview.js   # Type G 预览
+│       │       ├── type-h-preview.js   # Type H 预览
+│       │       ├── type-i-preview.js   # Type I 预览
+│       │       ├── type-j-preview.js   # Type J 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
 │       │       ├── type-d-export.js    # Type D 导出
 │       │       ├── type-e-export.js    # Type E 导出
 │       │       ├── type-f-export.js    # Type F 导出
-│       │       └── type-g-export.js    # Type G 导出
+│       │       ├── type-g-export.js    # Type G 导出
+│       │       ├── type-h-export.js    # Type H 导出
+│       │       ├── type-i-export.js    # Type I 导出
+│       │       └── type-j-export.js    # Type J 导出
 │       ├── logos/               # 相机厂商 Logo（SVG）
 │       │   ├── Apple.svg        # 原始 Logo
 │       │   ├── Apple.auto.svg   # 自动配色版 Logo
@@ -150,6 +163,31 @@ OneFrame/
 - **编辑面板**：隐藏边框颜色/高度/比例，隐藏所有显示开关（默认显示），保留 Logo 选择区域
 - **机型名称**：只显示型号，不带品牌前缀
 - **文字颜色**：全部黑色
+
+### Type H - 全画幅叠加文字
+- **特点**：照片 100% 填满画布，Logo 和文字叠加在照片底部
+- **布局**：画布大小 = 图片原始大小，无额外白色区域
+- **文字区域**：底部 15%，第一行 Logo、第二行日期|参数|机型、第三行署名
+- **字号**：动态缩放（基准 900px 宽度对应 14px）
+- **文字颜色**：支持黑/灰/白三种，默认白色
+- **编辑面板**：隐藏边框颜色/高度/比例，显示 Logo 选择 + 文字颜色
+
+### Type I - 极简叠加文字
+- **特点**：最大化照片展示面积，仅保留 Logo 和署名
+- **布局**：Logo 顶部居中，底部仅署名
+- **默认署名**：自动填入 "OneFrame"
+- **纵向图片**：底部字号增大 50%
+- **编辑面板**：仅显示 Logo 选择、署名、文字颜色
+
+### Type J - 署名+三栏参数行
+- **特点**：不显示 Logo，署名替代 Logo 位置，参数行三栏布局
+- **布局**：照片 100% 填满画布，署名在底部第一行，参数行左机型/中参数/右时间
+- **三栏布局**：左栏 5%（机型含厂商）、中栏居中（焦距 光圈 快门 ISO）、右栏 95%（时间）
+- **机型名称**：自动包含厂商前缀（如 "Sony A7M4"，与 Type F 相同逻辑）
+- **默认署名**：自动填入 "OneFrame"
+- **纵向图片**：底部字号增大 50%
+- **编辑面板**：仅显示署名、文字颜色，隐藏 Logo/边框/设备型号/所有开关
+- **文字颜色**：支持黑/灰/白三种，默认白色
 
 ---
 

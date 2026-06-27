@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="css/type-f.css">
   <link rel="stylesheet" href="css/type-g.css">
   <link rel="stylesheet" href="css/type-h.css">
+  <link rel="stylesheet" href="css/type-i.css">
+  <link rel="stylesheet" href="css/type-j.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/opentype.js/1.3.4/opentype.min.js"></script>
   <script src="assets/piexif.js"></script>
@@ -103,6 +105,26 @@
 
         <!-- 样式卡片 8: Type H 全画幅叠加文字 -->
         <div class="style-card" data-style="type-h" data-category="params">
+          <div class="style-preview">
+            <div class="frame-container">
+              <img src="TypeH-sample_compressed.jpeg" alt="示例图片" class="preview-image">
+              <div class="photo-footer"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 样式卡片 9: Type I 顶部Logo+底部时间署名 -->
+        <div class="style-card" data-style="type-i" data-category="params">
+          <div class="style-preview">
+            <div class="frame-container">
+              <img src="TypeH-sample_compressed.jpeg" alt="示例图片" class="preview-image">
+              <div class="photo-footer"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 样式卡片 10: Type J 署名+三栏参数行 -->
+        <div class="style-card" data-style="type-j" data-category="params">
           <div class="style-preview">
             <div class="frame-container">
               <img src="TypeH-sample_compressed.jpeg" alt="示例图片" class="preview-image">
@@ -277,7 +299,7 @@
         </div>
       </div>
 
-      <!-- 文字颜色设置（仅 Type H 显示） -->
+      <!-- 文字颜色设置（仅 Type H/I/J 显示） -->
       <div class="edit-section" id="textColorSection" style="display:none">
         <div class="section-title"><i class="fas fa-palette"></i> 文字颜色</div>
         <div class="control-group">
@@ -319,7 +341,7 @@
         <button class="modal-close" id="modalClose">&times;</button>
       </div>
       <div class="modal-body">
-<p><strong>OneFrame</strong> v1.0.6</p>
+<p><strong>OneFrame</strong> v1.0.7</p>
         <p>一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。</p>
         <hr>
         <p><strong>GitHub：</strong><a href="https://github.com/IceyVanci/OneFrame" target="_blank">github.com/IceyVanci/OneFrame</a></p>
