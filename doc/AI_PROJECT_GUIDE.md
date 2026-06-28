@@ -10,7 +10,7 @@
 
 ### 核心特性
 - 智能 EXIF 读取：自动识别相机厂商并显示对应 Logo
-- 多种边框样式：支持 Type A/B/C/D/E/F/G/H/I/J 十种样式
+- 多种边框样式：支持 Type A/B/C/D/E/F/G/H/I/J/K/L 十二种样式
 - EXIF 保留：导出时自动保留原图 EXIF 信息
 - 跨平台支持：基于 Electron，可在 Windows/Mac/Linux 运行
 
@@ -48,7 +48,9 @@ OneFrame/
 │       │   ├── type-g.css      # Type G：Logo+参数画中画
 │       │   ├── type-h.css      # Type H：全画幅叠加文字
 │       │   ├── type-i.css      # Type I：极简叠加文字
-│       │   └── type-j.css      # Type J：署名+三栏参数行
+│       │   ├── type-j.css      # Type J：署名+三栏参数行
+│       │   ├── type-k.css      # Type K：左下角Logo+双行文字
+│       │   └── type-l.css      # Type L：高斯模糊背景
 │       ├── js/
 │       │   ├── app.js          # 主逻辑入口（混合处理所有类型）
 │       │   ├── exif.js         # EXIF 读取（exifreader）
@@ -62,7 +64,9 @@ OneFrame/
 │       │   │   ├── type-g-editor-panel.js  # Type G 面板配置
 │       │   │   ├── type-h-editor-panel.js  # Type H 面板配置
 │       │   │   ├── type-i-editor-panel.js  # Type I 面板配置
-│       │   │   └── type-j-editor-panel.js  # Type J 面板配置
+│       │   │   ├── type-j-editor-panel.js  # Type J 面板配置
+│       │   │   ├── type-k-editor-panel.js  # Type K 面板配置
+│       │   │   └── type-l-editor-panel.js  # Type L 面板配置
 │       │   └── styles/
 │       │       ├── index.js     # 样式注册表
 │       │       ├── type-a-preview.js   # Type A 预览
@@ -75,6 +79,8 @@ OneFrame/
 │       │       ├── type-h-preview.js   # Type H 预览
 │       │       ├── type-i-preview.js   # Type I 预览
 │       │       ├── type-j-preview.js   # Type J 预览
+│       │       ├── type-k-preview.js   # Type K 预览
+│       │       ├── type-l-preview.js   # Type L 预览
 │       │       ├── type-a-export.js    # Type A 导出
 │       │       ├── type-b-export.js    # Type B 导出
 │       │       ├── type-c-export.js    # Type C 导出
@@ -84,7 +90,9 @@ OneFrame/
 │       │       ├── type-g-export.js    # Type G 导出
 │       │       ├── type-h-export.js    # Type H 导出
 │       │       ├── type-i-export.js    # Type I 导出
-│       │       └── type-j-export.js    # Type J 导出
+│       │       ├── type-j-export.js    # Type J 导出
+│       │       ├── type-k-export.js    # Type K 导出
+│       │       └── type-l-export.js    # Type L 导出
 │       ├── logos/               # 相机厂商 Logo（SVG）
 │       │   ├── Apple.svg        # 原始 Logo
 │       │   ├── Apple.auto.svg   # 自动配色版 Logo
@@ -186,8 +194,27 @@ OneFrame/
 - **机型名称**：自动包含厂商前缀（如 "Sony A7M4"，与 Type F 相同逻辑）
 - **默认署名**：自动填入 "OneFrame"
 - **纵向图片**：底部字号增大 50%
-- **编辑面板**：仅显示署名、文字颜色，隐藏 Logo/边框/设备型号/所有开关
+- **编辑面板**：显示设备型号输入框、署名、文字颜色，隐藏 Logo/边框/所有开关
 - **文字颜色**：支持黑/灰/白三种，默认白色
+
+### Type K - 左下角 Logo + 双行文字
+- **特点**：Logo 在底部左下角，右侧两行文字
+- **布局**：照片 100% 填满画布，底部左下角 Logo + 双行文字
+- **第一行**：署名（medium）+ 日期（normal）
+- **第二行**：机型名称（medium）+ 拍摄参数（normal）
+- **机型名称**：不含厂商前缀
+- **纵向图片**：底部字号增大 50%
+- **编辑面板**：显示 Logo 选择、署名、文字颜色，隐藏边框/设备型号/所有开关
+- **文字颜色**：支持黑/灰/白三种，默认白色
+
+### Type L - 高斯模糊背景
+- **特点**：基于 Type G，白色外框替换为照片高斯模糊背景
+- **布局**：高斯模糊照片铺满画布，中部 92%×80% 清晰照片居中，底部 15% 文字信息区
+- **预览端**：动态创建 blur 背景层 DOM，CSS `filter: blur()` + `transform: scale(1.5)` + `overflow: hidden`
+- **导出端**：Canvas `ctx.filter = 'blur()'` 两步绘制（blur 底层 + 清晰前景）
+- **纵向图片自适应**：白色区域减半（顶部 2.5%，底部 7.5%，照片 90%）
+- **编辑面板**：显示 Logo 选择、署名、文字颜色选择
+- **文字颜色**：默认白色（与 Type G 黑色不同）
 
 ---
 

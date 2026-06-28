@@ -1,8 +1,7 @@
 /**
- * Type J 编辑面板配置模块
- * 基于 Type H，署名在底部第一行，参数行三栏布局
- * 隐藏 Logo、所有开关
- * 保留设备型号（含厂商名）、署名、文字颜色选择
+ * Type K 编辑面板配置模块
+ * 与 Type H 类似：显示 Logo 选择、署名、文字颜色
+ * 隐藏边框颜色/高度/比例、设备型号、所有显示开关
  */
 
 export function configureEditPanel() {
@@ -16,15 +15,13 @@ export function configureEditPanel() {
   const aspectRatioSection = document.getElementById('aspectRatioSection');
   if (aspectRatioSection) aspectRatioSection.style.display = 'none';
   
-  // Logo 设置区域：隐藏
+  // Logo 设置区域：显示
   const logoSection = document.querySelector('.edit-section:has(#logoGrid)');
-  if (logoSection) logoSection.style.display = 'none';
+  if (logoSection) logoSection.style.display = '';
   
-  // 设备型号：显示（自动从 EXIF 读取含厂商名，用户可手动修改）
-  const customModel = document.getElementById('customModel');
-  if (customModel) {
-    customModel.placeholder = '型号（如 Sony A7M4）';
-  }
+  // 设备型号：隐藏（EXIF 自动读取，不含厂商前缀）
+  const modelSection = document.querySelector('.edit-section:has(#customModel)');
+  if (modelSection) modelSection.style.display = 'none';
   
   // 隐藏所有显示开关（默认激活）
   ['switchLogo', 'switchModel', 'switchParams', 'switchTime', 'switchSignature'].forEach(id => {

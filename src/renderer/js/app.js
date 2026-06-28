@@ -7,6 +7,8 @@ import { configureEditPanel as configureTypeG } from './components/type-g-editor
 import { configureEditPanel as configureTypeH } from './components/type-h-editor-panel.js';
 import { configureEditPanel as configureTypeI } from './components/type-i-editor-panel.js';
 import { configureEditPanel as configureTypeJ } from './components/type-j-editor-panel.js';
+import { configureEditPanel as configureTypeK } from './components/type-k-editor-panel.js';
+import { configureEditPanel as configureTypeL } from './components/type-l-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -107,6 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let typeHCachedSize = null;  // Type H 图框尺寸缓存
   let typeICachedSize = null;  // Type I 图框尺寸缓存
   let typeJCachedSize = null;  // Type J 图框尺寸缓存
+  let typeKCachedSize = null;  // Type K 图框尺寸缓存
+  let typeLCachedSize = null;  // Type L 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -167,6 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
     typeHCachedSize = null;  // 清除 Type H 图框缓存
     typeICachedSize = null;  // 清除 Type I 图框缓存
     typeJCachedSize = null;  // 清除 Type J 图框缓存
+    typeKCachedSize = null;  // 清除 Type K 图框缓存
+    typeLCachedSize = null;  // 清除 Type L 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -197,6 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
     typeHCachedSize = null;  // 清除 Type H 图框缓存
     typeICachedSize = null;  // 清除 Type I 图框缓存
     typeJCachedSize = null;  // 清除 Type J 图框缓存
+    typeKCachedSize = null;  // 清除 Type K 图框缓存
+    typeLCachedSize = null;  // 清除 Type L 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -285,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j' || currentStyle === 'type-k' || currentStyle === 'type-l') ? 'none' : 'block';
     
     // Type F: 调用面板配置模块
     if (currentStyle === 'type-f') {
@@ -310,6 +318,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Type J: 调用面板配置模块
     if (currentStyle === 'type-j') {
       configureTypeJ();
+    }
+    
+    // Type K: 调用面板配置模块
+    if (currentStyle === 'type-k') {
+      configureTypeK();
+    }
+    
+    // Type L: 调用面板配置模块
+    if (currentStyle === 'type-l') {
+      configureTypeL();
     }
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
@@ -592,6 +610,66 @@ document.addEventListener('DOMContentLoaded', () => {
       const jDisplayH = Math.round(jCanvasH * jDisplayScale);
       preview.updateFrameWrapper(jDisplayW, jDisplayH);
       preview.updatePreview(jDisplayW, jDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-k') {
+      // 使用 Type K Preview 模块（与 Type H 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeKCachedSize) {
+        typeKCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: kCanvasW, canvasHeight: kCanvasH } = typeKCachedSize;
+      const kPreviewArea = frameWrapper?.parentElement;
+      const kAvailW = (kPreviewArea?.clientWidth || 500) * 0.96;
+      const kAvailH = (kPreviewArea?.clientHeight || 600) * 0.96;
+      const kDisplayScale = Math.min(kAvailW / kCanvasW, kAvailH / kCanvasH, 1);
+      const kDisplayW = Math.round(kCanvasW * kDisplayScale);
+      const kDisplayH = Math.round(kCanvasH * kDisplayScale);
+      preview.updateFrameWrapper(kDisplayW, kDisplayH);
+      preview.updatePreview(kDisplayW, kDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-l') {
+      // 使用 Type L Preview 模块（与 Type G 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeLCachedSize) {
+        typeLCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: lCanvasW, canvasHeight: lCanvasH } = typeLCachedSize;
+      const lPreviewArea = frameWrapper?.parentElement;
+      const lAvailW = (lPreviewArea?.clientWidth || 500) * 0.96;
+      const lAvailH = (lPreviewArea?.clientHeight || 600) * 0.96;
+      const lDisplayScale = Math.min(lAvailW / lCanvasW, lAvailH / lCanvasH, 1);
+      const lDisplayW = Math.round(lCanvasW * lDisplayScale);
+      const lDisplayH = Math.round(lCanvasH * lDisplayScale);
+      preview.updateFrameWrapper(lDisplayW, lDisplayH);
+      preview.updatePreview(lDisplayW, lDisplayH, {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });
