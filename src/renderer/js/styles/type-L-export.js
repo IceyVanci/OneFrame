@@ -1,9 +1,9 @@
-/**
- * Type L 导出渲染模块
- * 布局：基于 Type G，白色背景替换为照片高斯模糊
- * - 全画幅模糊背景
- * - 中部 92%×80% 清晰照片
- * - 底部 15% 文字信息区（白色文字）
+﻿/**
+ * Type L ĺŻźĺşć¸˛ćć¨Ąĺ
+ * ĺ¸ĺąďźĺşäş?Type Gďźç˝č˛čćŻćżć˘ä¸şç§çéŤćŻć¨Ąçł
+ * - ĺ¨çťĺšć¨Ąçłčć?
+ * - ä¸­é¨ 92%Ă80% ć¸ć°ç§ç
+ * - ĺşé¨ 15% ćĺ­äżĄćŻĺşďźç˝č˛ćĺ­ďź?
  */
 
 const opentype = window.opentype;
@@ -34,7 +34,7 @@ async function loadFonts() {
 }
 
 /**
- * 使用 ctx.fillText 绘制文字
+ * ä˝żç¨ ctx.fillText çťĺśćĺ­
  */
 function drawText(ctx, text, x, y, fontSize, options = {}) {
   const color = options.color || '#ffffff';
@@ -50,7 +50,7 @@ function drawText(ctx, text, x, y, fontSize, options = {}) {
 }
 
 /**
- * 格式化日期
+ * ć źĺźĺćĽć?
  */
 function formatDateForDisplay(dateTimeStr) {
   if (!dateTimeStr) return '';
@@ -62,7 +62,7 @@ function formatDateForDisplay(dateTimeStr) {
 }
 
 /**
- * 绘制 Logo（Type L 专用，居中）
+ * çťĺś LogoďźType L ä¸ç¨ďźĺąä¸­ďź
  */
 function drawLogoL(ctx, logoName, centerX, centerY, maxHeight) {
   return new Promise((resolve) => {
@@ -86,11 +86,15 @@ function drawLogoL(ctx, logoName, centerX, centerY, maxHeight) {
 }
 
 /**
- * 绘制模糊背景（cover 裁剪）
+ * çťĺść¨ĄçłčćŻďźcover čŁĺŞďź?
  */
 function drawBlurredBackground(ctx, img, canvasWidth, canvasHeight, blurRadius) {
+  // ä¸é˘č§çŤŻ CSS transform: scale(1.5) ä¸č´ďźćžĺ¤§ 1.5 ĺéč?blur éćčžšçź
+  const scale = 1.5;
+  const scaledW = canvasWidth * scale;
+  const scaledH = canvasHeight * scale;
   const imgRatio = img.naturalWidth / img.naturalHeight;
-  const canvasRatio = canvasWidth / canvasHeight;
+  const canvasRatio = scaledW / scaledH;
   
   let srcX = 0, srcY = 0, srcW = img.naturalWidth, srcH = img.naturalHeight;
   
@@ -102,17 +106,19 @@ function drawBlurredBackground(ctx, img, canvasWidth, canvasHeight, blurRadius) 
     srcY = Math.round((img.naturalHeight - srcH) / 2);
   }
   
+  const offsetX = (canvasWidth - scaledW) / 2;
+  const offsetY = (canvasHeight - scaledH) / 2;
   ctx.filter = `blur(${blurRadius}px)`;
-  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, canvasWidth, canvasHeight);
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, offsetX, offsetY, scaledW, scaledH);
   ctx.filter = 'none';
 }
 
 /**
- * 绘制 Type L 底部内容
- * 第一行：厂商 Logo
- * 第二行：拍摄日期 | 拍摄参数 | 相机名称
- * 第三行：© 署名
- * 文字颜色默认白色
+ * çťĺś Type L ĺşé¨ĺĺŽš
+ * çŹŹä¸čĄďźĺĺ Logo
+ * çŹŹäşčĄďźćććĽć | ććĺć° | ç¸ćşĺç§°
+ * çŹŹä¸čĄďźÂŠ ç˝˛ĺ
+ * ćĺ­é˘č˛éťčŽ¤ç˝č˛
  */
 async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait = false) {
   const textRatio = isPortrait ? 0.075 : 0.15;
@@ -131,7 +137,7 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
   
   const hasLogo = settings.selectedLogo && settings.showLogo;
   
-  // 第二行：拍摄日期 | 拍摄参数 | 相机名称
+  // çŹŹäşčĄďźćććĽć | ććĺć° | ç¸ćşĺç§°
   const line2Parts = [];
   if (settings.dateTime && settings.showTime) {
     line2Parts.push(formatDateForDisplay(settings.dateTime));
@@ -145,22 +151,22 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
   if (settings.showModel && settings.customModel) line2Parts.push(settings.customModel);
   const line2Text = line2Parts.join(' | ');
   
-  // 第三行：署名
+  // çŹŹä¸čĄďźç˝˛ĺ
   const signatureText = settings.signatureText || '';
-  const line3Text = signatureText ? `© ${signatureText}` : '';
+  const line3Text = signatureText ? `ÂŠ ${signatureText}` : '';
   
-  // 计算布局位置
+  // čŽĄçŽĺ¸ĺąä˝ç˝Ž
   const groupHeight = (hasLogo ? lineHeight1 : 0) + lineGap + (line2Text ? lineHeight2 : 0);
   const line1Y = textCenterY - groupHeight / 2 + (hasLogo ? lineHeight1 / 2 : 0);
   const line2Y = line1Y + lineHeight1 / 2 + lineGap + lineHeight2 / 2;
   
-  // 绘制第一行：Logo
+  // çťĺśçŹŹä¸čĄďźLogo
   if (hasLogo) {
     const logoMaxHeight = Math.round(canvasHeight * (isPortrait ? 0.0125 : 0.025));
     await drawLogoL(ctx, settings.selectedLogo, centerX, line1Y, logoMaxHeight);
   }
   
-  // 绘制第二行（白色文字）
+  // çťĺśçŹŹäşčĄďźç˝č˛ćĺ­ďź?
   const textColor = settings.textColor || '#ffffff';
   if (line2Text) {
     drawText(ctx, line2Text, centerX, line2Y, line2FontSize, {
@@ -168,7 +174,7 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
     });
   }
   
-  // 绘制第三行（署名，白色文字）
+  // çťĺśçŹŹä¸čĄďźç˝˛ĺďźç˝č˛ćĺ­ďź
   if (line3Text) {
     const line3Y = line2Text ? line2Y + lineHeight2 / 2 + signatureGap + lineHeight2 / 2 : line2Y + signatureGap;
     drawText(ctx, line3Text, centerX, line3Y, Math.round(12 * baseScale), {
@@ -178,9 +184,9 @@ async function drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts
 }
 
 /**
- * 渲染 Type L 导出图片
- * @param {HTMLImageElement} img - 原始图片元素
- * @param {Object} options - 渲染选项
+ * ć¸˛ć Type L ĺŻźĺşĺžç
+ * @param {HTMLImageElement} img - ĺĺ§ĺžçĺç´ 
+ * @param {Object} options - ć¸˛ćééĄš
  * @returns {Promise<string>} DataURL
  */
 export async function renderImage(img, options) {
@@ -189,10 +195,10 @@ export async function renderImage(img, options) {
   const fonts = await loadFonts();
   
   if (!img.complete || img.naturalWidth === 0) {
-    throw new Error('图片尚未加载完成');
+    throw new Error('ĺžçĺ°ćŞĺ č˝˝ĺŽć');
   }
   
-  // 画布尺寸
+  // çťĺ¸ĺ°şĺŻ¸
   const canvasWidth = img.naturalWidth;
   const isPortrait = img.naturalHeight > img.naturalWidth;
   const heightRatio = isPortrait ? 0.9 : 0.8;
@@ -203,17 +209,17 @@ export async function renderImage(img, options) {
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
   
-  // 1. 全画幅模糊背景
+  // 1. ĺ¨çťĺšć¨Ąçłčć?
   const blurRadius = Math.max(10, Math.round(canvasWidth * 0.02));
   drawBlurredBackground(ctx, img, canvasWidth, canvasHeight, blurRadius);
   
-  // 2. 清晰照片（92% 宽度，纵向 90%/横向 80% 高度）
+  // 2. ć¸ć°ç§çďź?2% ĺŽ˝ĺşŚďźçşľĺ?90%/ć¨Şĺ 80% éŤĺşŚďź?
   const photoX = canvasWidth * 0.04;
   const photoY = canvasHeight * (isPortrait ? 0.025 : 0.05);
   const photoWidth = canvasWidth * 0.92;
   const photoHeight = canvasHeight * (isPortrait ? 0.90 : 0.80);
   
-  // cover 裁剪
+  // cover čŁĺŞ
   const imgRatio = img.naturalWidth / img.naturalHeight;
   const areaRatio = photoWidth / photoHeight;
   
@@ -227,16 +233,24 @@ export async function renderImage(img, options) {
     srcY = Math.round((img.naturalHeight - srcH) / 2);
   }
   
+  // Round corners (scaled proportionally)
+  const baseScaleL = canvasWidth / 900;
+  const cornerRadiusL = Math.round(12 * baseScaleL);
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(photoX, photoY, photoWidth, photoHeight, cornerRadiusL);
+  ctx.clip();
   ctx.drawImage(img, srcX, srcY, srcW, srcH, photoX, photoY, photoWidth, photoHeight);
+  ctx.restore();
   
-  // 3. 绘制底部文字内容
+  // 3. çťĺśĺşé¨ćĺ­ĺĺŽš
   await drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait);
   
   return canvas.toDataURL('image/jpeg', quality);
 }
 
 /**
- * Type L 导出样式配置
+ * Type L ĺŻźĺşć ˇĺźéç˝Ž
  */
 export const typeLExport = {
   id: 'type-l-export',

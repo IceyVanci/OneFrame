@@ -17,6 +17,11 @@
   border: 2px solid rgba(255, 255, 255, 0.3); /* 预览端标识画布边缘，不导出 */
 }
 
+/* 照片区（排除模糊背景层）：圆角 12px */
+.frame-wrapper.type-l > img:not(.type-l-blur-bg) {
+  border-radius: 12px;
+}
+
 /* 模糊背景层（由 JS 动态创建） */
 .type-l-blur-bg {
   position: absolute;

@@ -235,10 +235,10 @@ export function updateContentPreview(elements, settings) {
         const yearEl = state.borderContent.querySelector('.type-e-year');
         const paramsEl = state.borderContent.querySelector('#typeEParams');
         if (yearEl && paramsEl) {
-          const yearRect = yearEl.getBoundingClientRect();
-          const paramsRect = paramsEl.getBoundingClientRect();
-          // 计算年份与参数的相对位置差，而非年份的绝对位置
-          paramsEl.style.marginTop = `${yearRect.top - paramsRect.top}px`;
+          // 使用 offsetTop 替代 getBoundingClientRect，不受 CSS transform 影响
+          const yearOffset = yearEl.offsetTop;
+          const paramsOffset = paramsEl.offsetTop;
+          paramsEl.style.marginTop = `${yearOffset - paramsOffset}px`;
         }
       });
     });

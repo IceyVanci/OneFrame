@@ -16,7 +16,7 @@
   /* 尺寸由 JS 通过 inline style 设置 */
 }
 
-/* 照片区：居中，92% 宽度，80% 高度（仅匹配直接子级 img，不匹配 Logo） */
+/* 照片区：居中，92% 宽度，80% 高度，圆角 12px（仅匹配直接子级 img，不匹配 Logo） */
 .frame-wrapper.type-g > img {
   position: absolute;
   top: 5%;
@@ -27,6 +27,7 @@
   object-position: center center;
   max-width: none;
   max-height: none;
+  border-radius: 12px;
 }
 
 /* 隐藏 Type G 的 photoFooter */

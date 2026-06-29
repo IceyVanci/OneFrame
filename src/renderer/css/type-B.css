@@ -21,3 +21,8 @@
 #frameWrapper.type-b #photoFooter {
   background-color: #ffffff !important;
 }
+
+/* Type B: 图片圆角 12px */
+.frame-wrapper.type-b > img {
+  border-radius: 12px;
+}

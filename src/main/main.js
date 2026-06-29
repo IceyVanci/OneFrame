@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -164,6 +164,17 @@ ipcMain.handle('get-file-mtime', async (event, filePath) => {
   } catch (error) {
     console.error('Error getting file mtime:', error);
     return null;
+  }
+});
+
+// 在系统浏览器中打开链接
+ipcMain.handle('open-external', async (event, url) => {
+  try {
+    await shell.openExternal(url);
+    return { success: true };
+  } catch (error) {
+    console.error('Error opening external URL:', error);
+    return { success: false, error: error.message };
   }
 });
 

@@ -19,7 +19,6 @@ let currentStyle = null;
 /**
  * 提取图片主色调并设置为编辑器背景色
  * @param {HTMLImageElement} img - 已加载的图片元素
- * @param {HTMLElement} editorView - 编辑器 DOM 元素
  */
 function applyDynamicBackground(img) {
   const target = document.querySelector('.preview-area');
@@ -56,15 +55,18 @@ const logoBrightnessCache = {};
 async function checkImageOrientation(fileOrPath) {
   return new Promise((resolve) => {
     const img = new Image();
+    const isBlob = typeof fileOrPath !== 'string';
+    const src = isBlob ? URL.createObjectURL(fileOrPath) : `file://${fileOrPath}`;
     img.onload = () => {
+      if (isBlob) URL.revokeObjectURL(src);
       resolve({
         isPortrait: img.naturalHeight > img.naturalWidth,
         width: img.naturalWidth,
         height: img.naturalHeight
       });
     };
-    img.onerror = () => resolve({ isPortrait: false, width: 0, height: 0 });
-    img.src = typeof fileOrPath === 'string' ? `file://${fileOrPath}` : URL.createObjectURL(fileOrPath);
+    img.onerror = () => { if (isBlob) URL.revokeObjectURL(src); resolve({ isPortrait: false, width: 0, height: 0 }); };
+    img.src = src;
   });
 }
 
@@ -77,8 +79,8 @@ function detectLogoBrightness(logoPath) {
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.width = 32;
+      canvas.height = 32;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
       try {
@@ -260,8 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userImage.complete) {
       updateExifDisplay();
       updateBorder();
+      applyDynamicBackground(userImage);
     } else {
-      userImage.onload = () => { updateExifDisplay(); updateBorder(); applyDynamicBackground(userImage); };
+      userImage.addEventListener('load', () => { updateExifDisplay(); updateBorder(); applyDynamicBackground(userImage); }, { once: true });
     }
   }
 
@@ -326,40 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
     if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j' || currentStyle === 'type-k' || currentStyle === 'type-l') ? 'none' : 'block';
     
-    // Type F: 调用面板配置模块
-    if (currentStyle === 'type-f') {
-      configureTypeF();
-    }
-    
-    // Type G: 调用面板配置模块
-    if (currentStyle === 'type-g') {
-      configureTypeG();
-    }
-    
-    // Type H: 调用面板配置模块
-    if (currentStyle === 'type-h') {
-      configureTypeH();
-    }
-    
-    // Type I: 调用面板配置模块
-    if (currentStyle === 'type-i') {
-      configureTypeI();
-    }
-    
-    // Type J: 调用面板配置模块
-    if (currentStyle === 'type-j') {
-      configureTypeJ();
-    }
-    
-    // Type K: 调用面板配置模块
-    if (currentStyle === 'type-k') {
-      configureTypeK();
-    }
-    
-    // Type L: 调用面板配置模块
-    if (currentStyle === 'type-l') {
-      configureTypeL();
-    }
+    // 调用对应样式的面板配置模块
+    const panelConfigurers = {
+      'type-f': configureTypeF, 'type-g': configureTypeG,
+      'type-h': configureTypeH, 'type-i': configureTypeI,
+      'type-j': configureTypeJ, 'type-k': configureTypeK,
+      'type-l': configureTypeL
+    };
+    panelConfigurers[currentStyle]?.();
     
     // Type B: 隐藏 Logo、拍摄参数、时间开关
     if (currentStyle === 'type-b') {
@@ -909,6 +886,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === aboutModal) {
         aboutModal.classList.add('hidden');
       }
+    });
+
+    // 关于模态框中的链接在系统浏览器中打开
+    aboutModal.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = link.href;
+        if (window.electronAPI?.openExternal) {
+          window.electronAPI.openExternal(url);
+        } else {
+          window.open(url, '_blank');
+        }
+      });
     });
   }
 });
