@@ -1,8 +1,7 @@
 /**
- * Type L 编辑面板配置模块
- * 与 Type G 类似：隐藏边框颜色/高度/比例、所有显示开关
- * 保留 Logo 选择、署名、文字颜色选择
- * 文字颜色默认白色
+ * Type K 编辑面板配置模块
+ * 与 Type H 类似：显示 Logo 选择、署名、文字颜色
+ * 隐藏边框颜色/高度/比例、设备型号、所有显示开关
  */
 
 export function configureEditPanel() {
@@ -20,9 +19,11 @@ export function configureEditPanel() {
   const logoSection = document.querySelector('.edit-section:has(#logoGrid)');
   if (logoSection) logoSection.style.display = '';
   
-  // 设备型号：隐藏（EXIF 自动读取）
-  const modelSection = document.querySelector('.edit-section:has(#customModel)');
-  if (modelSection) modelSection.style.display = 'none';
+  // 设备型号：显示（EXIF 自动读取，用户可手动修改）
+  const customModel = document.getElementById('customModel');
+  if (customModel) {
+    customModel.placeholder = '型号（如 A7M4）';
+  }
   
   // 隐藏所有显示开关（默认激活）
   ['switchLogo', 'switchModel', 'switchParams', 'switchTime', 'switchSignature'].forEach(id => {
@@ -40,7 +41,7 @@ export function configureEditPanel() {
     sigInput.value = 'OneFrame';
   }
   
-  // 文字颜色选择：显示，默认白色
+  // 文字颜色选择：显示
   const textColorSection = document.getElementById('textColorSection');
   if (textColorSection) {
     textColorSection.style.display = '';

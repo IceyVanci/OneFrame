@@ -1,7 +1,7 @@
 /* 导入样式模块 */
-@import url('css/type-a.css');
-@import url('css/type-b.css');
-@import url('css/type-c.css');
+@import url('css/type-A.css');
+@import url('css/type-B.css');
+@import url('css/type-C.css');
 
 /* 导入 MiSans 字体 */
 @font-face {
@@ -43,7 +43,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 40px 20px;
+  padding: 24px 32px;
 }
 
 /* 顶部标题栏 */
@@ -53,10 +53,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
+  max-width: none;
+  padding: 0;
 }
 
 /* 关于按钮 */
@@ -125,8 +123,8 @@ body {
 /* 样式图片墙 */
 .style-gallery {
   flex: 1;
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   width: 100%;
 }
 
@@ -138,13 +136,14 @@ body {
 }
 
 .style-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 800px));
-  gap: 24px;
-  padding: 20px;
+  column-count: 3;
+  column-gap: 12px;
+  padding: 0;
 }
 
 .style-card {
+  break-inside: avoid;
+  margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -166,6 +165,7 @@ body {
 .style-preview {
   padding: 0;
   background: transparent;
+  position: relative;
 }
 
 .frame-container {
@@ -195,6 +195,20 @@ body {
   justify-content: center;
   color: #555;
   font-size: 14px;
+}
+
+/* 样式名称覆盖标签 */
+.style-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 14px;
+  color: #ddd;
+  font-size: 13px;
+  font-weight: 500;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+  pointer-events: none;
 }
 
 .style-info {

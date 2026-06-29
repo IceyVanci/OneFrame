@@ -4,18 +4,18 @@
  */
 
 import { readExifFromFile, readExifFromPath, embedExif, hasExifData } from './exif-exporter.js';
-import { typeAExport } from './styles/type-a-export.js';
-import { typeBExport } from './styles/type-b-export.js';
-import { typeCExport } from './styles/type-c-export.js';
-import { typeDExport } from './styles/type-d-export.js';
-import { typeEExport } from './styles/type-e-export.js';
-import { typeFExport } from './styles/type-f-export.js';
-import { typeGExport } from './styles/type-g-export.js';
-import { typeHExport } from './styles/type-h-export.js';
-import { typeIExport } from './styles/type-i-export.js';
-import { typeJExport } from './styles/type-j-export.js';
-import { typeKExport } from './styles/type-k-export.js';
-import { typeLExport } from './styles/type-l-export.js';
+import { typeAExport } from './styles/type-A-export.js';
+import { typeBExport } from './styles/type-B-export.js';
+import { typeCExport } from './styles/type-C-export.js';
+import { typeDExport } from './styles/type-D-export.js';
+import { typeEExport } from './styles/type-E-export.js';
+import { typeFExport } from './styles/type-F-export.js';
+import { typeGExport } from './styles/type-G-export.js';
+import { typeHExport } from './styles/type-H-export.js';
+import { typeIExport } from './styles/type-I-export.js';
+import { typeJExport } from './styles/type-J-export.js';
+import { typeKExport } from './styles/type-K-export.js';
+import { typeLExport } from './styles/type-L-export.js';
 
 // 导出样式映射
 const exportStyles = {

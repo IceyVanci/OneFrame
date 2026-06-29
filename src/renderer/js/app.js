@@ -2,19 +2,50 @@
 import { getExif, formatDateTime, getFocalLength } from './exif.js';
 import { getModelName, getAllLogos, getLogoFilename, getMakeName } from './logo-utils.js';
 import { getStyle, getPreview, typeBPreview, typeEPreview, typeFPreview } from './styles/index.js';
-import { configureEditPanel as configureTypeF } from './components/type-f-editor-panel.js';
-import { configureEditPanel as configureTypeG } from './components/type-g-editor-panel.js';
-import { configureEditPanel as configureTypeH } from './components/type-h-editor-panel.js';
-import { configureEditPanel as configureTypeI } from './components/type-i-editor-panel.js';
-import { configureEditPanel as configureTypeJ } from './components/type-j-editor-panel.js';
-import { configureEditPanel as configureTypeK } from './components/type-k-editor-panel.js';
-import { configureEditPanel as configureTypeL } from './components/type-l-editor-panel.js';
+import { configureEditPanel as configureTypeF } from './components/type-F-editor-panel.js';
+import { configureEditPanel as configureTypeG } from './components/type-G-editor-panel.js';
+import { configureEditPanel as configureTypeH } from './components/type-H-editor-panel.js';
+import { configureEditPanel as configureTypeI } from './components/type-I-editor-panel.js';
+import { configureEditPanel as configureTypeJ } from './components/type-J-editor-panel.js';
+import { configureEditPanel as configureTypeK } from './components/type-K-editor-panel.js';
+import { configureEditPanel as configureTypeL } from './components/type-L-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
 let currentFile = null;
 let currentImagePath = null;
 let currentStyle = null;
+
+/**
+ * 提取图片主色调并设置为编辑器背景色
+ * @param {HTMLImageElement} img - 已加载的图片元素
+ * @param {HTMLElement} editorView - 编辑器 DOM 元素
+ */
+function applyDynamicBackground(img) {
+  const target = document.querySelector('.preview-area');
+  if (!target) return;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 10;
+    canvas.height = 10;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, 10, 10);
+    const imageData = ctx.getImageData(0, 0, 10, 10).data;
+    let r = 0, g = 0, b = 0, count = 0;
+    for (let i = 0; i < imageData.length; i += 4) {
+      r += imageData[i];
+      g += imageData[i + 1];
+      b += imageData[i + 2];
+      count++;
+    }
+    r = Math.round(r / count * 0.4);
+    g = Math.round(g / count * 0.4);
+    b = Math.round(b / count * 0.4);
+    target.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+  } catch (e) {
+    target.style.backgroundColor = '#16213e';
+  }
+}
 
 // Logo 亮度缓存 { logoName: { isLight: boolean } }
 const logoBrightnessCache = {};
@@ -230,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateExifDisplay();
       updateBorder();
     } else {
-      userImage.onload = () => { updateExifDisplay(); updateBorder(); };
+      userImage.onload = () => { updateExifDisplay(); updateBorder(); applyDynamicBackground(userImage); };
     }
   }
 
@@ -356,7 +387,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-    if (userImage.complete) updateBorder();
+    if (userImage.complete) {
+      updateBorder();
+      applyDynamicBackground(userImage);
+    }
   }
 
   function hideEditor() {
@@ -755,7 +789,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   borderColor.addEventListener('input', updateBorder);
   borderHeight.addEventListener('input', updateBorder);
-  userImage.addEventListener('load', updateBorder);
+  userImage.addEventListener('load', () => {
+    updateBorder();
+    applyDynamicBackground(userImage);
+  });
 
   ['customModel', 'fNumber', 'exposureTime', 'focalLength', 'iso', 'dateTime', 'signatureText'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', updateBorderContent);
@@ -850,30 +887,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ========== 标签页筛选逻辑 ==========
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const allStyleCards = document.querySelectorAll('.style-card');
-
-  function filterCards(category) {
-    allStyleCards.forEach(card => {
-      if (card.dataset.category === category) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
-    });
-  }
-
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      filterCards(btn.dataset.tab);
-    });
-  });
-
-  // 默认激活"参数"标签并筛选
-  filterCards('params');
 
   // ========== 关于模态框逻辑 ==========
   const aboutBtn = document.getElementById('aboutBtn');
