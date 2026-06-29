@@ -9,6 +9,7 @@ import { configureEditPanel as configureTypeI } from './components/type-I-editor
 import { configureEditPanel as configureTypeJ } from './components/type-J-editor-panel.js';
 import { configureEditPanel as configureTypeK } from './components/type-K-editor-panel.js';
 import { configureEditPanel as configureTypeL } from './components/type-L-editor-panel.js';
+import { configureEditPanel as configureTypeM } from './components/type-M-editor-panel.js';
 import { exportImage } from './exporter.js';
 
 let currentExif = null;
@@ -144,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let typeJCachedSize = null;  // Type J 图框尺寸缓存
   let typeKCachedSize = null;  // Type K 图框尺寸缓存
   let typeLCachedSize = null;  // Type L 图框尺寸缓存
+  let typeMCachedSize = null;  // Type M 图框尺寸缓存
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -206,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeJCachedSize = null;  // 清除 Type J 图框缓存
     typeKCachedSize = null;  // 清除 Type K 图框缓存
     typeLCachedSize = null;  // 清除 Type L 图框缓存
+    typeMCachedSize = null;  // 清除 Type M 图框缓存
     // 释放旧的 Object URL 内存
     if (userImage.src && userImage.src.startsWith('blob:')) {
       URL.revokeObjectURL(userImage.src);
@@ -238,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeJCachedSize = null;  // 清除 Type J 图框缓存
     typeKCachedSize = null;  // 清除 Type K 图框缓存
     typeLCachedSize = null;  // 清除 Type L 图框缓存
+    typeMCachedSize = null;  // 清除 Type M 图框缓存
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -327,14 +331,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听窗口大小变化，重新计算预览布局
     window.addEventListener('resize', updateBorder);
     const borderColorSection = document.querySelector('.edit-section:has(#borderColor)');
-    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j' || currentStyle === 'type-k' || currentStyle === 'type-l') ? 'none' : 'block';
+    if (borderColorSection) borderColorSection.style.display = (currentStyle === 'type-b' || currentStyle === 'type-e' || currentStyle === 'type-f' || currentStyle === 'type-g' || currentStyle === 'type-h' || currentStyle === 'type-i' || currentStyle === 'type-j' || currentStyle === 'type-k' || currentStyle === 'type-l' || currentStyle === 'type-m') ? 'none' : 'block';
     
     // 调用对应样式的面板配置模块
     const panelConfigurers = {
       'type-f': configureTypeF, 'type-g': configureTypeG,
       'type-h': configureTypeH, 'type-i': configureTypeI,
       'type-j': configureTypeJ, 'type-k': configureTypeK,
-      'type-l': configureTypeL
+      'type-l': configureTypeL,
+      'type-m': configureTypeM
     };
     panelConfigurers[currentStyle]?.();
     
@@ -681,6 +686,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const lDisplayH = Math.round(lCanvasH * lDisplayScale);
       preview.updateFrameWrapper(lDisplayW, lDisplayH);
       preview.updatePreview(lDisplayW, lDisplayH, {
+        naturalWidth: userImage.naturalWidth,
+        naturalHeight: userImage.naturalHeight
+      });
+      frameWrapper.style.transform = 'none';
+      updateBorderContent();
+    } else if (currentStyle === 'type-m') {
+      // 使用 Type M Preview 模块（与 Type I 相同的缩放逻辑）
+      const frameWrapper = document.getElementById('frameWrapper');
+      const borderContent = document.getElementById('borderContent');
+      preview.init({
+        img: userImage,
+        frameWrapper: frameWrapper,
+        photoFooter: photoFooter,
+        borderContent: borderContent
+      });
+      if (!typeMCachedSize) {
+        typeMCachedSize = preview.calcSize({
+          naturalWidth: userImage.naturalWidth,
+          naturalHeight: userImage.naturalHeight
+        });
+      }
+      const { squareSize: mCanvasW, canvasHeight: mCanvasH } = typeMCachedSize;
+      const mPreviewArea = frameWrapper?.parentElement;
+      const mAvailW = (mPreviewArea?.clientWidth || 500) * 0.96;
+      const mAvailH = (mPreviewArea?.clientHeight || 600) * 0.96;
+      const mDisplayScale = Math.min(mAvailW / mCanvasW, mAvailH / mCanvasH, 1);
+      const mDisplayW = Math.round(mCanvasW * mDisplayScale);
+      const mDisplayH = Math.round(mCanvasH * mDisplayScale);
+      preview.updateFrameWrapper(mDisplayW, mDisplayH);
+      preview.updatePreview(mDisplayW, mDisplayH, {
         naturalWidth: userImage.naturalWidth,
         naturalHeight: userImage.naturalHeight
       });
