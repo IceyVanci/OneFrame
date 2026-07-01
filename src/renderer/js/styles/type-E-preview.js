@@ -170,7 +170,6 @@ export function updatePreview(squareSize, margin, imgDimensions = {}) {
   state.img.style.maxWidth = 'none';
   state.img.style.maxHeight = 'none';
   state.img.style.objectFit = 'cover';
-  state.img.style.objectPosition = 'center center';
   state.img.style.clipPath = 'none';
   state.img.style.transform = 'none';
 
@@ -195,6 +194,9 @@ export function updatePreview(squareSize, margin, imgDimensions = {}) {
 
   // 添加/更新拖动提示文字
   updateDragHint();
+
+  // 应用并钳制当前偏移，确保 DOM 预览与导出状态一致
+  applyImageOffset();
 
 }
 
@@ -382,32 +384,74 @@ export function reset() {
   state.footerHeight = 0;
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 /**
- * 获取图片裁剪区域的最大偏移量（预览像素）
- * 图片使用 object-fit: cover，在预览区域被缩放
- * 可拖动范围 = (原始图片尺寸 - 预览显示尺寸) / 2
+ * 获取 Type E 图片在预览正方形中 object-fit: cover 后的渲染指标
  */
-function getMaxOffset() {
+function getRenderedImageMetrics() {
   const { naturalWidth, naturalHeight } = originalImageDimensions;
+  const displaySize = state.squareSize;
+
+  if (naturalWidth <= 0 || naturalHeight <= 0 || displaySize <= 0) {
+    return {
+      naturalWidth,
+      naturalHeight,
+      displaySize,
+      isPortrait: false,
+      renderedWidth: displaySize,
+      renderedHeight: displaySize,
+      maxOffsetX: 0,
+      maxOffsetY: 0
+    };
+  }
+
   const isPortrait = naturalHeight > naturalWidth;
-  
+  let renderedWidth = displaySize;
+  let renderedHeight = displaySize;
   let maxOffsetX = 0;
   let maxOffsetY = 0;
-  
-  // 预览区域尺寸（squareSize x squareSize）
-  const displaySize = state.squareSize;
-  
+
   if (isPortrait) {
-    // 纵向图片：只能上下拖动
-    // 原始图片高度 > 显示高度，所以可以上下偏移
-    // 可拖动偏移（预览像素）= (原始图片高度 - 显示高度) / 2
-    maxOffsetY = Math.max(0, (naturalHeight - displaySize) / 2);
+    renderedHeight = displaySize * (naturalHeight / naturalWidth);
+    maxOffsetY = Math.max(0, (renderedHeight - displaySize) / 2);
   } else {
-    // 横向/方形图片：只能左右拖动
-    maxOffsetX = Math.max(0, (naturalWidth - displaySize) / 2);
+    renderedWidth = displaySize * (naturalWidth / naturalHeight);
+    maxOffsetX = Math.max(0, (renderedWidth - displaySize) / 2);
   }
-  
+
+  return {
+    naturalWidth,
+    naturalHeight,
+    displaySize,
+    isPortrait,
+    renderedWidth,
+    renderedHeight,
+    maxOffsetX,
+    maxOffsetY
+  };
+}
+
+/**
+ * 获取图片裁剪区域的最大偏移量（预览像素）
+ */
+function getMaxOffset() {
+  const { maxOffsetX, maxOffsetY } = getRenderedImageMetrics();
   return { maxOffsetX, maxOffsetY };
+}
+
+/**
+ * 将图片偏移量限制在当前图片的有效裁剪范围内
+ */
+function clampImageOffset(offset) {
+  const { maxOffsetX, maxOffsetY } = getRenderedImageMetrics();
+
+  return {
+    x: clamp(offset.x || 0, -maxOffsetX, maxOffsetX),
+    y: clamp(offset.y || 0, -maxOffsetY, maxOffsetY)
+  };
 }
 
 /**
@@ -415,7 +459,22 @@ function getMaxOffset() {
  */
 function calculateObjectPosition() {
   const { x, y } = state.imageOffset;
-  return `${50 + (x / state.squareSize) * 100}% ${50 + (y / state.squareSize) * 100}%`;
+  const { maxOffsetX, maxOffsetY } = getRenderedImageMetrics();
+
+  const xPercent = maxOffsetX > 0 ? 50 + (x / maxOffsetX) * 50 : 50;
+  const yPercent = maxOffsetY > 0 ? 50 + (y / maxOffsetY) * 50 : 50;
+
+  return `${clamp(xPercent, 0, 100)}% ${clamp(yPercent, 0, 100)}%`;
+}
+
+/**
+ * 应用当前偏移到图片 DOM，并确保偏移在有效范围内
+ */
+function applyImageOffset() {
+  state.imageOffset = clampImageOffset(state.imageOffset);
+  if (state.img) {
+    state.img.style.objectPosition = calculateObjectPosition();
+  }
 }
 
 /**
@@ -460,10 +519,7 @@ function onDrag(e) {
   }
   
   state.imageOffset = { x: newX, y: newY };
-  
-  // 应用 object-position
-  const newPosition = calculateObjectPosition();
-  state.img.style.objectPosition = newPosition;
+  applyImageOffset();
 }
 
 /**
@@ -498,6 +554,7 @@ export function getState() {
  */
 export function getNormalizedOffset() {
   if (state.squareSize > 0) {
+    state.imageOffset = clampImageOffset(state.imageOffset);
     return {
       x: state.imageOffset.x / state.squareSize,
       y: state.imageOffset.y / state.squareSize
@@ -511,9 +568,7 @@ export function getNormalizedOffset() {
  */
 export function resetImageOffset() {
   state.imageOffset = { x: 0, y: 0 };
-  if (state.img) {
-    state.img.style.objectPosition = '50% 50%';
-  }
+  applyImageOffset();
 }
 
 /**

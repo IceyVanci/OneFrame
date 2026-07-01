@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let typeKCachedSize = null;  // Type K 图框尺寸缓存
   let typeLCachedSize = null;  // Type L 图框尺寸缓存
   let typeMCachedSize = null;  // Type M 图框尺寸缓存
+  let imageLoadSequence = 0;   // 图片加载序号，防止旧异步 EXIF 结果覆盖新选择
 
   async function initLogoGrid() {
     let logos = getAllLogos();
@@ -191,6 +192,19 @@ document.addEventListener('DOMContentLoaded', () => {
     updateBorderContent();
   }
 
+  function formatDateTimeForInput(value) {
+    if (!value) return '';
+    const str = String(value).trim();
+    const parts = str.match(/^(\d{4})[:-](\d{2})[:-](\d{2})[ T](\d{2}):(\d{2})/);
+    if (parts) {
+      return `${parts[1]}-${parts[2]}-${parts[3]}T${parts[4]}:${parts[5]}`;
+    }
+
+    const dt = new Date(str);
+    if (Number.isNaN(dt.getTime())) return '';
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}T${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+  }
+
   async function loadImageWithExif(file) {
     if (currentStyle === 'type-b') {
       const orientation = await checkImageOrientation(file);
@@ -199,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
+    const loadId = ++imageLoadSequence;
     currentFile = file;
     currentImagePath = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
@@ -214,11 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
       URL.revokeObjectURL(userImage.src);
     }
     resetForm();
+    if (currentStyle === 'type-e') {
+      typeEPreview.resetImageOffset();
+    }
     userImage.src = URL.createObjectURL(file);
     try {
-      currentExif = await getExif(file);
+      const exif = await getExif(file);
+      if (loadId !== imageLoadSequence) return false;
+      currentExif = exif;
       updateExifDisplay();
     } catch (error) {
+      if (loadId !== imageLoadSequence) return false;
       currentExif = {};
     }
     return true;
@@ -232,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
+    const loadId = ++imageLoadSequence;
     currentImagePath = imagePath;
     currentFile = null;
     typeFCachedSize = null;  // 清除 Type F 图框缓存
@@ -242,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typeKCachedSize = null;  // 清除 Type K 图框缓存
     typeLCachedSize = null;  // 清除 Type L 图框缓存
     typeMCachedSize = null;  // 清除 Type M 图框缓存
+    let fallbackDateTimeValue = '';
     try {
       const exifTags = await window.electronAPI.readExif(imagePath);
       if (exifTags && Object.keys(exifTags).length > 0) {
@@ -254,22 +277,29 @@ document.addEventListener('DOMContentLoaded', () => {
         currentExif = {};
         const fileMtime = await window.electronAPI.getFileMtime(imagePath);
         if (fileMtime) {
-          const dt = new Date(fileMtime);
-          dateTime.value = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}T${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+          fallbackDateTimeValue = formatDateTimeForInput(fileMtime);
         }
       }
     } catch (error) {
       currentExif = {};
     }
+    if (loadId !== imageLoadSequence) return false;
     resetForm();
+    if (currentStyle === 'type-e') {
+      typeEPreview.resetImageOffset();
+    }
+    updateExifDisplay();
+    if (!currentExif.DateTimeOriginal && fallbackDateTimeValue) {
+      dateTime.value = fallbackDateTimeValue;
+    }
     userImage.src = `file://${imagePath}`;
     if (userImage.complete) {
-      updateExifDisplay();
       updateBorder();
       applyDynamicBackground(userImage);
     } else {
-      userImage.addEventListener('load', () => { updateExifDisplay(); updateBorder(); applyDynamicBackground(userImage); }, { once: true });
+      userImage.addEventListener('load', () => { updateBorder(); applyDynamicBackground(userImage); }, { once: true });
     }
+    return true;
   }
 
   function updateExifDisplay() {
@@ -296,8 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (focal) focalLength.value = focal;
     if (currentExif.ISOSpeedRatings) iso.value = currentExif.ISOSpeedRatings;
     if (currentExif.DateTimeOriginal) {
-      const parts = currentExif.DateTimeOriginal.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2})/);
-      if (parts) dateTime.value = `${parts[1]}-${parts[2]}-${parts[3]}T${parts[4]}:${parts[5]}`;
+      const formattedDateTime = formatDateTimeForInput(currentExif.DateTimeOriginal);
+      if (formattedDateTime) dateTime.value = formattedDateTime;
     }
   }
 
@@ -407,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.onchange = (e) => { if (e.target.files[0]) loadImageWithExif(e.target.files[0]); };
+      input.onchange = async (e) => { if (e.target.files[0]) await loadImageWithExif(e.target.files[0]); };
       input.click();
     }
   });
