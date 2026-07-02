@@ -167,6 +167,19 @@ ipcMain.handle('get-file-mtime', async (event, filePath) => {
   }
 });
 
+// 读取 Sample 目录中的缩略图文件列表
+ipcMain.handle('get-sample-files', async () => {
+  try {
+    const samplePath = path.join(__dirname, '../renderer/Sample');
+    const files = fs.readdirSync(samplePath);
+    const imageFiles = files.filter(f => /\.(jpeg|jpg|png|webp)$/i.test(f));
+    return imageFiles;
+  } catch (error) {
+    console.error('Error reading Sample directory:', error);
+    return [];
+  }
+});
+
 // 在系统浏览器中打开链接
 ipcMain.handle('open-external', async (event, url) => {
   try {

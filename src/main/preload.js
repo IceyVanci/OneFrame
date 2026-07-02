@@ -27,6 +27,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 获取文件修改时间
   getFileMtime: (filePath) => ipcRenderer.invoke('get-file-mtime', filePath),
+
+  // 读取 Sample 目录中的缩略图文件列表
+  getSampleFiles: () => ipcRenderer.invoke('get-sample-files'),
   
   // 在系统浏览器中打开链接
   openExternal: (url) => ipcRenderer.invoke('open-external', url)

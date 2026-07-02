@@ -11,6 +11,7 @@ import { configureEditPanel as configureTypeK } from './components/type-K-editor
 import { configureEditPanel as configureTypeL } from './components/type-L-editor-panel.js';
 import { configureEditPanel as configureTypeM } from './components/type-M-editor-panel.js';
 import { exportImage } from './exporter.js';
+import { initHomepageThumbnails } from './thumbnail-selector.js';
 
 let currentExif = null;
 let currentFile = null;
@@ -918,16 +919,9 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSave.addEventListener('click', exportImageHandler);
   document.getElementById('btnExport')?.addEventListener('click', exportImageHandler);
   document.getElementById('btnExportTop')?.addEventListener('click', exportImageHandler);
+  initHomepageThumbnails(styleCards).catch(console.warn);
   initLogoGrid();
 
-  document.querySelectorAll('.style-preview .frame-container img').forEach(img => {
-    img.addEventListener('load', function() {
-      const footer = this.nextElementSibling;
-      if (footer?.classList.contains('photo-footer')) {
-        footer.style.height = `${Math.round(Math.min(this.clientWidth, this.clientHeight) * 0.12)}px`;
-      }
-    });
-  });
 
 
   // ========== 关于模态框逻辑 ==========
