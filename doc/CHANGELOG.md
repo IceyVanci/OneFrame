@@ -1,5 +1,23 @@
 # OneFrame 更新日志
 
+## v1.1.4 (2026-07-03)
+
+### ⚡ 性能优化
+
+#### Manifest 清单法优化首页缩略图
+- 新增 `sample-manifest.json` 静态清单文件，替代暴力探测（2,574→1 次请求）
+- 首页样式卡片 `<img>` 改为透明 GIF 占位符 + `data-fallback-src`，消除页面加载闪烁
+- 重写 `thumbnail-selector.js`（287→195 行），采用三级回退策略：manifest 清单 → IPC 文件列表 → data-fallback-src
+- 新增 `get-sample-manifest` IPC 端点和 `getSampleManifest` API
+- 新增 `scripts/generate-manifest.js` 自动生成脚本，集成到 `dev`/`build` 命令
+
+### 📝 文档
+
+- 新增 `doc/V1.14_CHANGES.md` 详细修改记录
+- 版本号更新至 v1.1.4
+
+---
+
 ## v1.1.3 (2026-07-02)
 
 ### ✨ 新功能
