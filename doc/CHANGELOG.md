@@ -1,5 +1,31 @@
 # OneFrame 更新日志
 
+## v1.1.3 (2026-07-02)
+
+### ✨ 新功能
+
+#### 首页缩略图随机选择
+- 新增首页缩略图随机选择机制，每次页面加载时样式卡片从 `Sample/` 目录随机选择不同 ID 的缩略图
+- Fisher-Yates 洗牌 + 全局去重分配，同屏不同样式不使用相同原始图片
+- 新增 `thumbnail-selector.js` 缩略图选择器模块
+- 新增 Electron IPC `get-sample-files` 端点，主进程直接读取目录文件列表，避免逐个探测
+- 浏览器环境回退到 Image 对象探测模式
+
+### 🐛 Bug 修复
+
+- 修复首页样式卡片 `<img src>` 指向不存在的根目录文件导致全部 404
+- 修复 `checkFileExists()` 在 Electron `file://` 协议下无法探测本地文件（改用 Image 对象）
+- 修复 `buildStyleThumbnailMeta()` 回退路径缺少 `Sample/` 前缀
+- 修复首页样式卡片图片下方多余白色边框区域（移除首页 photo-footer 元素）
+
+### 📝 文档
+
+- 新增 `doc/V1.13_CHANGES.md` 详细修改记录
+- 更新 `doc/RELEASE.md` 添加 v1.1.3 发布说明
+- 版本号更新至 v1.1.3
+
+---
+
 ## v1.1.2 (2026-07-01)
 
 ### 🐛 Bug 修复
