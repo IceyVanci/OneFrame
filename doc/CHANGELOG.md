@@ -1,5 +1,64 @@
 # OneFrame 更新日志
 
+## v1.1.2 (2026-07-01)
+
+### 🐛 Bug 修复
+
+#### Type E 预览拖动边界修复
+- 建立统一"预览像素偏移模型"，新增 `getRenderedImageMetrics()` 根据 `object-fit: cover` 后实际渲染尺寸计算可拖动范围
+- 新增 `clamp()`、`clampImageOffset()`、`applyImageOffset()` 统一限制偏移量
+- 重写 `calculateObjectPosition()`，将偏移量映射到有效 `0%-100%` 范围
+- 修复图片可拖出有效选框区域的问题
+
+#### Type E 导出偏移方向修复
+- 导出端绘制偏移符号从 `+` 改为 `-`，与 CSS 预览端保持偏移语义一致
+- 修复导出裁剪区域与预览相反的问题
+
+#### Type E 重选图片 EXIF 刷新修复
+- 新增 `imageLoadSequence` 加载序号，防止旧异步 EXIF 结果覆盖新选择
+- 新增 `formatDateTimeForInput()` 统一日期格式转换
+- 修复 Electron 路径下无 EXIF 时文件修改时间回退被清空的问题
+- 修复浏览器路径重选未 `await` 异步 EXIF 读取的问题
+- Type E 新图片加载时自动调用 `typeEPreview.resetImageOffset()`
+
+### 📝 文档
+
+- 新增 `doc/V1.12_CHANGES.md` 详细修改记录
+- 版本号更新至 v1.1.2
+
+---
+
+## v1.1.1 (2026-06-30)
+
+### ✨ 新功能
+
+#### 新增 Type M 模糊边框样式
+- 第十三种边框样式：照片 90%×90% 居中，四条边等高模糊背景
+- 顶部 Logo（类似 Type J），底部署名 + 参数行三栏（类似 Type J）
+- 导入图像应用 12px 圆角
+- 新建 5 个文件：CSS、预览、导出、编辑面板配置、缩略图
+
+#### 关于界面调整
+- 删除模态框中"技术栈"行（`Electron 28 + 原生 HTML/CSS/JS`）
+- GitHub、Bilibili、Instagram 使用文本超链接
+- 链接点击从系统默认浏览器打开（`shell.openExternal` + IPC）
+
+### 🎨 优化
+
+#### Type L 导出模糊背景缩放修复
+- `drawBlurredBackground()` 添加 1.5x 缩放，与预览端 CSS `transform: scale(1.5)` 一致
+- 修复导出图片模糊背景边缘可能出现的黑边/透明边
+
+#### 样式 B/F/G/L/M 图片圆角
+- 预览端 CSS 添加 `border-radius: 12px`
+- 导出端 Canvas 使用 `ctx.roundRect()` + `ctx.clip()` 裁剪，圆角按画布宽度等比缩放
+
+### 📝 文档
+
+- 新增 `doc/V1.11_CHANGES.md` 详细修改记录
+
+---
+
 ## v1.1.0 (2026-06-29)
 
 ### ✨ 新功能
