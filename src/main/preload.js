@@ -30,6 +30,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 读取 Sample 目录中的缩略图文件列表
   getSampleFiles: () => ipcRenderer.invoke('get-sample-files'),
+
+  // 读取 sample-manifest.json 清单
+  getSampleManifest: () => ipcRenderer.invoke('get-sample-manifest'),
   
   // 在系统浏览器中打开链接
   openExternal: (url) => ipcRenderer.invoke('open-external', url)

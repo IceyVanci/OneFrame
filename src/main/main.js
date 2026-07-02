@@ -180,6 +180,18 @@ ipcMain.handle('get-sample-files', async () => {
   }
 });
 
+// 读取 sample-manifest.json 清单
+ipcMain.handle('get-sample-manifest', async () => {
+  try {
+    const manifestPath = path.join(__dirname, '../renderer/Sample/sample-manifest.json');
+    const content = fs.readFileSync(manifestPath, 'utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    console.error('Error reading sample manifest:', error);
+    return null;
+  }
+});
+
 // 在系统浏览器中打开链接
 ipcMain.handle('open-external', async (event, url) => {
   try {
