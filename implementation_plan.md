@@ -1,206 +1,156 @@
-﻿# OneFrame Manifest 清单优化计划
+﻿# Implementation Plan
 
-**版本**: v1.1.4  
-**日期**: 2026-07-02  
-**状态**: 待实施
+## [Overview]
 
----
+基于 Type G 样式创建新的 Type N 样式，修改边框布局：底部白色边框高度减半，顶部新增与底部等高的白色边框（Logo 移入顶部），删除时间和机型显示，保留拍摄参数和署名。Type N 与 Type G 共享左右图框比例（92% 宽度，左右各 4%），但上下边框对称分配。
 
-## 一、背景
+**Type G 当前布局（横向）：**
+- 顶部：5% 白色留白
+- 照片区：92% 宽 × 80% 高（top:5%, left:4%）
+- 底部：15% 文字区（Logo + 日期|参数|机型 + 署名）
 
-### 当前实现
+**Type N 目标布局（横向）：**
+- 顶部：7.5% 白色边框（Logo 居中）
+- 照片区：92% 宽 × 85% 高（top:7.5%, left:4%）
+- 底部：7.5% 文字区（参数 + 署名，无日期、无机型）
 
-`thumbnail-selector.js`（287 行）采用两种策略为首页 13 个样式卡片选取随机缩略图：
+**Type N 目标布局（纵向）：**
+- 顶部：3.75% 白色边框（Logo 居中）
+- 照片区：92% 宽 × 92.5% 高（top:3.75%, left:4%）
+- 底部：3.75% 文字区（参数 + 署名）
 
-| 策略 | 条件 | 请求次数 | 适用环境 |
-|------|------|---------|---------|
-| IPC 高效模式 | `window.electronAPI.getSampleFiles` 可用 | 1 次 IPC + 内存筛选 | Electron |
-| Image 探测回退模式 | IPC 不可用 | 最多 99×2×13 = 2,574 次 | 浏览器 |
+## [Types]
 
-### 问题
+Type N 的数据结构与 Type G 完全一致，不需要新增类型定义。所有 settings 传参复用现有结构，仅在预览/导出渲染时忽略 `dateTime`、`customModel` 字段。
 
-1. **首页闪烁**：HTML `<img src>` 直接指向 `Sample/` 下的默认图片，浏览器先加载默认图，随机化完成后再次替换，导致图片闪烁两次。
-2. **回退模式性能差**：虽然 Electron 环境下走 IPC 高效模式，但如果 IPC 失败回退到 Image 探测，2,574 次加载请求会导致严重卡顿。
-3. **代码冗余**：`getDefaultImageIdList()`、`collectCandidatesForStyle()`、`checkFileExists()` 等函数仅用于回退模式，维护成本高。
+## [Files]
 
-### 优化目标
+### 新建文件（4 个）
 
-用 **manifest 清单法** 替代暴力探测，同时引入透明占位符消除闪烁。
+1. **`src/renderer/css/type-N.css`** — Type N 的 CSS 样式
+   - 基于 `type-G.css` 修改
+   - `.frame-wrapper.type-n` 白色背景，block 布局
+   - 照片区 `top: 7.5%`（横向）/ `top: 3.75%`（纵向，由 JS 覆盖）
+   - `.border-content` 分为两部分：顶部 `.type-n-top`（Logo）+ 底部 `.type-n-bottom`（参数+署名）
+   - 文字行样式 `.type-n-line`, `.type-n-line1`(参数), `.type-n-line2`(署名)
 
----
+2. **`src/renderer/js/styles/type-N-preview.js`** — Type N 预览模块
+   - 基于 `type-G-preview.js` 修改
+   - `calcSize()`: 横向照片占 85%（canvasHeight = naturalHeight / 0.85），纵向占 92.5%（canvasHeight = naturalHeight / 0.925）
+   - `updateFrameWrapper()`: 类名切换为 `type-n`
+   - `updatePreview()`: 纵向图片覆盖 CSS top/height
+   - `updateContentPreview()`:
+     - 顶部区域：仅显示 Logo（居中）
+     - 底部区域：仅显示参数行（日期 | 参数，无机型）+ 署名行
+     - 布局使用绝对定位（与 Type G 一致）
+   - `reset()`: 清理 type-n 类名
 
-## 二、性能分析（Electron 环境）
+3. **`src/renderer/js/styles/type-N-export.js`** — Type N 导出渲染模块
+   - 基于 `type-G-export.js` 修改
+   - `renderImage()`: 画布高度 = naturalHeight / 0.85（横向）/ 0.925（纵向）
+   - 照片区域：top 7.5%（横向）/ 3.75%（纵向），left 4%，width 92%，height 85%/92.5%
+   - `drawBorderContent()`: 
+     - 绘制顶部 Logo（居中于顶部 7.5% 区域）
+     - 绘制底部参数行（f/xx xxmm xxs ISOxxxx，无日期、无机型）
+     - 绘制底部署名行
+   - 不绘制日期时间、不绘制机型名称
 
-### Electron 环境下的实际影响
+4. **`src/renderer/js/components/type-N-editor-panel.js`** — Type N 编辑面板配置
+   - 基于 `type-G-editor-panel.js` 修改
+   - 隐藏：边框颜色、边框高度、比例、时间开关及输入框、设备型号输入框
+   - 显示：Logo 设置区域
+   - 隐藏所有显示开关（与 Type G 一致，Type N 默认显示所有保留元素）
 
-当前 Electron 模式已通过 IPC `getSampleFiles`（`fs.readdirSync`）获取文件列表，性能已经不错。Manifest 优化对 Electron 的主要收益：
+### 修改文件（5 个）
 
-| 维度 | 优化前（IPC） | 优化后（manifest） | 收益 |
-|------|-------------|-------------------|------|
-| IPC 调用 | 1 次 `getSampleFiles`（读目录） | 1 次 `getSampleManifest`（读 JSON） | **微乎其微**（两者都是单次 fs 操作） |
-| 回退路径 | Image 探测（2,574 次） | 用 `data-fallback-src` 直接回退 | **消除极端回退风险** |
-| 首页闪烁 | 有（先显示默认图，再替换） | **无**（透明占位 → 一次性写入） | **用户体验明显提升** |
-| 代码行数 | 287 行 | ~160 行 | **维护性提升** |
+5. **`src/renderer/index.html`**
+   - 在 `<head>` 中添加 `<link rel="stylesheet" href="css/type-N.css">`
+   - 在样式卡片列表中添加 Type N 卡片（第 14 个，data-style="type-n"）
 
-### 结论
+6. **`src/renderer/js/styles/index.js`**
+   - 导入 `typeNPreview` 和 `typeNExport`
+   - 在 `styles` 注册表中添加 `'type-n'` 条目
+   - 重新导出 `typeNPreview`
 
-**对 Electron 纯桌面环境，manifest 的性能提升有限**（IPC 模式已经高效），主要价值是：
-1. ✅ **消除首页闪烁**（透明 GIF 占位符）
-2. ✅ **简化代码**（移除 ~130 行回退探测逻辑）
-3. ✅ **消除极端回退风险**（不再有 2,574 次 Image 加载的可能性）
+7. **`src/renderer/js/exporter.js`**
+   - 导入 `typeNExport`
+   - 在 `exportStyles` 中添加 `'type-n': typeNExport`
 
-**对 Web/NAS 部署环境，manifest 的性能提升显著**（从最多 2,574 次请求降到 1 次 fetch）。
+8. **`src/renderer/js/app.js`**
+   - 导入 `configureTypeN`
+   - 添加 `typeNCachedSize` 变量
+   - 在 `loadImageWithExif` 和 `loadImageInElectron` 中清除 `typeNCachedSize`
+   - 在 `showEditor()` 的 `borderColorSection` 条件中添加 `type-n`
+   - 在 `panelConfigurers` 中添加 `'type-n': configureTypeN`
+   - 在 `updateBorder()` 中添加 `type-n` 分支（与 type-g 相同的缩放逻辑）
 
----
+9. **`scripts/generate-manifest.js`**
+   - 无需修改（自动扫描 Sample 目录，只要放置 Type N 示例图片即可）
 
-## 三、改动范围
+## [Functions]
 
-### 3.1 新建文件
+### 新建函数
 
-#### `src/renderer/Sample/sample-manifest.json`
+**`src/renderer/js/styles/type-N-preview.js`:**
+- `init(elements)` — 初始化 DOM 元素引用（与 Type G 相同结构）
+- `calcSize(settings)` — 计算画布尺寸（横向 85%，纵向 92.5%）
+- `updateFrameWrapper(squareSize, canvasHeight)` — 设置 frameWrapper 样式，类名切换为 type-n
+- `updatePreview(squareSize, canvasHeight, imgDimensions)` — 重置图片样式，纵向覆盖 CSS
+- `updateContentPreview(elements, settings)` — 渲染顶部 Logo + 底部参数+署名
+- `reset()` — 清理 type-n 相关内联样式和类名
 
-静态 JSON 清单，列出所有实际存在的样本文件按样式分组：
+**`src/renderer/js/styles/type-N-export.js`:**
+- `loadFonts()` — 加载 MiSans 字体（与 Type G 相同）
+- `drawText(ctx, text, x, y, fontSize, options)` — 绘制文字（与 Type G 相同）
+- `drawBorderContent(ctx, canvasWidth, canvasHeight, settings, fonts, isPortrait)` — 绘制 Type N 边框内容（Logo 顶部居中 + 底部参数行 + 署名行）
+- `drawLogoN(ctx, logoName, centerX, centerY, maxHeight)` — 绘制 Logo（与 drawLogoG 相同）
+- `renderImage(img, options)` — 主渲染函数，绘制白色背景+照片+边框内容
 
-```json
-{
-  "version": 1,
-  "generated": "2026-07-02",
-  "samples": {
-    "TypeA": ["001", "022", "032"],
-    "TypeB": ["002", "017", "028"],
-    "TypeC": ["003", "020", "027"],
-    "TypeD": ["005", "018"],
-    "TypeE": ["006", "024"],
-    "TypeF": ["007", "026", "029"],
-    "TypeG": ["008"],
-    "TypeH": ["009", "011", "031"],
-    "TypeI": ["010", "023"],
-    "TypeJ": ["011", "012", "016"],
-    "TypeK": ["006", "014", "030"],
-    "TypeL": ["015", "030"],
-    "TypeM": ["013", "016", "022", "029"]
-  }
-}
-```
+**`src/renderer/js/components/type-N-editor-panel.js`:**
+- `configureEditPanel()` — 配置编辑面板，隐藏不需要的控件
 
-共 34 个样本文件，覆盖全部 13 种样式。
+### 修改函数
 
-### 3.2 修改文件
+**`src/renderer/js/app.js`:**
+- `updateBorder()` — 添加 `else if (currentStyle === 'type-n')` 分支，使用与 type-g 相同的缩放逻辑（calcSize + 缓存 + displayScale）
+- `loadImageWithExif()` — 添加 `typeNCachedSize = null`
+- `loadImageInElectron()` — 添加 `typeNCachedSize = null`
+- `showEditor()` — 在 borderColor 条件和 panelConfigurers 中添加 type-n
 
-#### `src/main/main.js`
+## [Classes]
 
-新增 IPC handler `get-sample-manifest`：
+无新增或修改类。Type N 使用与 Type G 相同的函数式模块模式（导出函数 + state 对象）。
 
-```javascript
-ipcMain.handle('get-sample-manifest', async () => {
-  try {
-    const manifestPath = path.join(__dirname, '..', 'renderer', 'Sample', 'sample-manifest.json');
-    const content = fs.readFileSync(manifestPath, 'utf-8');
-    return JSON.parse(content);
-  } catch {
-    return null;
-  }
-});
-```
+## [Dependencies]
 
-保留现有 `get-sample-files` handler 作为兼容回退。
+无新增依赖。Type N 复用现有依赖：
+- opentype.js（字体渲染）
+- MiSans 字体文件
+- piexifjs（EXIF 处理）
 
-#### `src/main/preload.js`
+## [Testing]
 
-新增 API 方法：
+手动测试步骤：
+1. 启动应用，确认 Type N 样式卡片出现在首页
+2. 选择 Type N 样式并加载横向图片：
+   - 确认顶部 7.5% 白色边框内 Logo 居中显示
+   - 确认照片区域占 85% 高度，92% 宽度，左右各 4%
+   - 确认底部 7.5% 区域显示参数（f/xx xxmm xxs ISOxxxx）和署名
+   - 确认不显示日期时间和机型
+3. 加载纵向图片：
+   - 确认顶部 3.75% / 底部 3.75% / 照片 92.5% 布局正确
+4. 测试 Logo 切换、参数编辑、署名编辑
+5. 测试导出功能，确认导出图片布局与预览一致
+6. 测试"换个模板"回到首页再重新选择 Type N
 
-```javascript
-getSampleManifest: () => ipcRenderer.invoke('get-sample-manifest'),
-```
+## [Implementation Order]
 
-#### `src/renderer/index.html`
-
-将 13 个样式卡片的 `<img>` 从实际图片路径改为透明 GIF 占位符 + `data-fallback-src`：
-
-```html
-<!-- 之前 -->
-<img src="Sample/022-TypeA-sample_compressed.jpeg" alt="示例图片" class="preview-image">
-
-<!-- 之后 -->
-<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-     data-fallback-src="Sample/022-TypeA-sample_compressed.jpeg"
-     alt="示例图片" class="preview-image">
-```
-
-同时更新 About 对话框版本号为 v1.1.4。
-
-#### `src/renderer/js/thumbnail-selector.js`（重写，287 行 → ~160 行）
-
-**新增函数：**
-
-- `fetchManifest()` — 通过 IPC 获取 manifest，失败时尝试 `fetch`（Web 兼容），返回解析后的 JSON 或 null
-- `selectRandomFromManifest(manifest, metaList)` — 从清单中为每个样式随机选取缩略图，Fisher-Yates 洗牌 + 全局 imageId 去重
-
-**移除函数：**
-
-- `getDefaultImageIdList()` — 不再需要遍历 99 个 ID
-- `collectCandidatesForStyle()` — 不再需要逐个 Image 探测
-- `checkFileExists()` — 不再作为主要探测手段
-
-**保留函数：**
-
-- `styleIdToTypeName()` — styleId 到 TypeName 转换
-- `buildCandidatePath()` — 构建候选路径
-- `isValidSampleFilename()` — 文件名校验
-- `shuffle()` — Fisher-Yates 洗牌
-- `collectCandidatesFromFileList()` — 保留作为回退（IPC 文件列表模式）
-- `assignUniqueIdThumbnails()` — 全局去重分配
-- `buildStyleThumbnailMeta()` — 增加 `data-fallback-src` 优先读取逻辑
-
-**主入口 `initHomepageThumbnails()` 新流程：**
-
-```
-1. 获取 manifest（IPC 优先，fetch 回退）
-2. 成功 → selectRandomFromManifest() 内存随机选取
-3. 失败 → 回退到 getSampleFiles（现有 IPC 文件列表）
-4. 再失败 → 使用 data-fallback-src 回退图片
-```
-
----
-
-## 四、版本更新
-
-| 文件 | 变更 |
-|------|------|
-| `package.json` | version → 1.1.4 |
-| `src/renderer/index.html` | About 对话框版本号 → v1.1.4 |
-| `doc/CHANGELOG.md` | 新增 v1.1.4 条目 |
-| `doc/V1.14_CHANGES.md` | 新建，详细变更记录 |
-| `doc/RELEASE.md` | 新增 v1.1.4 发布说明 |
-| `README.md` | 版本号更新，添加 manifest 特性说明 |
-
----
-
-## 五、实施步骤
-
-1. 基于 Sample/ 目录现有 34 个文件生成 `sample-manifest.json`
-2. 在 `main.js` 添加 `get-sample-manifest` IPC handler
-3. 在 `preload.js` 添加 `getSampleManifest` API
-4. 重写 `thumbnail-selector.js` 使用 manifest 优先策略
-5. 修改 `index.html` 使用透明 GIF 占位符 + data-fallback-src
-6. 更新版本号和文档
-7. 构建并测试
-
----
-
-## 六、维护说明
-
-当添加或删除 Sample 目录中的样本图片后，需要更新 `sample-manifest.json`。可用以下命令自动生成：
-
-```powershell
-$files = Get-ChildItem src/renderer/Sample/*_compressed.jpeg -Name
-$samples = @{}
-foreach ($f in $files) {
-  if ($f -match '^(\d+)-Type([A-Z])-sample_compressed\.jpeg$') {
-    $id = $matches[1]; $type = "Type$($matches[2])"
-    if (-not $samples[$type]) { $samples[$type] = @() }
-    $samples[$type] += $id
-  }
-}
-@{ version = 1; generated = (Get-Date -Format 'yyyy-MM-dd'); samples = $samples } |
-  ConvertTo-Json -Depth 3 | Set-Content src/renderer/Sample/sample-manifest.json -Encoding UTF8
+1. 创建 `src/renderer/css/type-N.css`
+2. 创建 `src/renderer/js/styles/type-N-preview.js`
+3. 创建 `src/renderer/js/styles/type-N-export.js`
+4. 创建 `src/renderer/js/components/type-N-editor-panel.js`
+5. 修改 `src/renderer/index.html`（添加 CSS 链接 + 样式卡片）
+6. 修改 `src/renderer/js/styles/index.js`（注册 Type N）
+7. 修改 `src/renderer/js/exporter.js`（注册 Type N 导出）
+8. 修改 `src/renderer/js/app.js`（添加 Type N 分支逻辑）
+9. 手动测试验证
