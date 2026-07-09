@@ -2,7 +2,7 @@
 
 一款简洁优雅的图片边框添加工具，为您的照片自动添加精美的底部边框，并智能显示相机 EXIF 信息。
 
-![OneFrame](https://img.shields.io/badge/version-1.1.4-blue.svg)
+![OneFrame](https://img.shields.io/badge/version-1.1.5-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Electron](https://img.shields.io/badge/Electron-28.0.0-47848F.svg)
 
@@ -36,6 +36,7 @@
 - **Type K**：左下角 Logo + 双行文字 - Logo 在底部左下角，右侧第一行署名+日期，第二行机型+参数
 - **Type L**：高斯模糊背景 - 照片高斯模糊铺满画布，中部 92%×80% 清晰照片，底部文字信息区
 - **Type M**：模糊边框+顶部Logo+底部署名 - 照片 90%×90% 居中，四条边等高高斯模糊背景，顶部 Logo，底部署名+参数行三栏
+- **Type N**：上下对称边框 - 顶部 Logo 居中，中部照片区，底部参数+署名，无时间和机型显示
 
 ### 🎲 首页随机缩略图
 - 首页样式卡片每次加载时从 `Sample/` 目录中随机选择不同图片作为缩略图
